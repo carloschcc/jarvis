@@ -52,16 +52,20 @@ $db = new SimpleFileDB();
 // Função para obter configurações LDAP
 function getLdapConfig() {
     global $db;
-    return $db->load('ldap_config', [
-        'server' => '',
-        'port' => DEFAULT_LDAP_PORT,
-        'domain' => '',
-        'base_dn' => '',
-        'admin_user' => '',
+    
+    // Configuração padrão para demonstração
+    $defaultConfig = [
+        'server' => 'servidor.empresa.com.br',
+        'port' => 389,
+        'domain' => 'empresa.com.br',
+        'base_dn' => 'DC=empresa,DC=com,DC=br',
+        'admin_user' => 'admin@empresa.com.br',
         'admin_pass' => '',
-        'use_ssl' => DEFAULT_LDAP_USE_SSL,
+        'use_ssl' => false,
         'configured' => false
-    ]);
+    ];
+    
+    return $db->load('ldap_config', $defaultConfig);
 }
 
 // Função para salvar configurações LDAP
