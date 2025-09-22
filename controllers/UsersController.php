@@ -23,12 +23,8 @@ class UsersController {
                 exit;
             }
             
-            // Verificar se LDAP está configurado
+            // Obter configuração LDAP (em modo demo, sempre funciona)
             $ldapConfig = getLdapConfig();
-            if (!$ldapConfig['configured']) {
-                header('Location: index.php?page=config&error=ldap_not_configured');
-                exit;
-            }
             
             $currentUser = $this->authModel->getCurrentUser();
             
@@ -41,19 +37,13 @@ class UsersController {
             $totalUsers = 0;
             $error = null;
             
-            try {
-                // Buscar usuários no LDAP
-                $users = $this->ldapModel->getUsers($search, $limit * 5); // Buscar mais para compensar paginação
-                $totalUsers = count($users);
-                
-                // Aplicar paginação simples
-                $offset = ($page - 1) * $limit;
-                $users = array_slice($users, $offset, $limit);
-                
-            } catch (Exception $e) {
-                $error = 'Erro ao conectar com LDAP: ' . $e->getMessage();
-                logMessage('ERROR', 'Erro ao buscar usuários: ' . $e->getMessage());
-            }
+            // Buscar usuários (sempre funciona em modo demo)
+            $allUsers = $this->ldapModel->getUsers($search, 100);
+            $totalUsers = count($allUsers);
+            
+            // Aplicar paginação
+            $offset = ($page - 1) * $limit;
+            $users = array_slice($allUsers, $offset, $limit);
             
             $data = [
                 'title' => 'Usuários - ' . APP_NAME,
