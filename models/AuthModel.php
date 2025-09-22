@@ -15,10 +15,18 @@ class AuthModel {
      */
     public function authenticate($username, $password) {
         try {
+            // Log para debug
+            error_log("DEBUG: Tentativa de login - Usuario: $username, Senha: [HIDDEN]");
+            error_log("DEBUG: DEFAULT_ADMIN_USER: " . DEFAULT_ADMIN_USER);
+            error_log("DEBUG: DEFAULT_ADMIN_PASS: " . DEFAULT_ADMIN_PASS);
+            
             // Verificar se é o admin padrão
             if ($this->isDefaultAdmin($username, $password)) {
+                error_log("DEBUG: Login admin padrão detectado");
                 return $this->loginDefaultAdmin();
             }
+            
+            error_log("DEBUG: Não é admin padrão, verificando LDAP...");
             
             // Verificar se LDAP está configurado
             $ldapConfig = getLdapConfig();

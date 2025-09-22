@@ -1,0 +1,10 @@
+[
+    {
+        "id": "68d1a2cbbe247",
+        "timestamp": "2025-09-22 16:26:03",
+        "action": "LOGIN",
+        "user": "admin",
+        "details": "Login como administrador padr\u00e3o",
+        "ip": "10.12.214.222"
+    }
+]

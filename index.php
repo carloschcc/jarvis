@@ -47,8 +47,8 @@ spl_autoload_register(function ($class) {
 $page = $_GET['page'] ?? 'login';
 $action = $_GET['action'] ?? 'index';
 
-// Verificar se usuário está logado (exceto para login)
-if ($page !== 'login' && !isset($_SESSION['user_logged'])) {
+// Verificar se usuário está logado (exceto para login e auth)
+if ($page !== 'login' && $page !== 'auth' && !isset($_SESSION['user_logged'])) {
     header('Location: index.php?page=login');
     exit;
 }
