@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AD Manager - Sistema de Gestão Active Directory</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-users-cog"></i>
+                    AD Manager
+                </div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="user-name">Demonstração</div>
+                        <div class="user-type">
+                            <i class="fas fa-crown"></i> Sistema
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegação -->
+    <nav class="navigation">
+        <div class="container">
+            <div class="nav-container">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#dashboard" class="nav-link active">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#users" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            Usuários
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#config" class="nav-link">
+                            <i class="fas fa-cogs"></i>
+                            Configurações
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Conteúdo principal -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Cabeçalho da página -->
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-tachometer-alt"></i>
+                    AD Manager - Demonstração
+                </h1>
+                <p class="page-subtitle">
+                    Sistema completo de gestão de usuários Active Directory desenvolvido em PHP
+                </p>
+            </div>
+
+            <!-- Alerta de demonstração -->
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>Demonstração Visual:</strong> Esta é uma prévia estática do sistema AD Manager. 
+                Para funcionalidade completa, instale em servidor XAMPP com PHP+LDAP.
+            </div>
+
+            <!-- Cartões de estatísticas -->
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-number">1.245</div>
+                    <div class="stat-label">Total de Usuários</div>
+                </div>
+                
+                <div class="stat-card success">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-number">1.189</div>
+                    <div class="stat-label">Usuários Ativos</div>
+                </div>
+                
+                <div class="stat-card danger">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-times"></i>
+                    </div>
+                    <div class="stat-number">56</div>
+                    <div class="stat-label">Usuários Bloqueados</div>
+                </div>
+                
+                <div class="stat-card success">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-number">
+                        <span class="status status-configurado">OK</span>
+                    </div>
+                    <div class="stat-label">Configuração LDAP</div>
+                </div>
+            </div>
+
+            <!-- Funcionalidades -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-star"></i>
+                        Principais Funcionalidades
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions">
+                        <div class="quick-action">
+                            <i class="fas fa-users"></i>
+                            <span>Gerenciar Usuários AD</span>
+                        </div>
+                        
+                        <div class="quick-action">
+                            <i class="fas fa-cogs"></i>
+                            <span>Configurações LDAP</span>
+                        </div>
+                        
+                        <div class="quick-action">
+                            <i class="fas fa-sync"></i>
+                            <span>Sincronização Tempo Real</span>
+                        </div>
+                        
+                        <div class="quick-action">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Segurança Avançada</span>
+                        </div>
+                        
+                        <div class="quick-action">
+                            <i class="fas fa-key"></i>
+                            <span>Reset de Senhas</span>
+                        </div>
+                        
+                        <div class="quick-action">
+                            <i class="fas fa-download"></i>
+                            <span>Exportar Dados CSV</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Características técnicas -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-code"></i>
+                            Tecnologias Utilizadas
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <ul style="margin: 0; padding-left: 20px;">
+                            <li><strong>Backend:</strong> PHP 7.4+ com extensão LDAP</li>
+                            <li><strong>Frontend:</strong> HTML5, CSS3, JavaScript ES6</li>
+                            <li><strong>Design:</strong> Estilo Hyper-V Manager</li>
+                            <li><strong>Segurança:</strong> CSRF, XSS protection</li>
+                            <li><strong>Arquitetura:</strong> MVC organizado</li>
+                            <li><strong>Compatibilidade:</strong> XAMPP, Apache, Nginx</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-server"></i>
+                            Informações do Sistema
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <tr><td><strong>Versão:</strong></td><td>AD Manager v1.0.0</td></tr>
+                            <tr><td><strong>Arquivos:</strong></td><td>22 arquivos PHP/CSS/JS</td></tr>
+                            <tr><td><strong>Linhas de Código:</strong></td><td>~6.000 linhas</td></tr>
+                            <tr><td><strong>Status:</strong></td><td><span class="status status-ativo">Demonstração</span></td></tr>
+                            <tr><td><strong>Ambiente:</strong></td><td>Pronto para produção</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instruções de instalação -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-rocket"></i>
+                        Como Instalar em Produção
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div>
+                            <h5><i class="fas fa-download text-primary"></i> 1. Preparar Ambiente</h5>
+                            <ul style="font-size: 13px; margin: 0; padding-left: 20px;">
+                                <li>Instalar XAMPP no Windows</li>
+                                <li>Habilitar extensão LDAP no PHP</li>
+                                <li>Configurar Apache virtual host</li>
+                                <li>Reiniciar serviços</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h5><i class="fas fa-upload text-success"></i> 2. Instalar Sistema</h5>
+                            <ul style="font-size: 13px; margin: 0; padding-left: 20px;">
+                                <li>Extrair arquivos para htdocs</li>
+                                <li>Configurar permissões da pasta</li>
+                                <li>Acessar via navegador</li>
+                                <li>Login: admin / admin123</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h5><i class="fas fa-cogs text-warning"></i> 3. Configurar LDAP</h5>
+                            <ul style="font-size: 13px; margin: 0; padding-left: 20px;">
+                                <li>Ir em "Configurações"</li>
+                                <li>Inserir dados do servidor AD</li>
+                                <li>Testar conexão LDAP</li>
+                                <li>Salvar configurações</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="footer" style="background: var(--light-gray); padding: 20px 0; margin-top: 40px; border-top: 1px solid var(--medium-gray);">
+        <div class="container">
+            <div class="text-center text-muted">
+                <p style="margin: 0;">
+                    <strong>AD Manager v1.0.0</strong> - Sistema Profissional de Gestão de Usuários Active Directory
+                </p>
+                <p style="margin: 5px 0 0 0; font-size: 12px;">
+                    Desenvolvido em PHP com design estilo Hyper-V Manager | 
+                    Arquitetura MVC | Segurança Enterprise | Pronto para Produção
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // Demonstração interativa simples
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animar estatísticas
+        const numbers = document.querySelectorAll('.stat-number');
+        numbers.forEach(num => {
+            const text = num.textContent;
+            if (!isNaN(text.replace(/,/g, ''))) {
+                const finalNumber = parseInt(text.replace(/,/g, ''));
+                animateNumber(num, finalNumber);
+            }
+        });
+
+        // Efeitos hover nos cards
+        const cards = document.querySelectorAll('.stat-card, .quick-action');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+
+    function animateNumber(element, target) {
+        let current = 0;
+        const increment = target / 100;
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                element.textContent = target.toLocaleString();
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(current).toLocaleString();
+            }
+        }, 20);
+    }
+
+    // Simular notificação de boas-vindas
+    setTimeout(() => {
+        if (typeof Notifications !== 'undefined') {
+            Notifications.info('Bem-vindo ao AD Manager! Sistema de demonstração carregado.', 5000);
+        }
+    }, 1000);
+    </script>
+</body>
+</html>
