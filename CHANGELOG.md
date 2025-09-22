@@ -1,129 +1,119 @@
-# Changelog - AD Manager
+# 📝 Changelog
+All notable changes to AD Manager project will be documented in this file.
 
-Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2024-09-22
+## [1.0.0-beta] - 2024-01-15
 
-### Adicionado
-- Sistema completo de gestão de usuários Active Directory
-- Arquitetura MVC organizada (Controllers, Models, Views)
-- Interface moderna com design inspirado no Hyper-V Manager
-- Sistema de autenticação duplo (admin padrão + LDAP)
-- Dashboard com estatísticas em tempo real
-- Gerenciamento completo de usuários AD:
-  - Listagem com busca em tempo real
-  - Ativação/Bloqueio individual e em massa
-  - Redefinição de senhas com geração automática
-  - Visualização de detalhes completos
-  - Exportação para CSV
-- Configuração LDAP via interface web:
-  - Teste de conexão em tempo real
-  - Validação de Base DN
-  - Suporte SSL/TLS
-  - Backup/restore de configurações
-- Sistema de logs e auditoria completo
-- Segurança avançada:
-  - Proteção CSRF
-  - Sanitização de inputs
-  - Sessões seguras com timeout
-  - Headers de segurança HTTP
-- Design responsivo para desktop e mobile
-- API AJAX para operações em tempo real
-- Sistema de notificações interativo
-- Componentes JavaScript modulares
-- Documentação completa
+### 🎉 Added - First Beta Release
+- **Complete MVC Architecture** with organized controllers, models, and views
+- **Real Active Directory Integration** with LDAP/LDAPS support
+- **User Management System** with create, block, reset password, search functionality
+- **Configuration Panel** for LDAP settings with real-time connection testing
+- **Dashboard** with statistics, system info, and activity logs
+- **Authentication System** with secure login/logout and session management
+- **Hyper-V Style Interface** with blue/white theme and responsive design
+- **XAMPP LDAP Diagnostic Tools** with automatic problem detection
+- **Security Features** including CSRF protection, XSS prevention, input sanitization
+- **Comprehensive Logging** system for debugging and monitoring
 
-### Características Técnicas
-- **Backend:** PHP 7.4+ com suporte LDAP
-- **Frontend:** HTML5, CSS3 (variáveis customizadas), JavaScript ES6
-- **Segurança:** CSRF protection, input sanitization, secure sessions
-- **Compatibilidade:** Apache/Nginx, Windows Server AD, XAMPP
-- **Armazenamento:** Arquivos JSON (sem necessidade de banco de dados)
-- **Cache:** Session-based com renovação automática
-- **Logs:** Sistema completo de auditoria e monitoramento
+### 🔧 Technical Implementation
+- PHP 7.4+ compatibility with LDAP extension requirements
+- No database required - uses JSON file storage for configurations
+- Vanilla JavaScript with AJAX for dynamic interactions
+- CSS variables for theming and responsive breakpoints
+- Git version control with proper branching strategy
 
-### Configurações Suportadas
-- Windows Server 2012+ Active Directory
-- Conexões LDAP/LDAPS (portas 389/636)
-- Autenticação por domínio
-- Operações em usuários e grupos AD
-- Suporte a múltiplos domínios
-- Validação de certificados SSL/TLS
+### 📚 Documentation
+- Complete setup instructions for XAMPP LDAP configuration
+- Step-by-step diagnostic tools for troubleshooting
+- API documentation for all endpoints
+- Security best practices and deployment guidelines
 
-### Interface e UX
-- Design estilo Microsoft Hyper-V Manager
-- Paleta de cores azul/branco profissional
-- Ícones Font Awesome 6.0
-- Animações suaves e transições
-- Feedback visual imediato
-- Loading states e progress indicators
-- Modais e tooltips informativos
-- Busca em tempo real com debounce
-- Paginação inteligente
-- Seleção múltipla com checkboxes
-- Keyboard shortcuts e navegação por teclado
+### 🛡️ Security
+- CSRF token validation on all state-changing operations
+- XSS protection through proper output escaping
+- Session timeout and automatic logout
+- Secure password handling and masking
+- LDAP injection prevention with proper escaping
 
-### Funcionalidades de Administração
-- Login padrão: admin/admin123 (primeira instalação)
-- Gerenciamento de sessões com timeout configurável
-- Logs detalhados de todas as operações
-- Estatísticas de usuários em tempo real
-- Sincronização manual com AD
-- Exportação de dados para análise
-- Configuração backup/restore
-- Monitoramento de conexões LDAP
-- Validação de configurações em tempo real
+### 🎨 User Interface
+- Hyper-V Manager inspired design with blue primary colors
+- Responsive layout that works on desktop and mobile
+- Interactive components with loading states and feedback
+- Professional notification system for user feedback
+- Accessible forms with proper validation
 
-### Otimizações de Performance
-- JavaScript modular e otimizado
-- CSS com variáveis e reutilização
-- Lazy loading de componentes
-- Debounce em buscas e validações
-- Cache inteligente de dados
-- Compressão GZIP habilitada
-- Headers de cache para assets estáticos
-- Minimização de requests AJAX
-- Otimização de queries LDAP
+### 🔌 LDAP Integration
+- Support for both LDAP (389) and LDAPS (636) connections
+- Automatic Base DN suggestion based on domain
+- Real user queries with proper AD filters
+- User status management (enable/disable accounts)
+- Password reset functionality with proper encoding
+- Statistics gathering from real AD data
+- Graceful fallback when LDAP is unavailable
 
-### Segurança Implementada
-- Validação server-side de todos os inputs
-- Escape HTML para prevenir XSS
-- Tokens CSRF em todos os formulários
-- Sessões seguras com regeneração
-- Headers de segurança HTTP
-- Proteção contra LDAP injection
-- Sanitização de parâmetros LDAP
-- Logs de segurança detalhados
-- Timeout automático de sessão
-- Proteção de diretórios sensíveis
+### 🧪 XAMPP Support
+- Automatic detection of XAMPP environment
+- LDAP extension diagnostic with detailed error reporting
+- Step-by-step instructions for enabling php_ldap.dll
+- Platform-specific guides (Windows, Linux, macOS)
+- DLL file verification and troubleshooting
 
-### Compatibilidade Testada
-- ✅ PHP 7.4, 8.0, 8.1, 8.2
-- ✅ Apache 2.4+ com mod_rewrite
-- ✅ Windows Server 2012, 2016, 2019, 2022
-- ✅ XAMPP 3.3+ no Windows
-- ✅ Ubuntu/Debian com LAMP stack
-- ✅ Browsers modernos (Chrome, Firefox, Edge, Safari)
-- ✅ Dispositivos móveis (responsive design)
+---
 
-### Arquivos e Estrutura
-```
-Total de arquivos: 18
-Linhas de código: ~4.800
-Tamanho total: ~850KB
-Arquivos PHP: 11
-Arquivos CSS: 1 (~16KB)
-Arquivos JS: 1 (~23KB)
-```
+## [Unreleased] - Future Versions
 
-### Próximas Versões Planejadas
-- [ ] Suporte a grupos AD
-- [ ] Relatórios avançados
-- [ ] Integração com múltiplos domínios
-- [ ] API REST completa
-- [ ] Tema dark/light
-- [ ] Configurações avançadas de políticas
-- [ ] Backup automático agendado
-- [ ] Integração com sistemas externos
-- [ ] Dashboard customizável
-- [ ] Notificações por email
+### 🔮 Planned for v1.1.0
+- [ ] Active Directory Groups and Organizational Units management
+- [ ] Advanced reporting and data export functionality
+- [ ] User audit trail and change history
+- [ ] REST API for third-party integrations
+- [ ] Multi-domain support for enterprise environments
+
+### 🔮 Planned for v1.2.0
+- [ ] Mobile-first responsive redesign
+- [ ] Email notifications for user changes
+- [ ] Configuration backup and restore
+- [ ] Plugin architecture for extensibility
+- [ ] Multiple theme support
+
+### 🔮 Planned for v1.3.0
+- [ ] Role-based access control (RBAC)
+- [ ] LDAP synchronization scheduling
+- [ ] Advanced search and filtering
+- [ ] Bulk user operations
+- [ ] Integration with other directory services
+
+---
+
+## Development Notes
+
+### Version Numbering
+- **Major.Minor.Patch-PreRelease**
+- Major: Breaking changes
+- Minor: New features, backwards compatible
+- Patch: Bug fixes, backwards compatible  
+- PreRelease: alpha, beta, rc
+
+### Release Process
+1. Update version in `config/app.php`
+2. Update `CHANGELOG.md` with changes
+3. Create git tag: `git tag -a v1.0.0-beta -m "Release v1.0.0-beta"`
+4. Push tag: `git push origin v1.0.0-beta`
+5. Create GitHub release with notes
+
+### Branch Strategy
+- `main`: Stable releases only
+- `develop`: Active development branch
+- `feature/*`: Individual feature development
+- `hotfix/*`: Critical bug fixes
+
+---
+
+## Contributors
+- **Development**: Sistema AD Manager Team
+- **Testing**: XAMPP Community Feedback
+- **Documentation**: Complete user and developer guides
+- **Design**: Hyper-V inspired professional interface

@@ -5,8 +5,10 @@
 
 // Configurações gerais da aplicação
 define('APP_NAME', 'AD Manager');
-define('APP_VERSION', '1.0.0');
+define('APP_VERSION', '1.0.0-beta');
 define('APP_DESCRIPTION', 'Sistema de Gestão de Usuários Active Directory');
+define('APP_BUILD_DATE', '2024-01-15');
+define('APP_BUILD_NUMBER', '001');
 
 // Configurações de segurança
 define('SESSION_TIMEOUT', 3600); // 1 hora em segundos
