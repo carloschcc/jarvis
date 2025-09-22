@@ -31,6 +31,7 @@ class ConfigController {
             'title' => 'Configurações LDAP - ' . APP_NAME,
             'current_user' => $currentUser,
             'ldap_config' => $ldapConfig,
+            'ldap_extension_loaded' => extension_loaded('ldap'),
             'csrf_token' => generateCSRFToken()
         ];
         
@@ -121,6 +122,18 @@ class ConfigController {
             exit;
         }
         
+        // Primeiro verificar se a extensão LDAP está disponível
+        if (!extension_loaded('ldap')) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Extensão PHP LDAP não está instalada ou habilitada',
+                'error' => 'LDAP_EXTENSION_MISSING',
+                'diagnostic_url' => 'xampp-ldap-diagnostic.php',
+                'help' => 'Acesse o diagnóstico XAMPP LDAP para obter ajuda sobre como habilitar a extensão'
+            ]);
+            exit;
+        }
+        
         $testConfig = [
             'server' => trim($_POST['server'] ?? ''),
             'port' => (int)($_POST['port'] ?? 389),
@@ -157,6 +170,54 @@ class ConfigController {
                 'success' => false,
                 'message' => 'Erro durante o teste: ' . $e->getMessage(),
                 'error' => 'EXCEPTION'
+            ]);
+        }
+    }
+    
+    /**
+     * Obter informações de diagnóstico LDAP
+     */
+    public function diagnostic() {
+        header('Content-Type: application/json');
+        
+        if (!$this->authModel->isLoggedIn()) {
+            echo json_encode(['success' => false, 'message' => 'Não autenticado']);
+            exit;
+        }
+        
+        try {
+            $diagnostic = [
+                'php_version' => PHP_VERSION,
+                'ldap_extension_loaded' => extension_loaded('ldap'),
+                'ldap_functions_available' => function_exists('ldap_connect'),
+                'php_ini_path' => php_ini_loaded_file(),
+                'extensions_dir' => ini_get('extension_dir'),
+                'loaded_extensions' => get_loaded_extensions(),
+                'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
+                'os_family' => PHP_OS_FAMILY,
+                'xampp_detected' => strpos(php_ini_loaded_file(), 'xampp') !== false
+            ];
+            
+            // Verificar funções LDAP específicas
+            $ldapFunctions = [
+                'ldap_connect', 'ldap_bind', 'ldap_search', 
+                'ldap_get_entries', 'ldap_close', 'ldap_escape', 'ldap_set_option'
+            ];
+            
+            $diagnostic['ldap_functions'] = [];
+            foreach ($ldapFunctions as $func) {
+                $diagnostic['ldap_functions'][$func] = function_exists($func);
+            }
+            
+            echo json_encode([
+                'success' => true,
+                'diagnostic' => $diagnostic
+            ]);
+            
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erro ao obter diagnóstico: ' . $e->getMessage()
             ]);
         }
     }

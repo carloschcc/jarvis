@@ -18,8 +18,26 @@ ob_start();
 <?php if (!$ldap_extension_loaded): ?>
 <div class="alert alert-danger">
     <i class="fas fa-exclamation-triangle"></i>
-    <strong>Atenção!</strong> A extensão PHP LDAP não está instalada ou habilitada. 
-    Para usar este sistema, você precisa instalar e habilitar a extensão LDAP no PHP.
+    <strong>⚠️ Extensão LDAP não encontrada!</strong><br>
+    A extensão PHP LDAP não está instalada ou habilitada no seu XAMPP. 
+    Para usar este sistema com Active Directory, você precisa habilitar a extensão LDAP.
+    <br><br>
+    <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <a href="xampp-ldap-diagnostic.php" target="_blank" class="btn btn-warning btn-sm">
+            <i class="fas fa-tools"></i> 
+            Diagnóstico XAMPP LDAP
+        </a>
+        <button onclick="window.location.reload()" class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-sync"></i>
+            Verificar Novamente
+        </button>
+    </div>
+</div>
+<?php else: ?>
+<div class="alert alert-success" style="margin-bottom: 20px;">
+    <i class="fas fa-check-circle"></i>
+    <strong>✅ Extensão LDAP detectada!</strong>
+    A extensão PHP LDAP está funcionando corretamente. Você pode configurar a conexão com o Active Directory.
 </div>
 <?php endif; ?>
 
@@ -452,7 +470,29 @@ async function testConnection() {
         }
         
     } catch (error) {
-        Notifications.error('Erro no teste de conexão: ' + error.message, 10000);
+        let errorMessage = 'Erro no teste de conexão: ' + error.message;
+        
+        // Verificar se é erro de extensão LDAP
+        if (error.response && error.response.error === 'LDAP_EXTENSION_MISSING') {
+            errorMessage = `
+                <div style="text-align: left;">
+                    <strong>❌ Extensão LDAP não encontrada!</strong><br>
+                    ${error.response.message}<br><br>
+                    <div style="margin-top: 10px;">
+                        <a href="xampp-ldap-diagnostic.php" target="_blank" class="btn btn-warning btn-sm">
+                            🔧 Abrir Diagnóstico XAMPP
+                        </a>
+                        <a href="XAMPP-LDAP-SETUP.md" target="_blank" class="btn btn-info btn-sm">
+                            📖 Ver Instruções
+                        </a>
+                    </div>
+                </div>
+            `;
+            
+            Notifications.error(errorMessage, 0); // Não desaparecer automaticamente
+        } else {
+            Notifications.error(errorMessage, 10000);
+        }
         
         // Mostrar detalhes do erro se disponíveis
         if (error.response && error.response.error_details) {
