@@ -1,9 +1,11 @@
 <?php
 class UsersController {
     private $authModel;
+    private $ldapModel;
     
     public function __construct() {
         $this->authModel = new AuthModel();
+        $this->ldapModel = new LdapModel();
     }
     
     public function index() {
@@ -14,22 +16,17 @@ class UsersController {
         
         $currentUser = $this->authModel->getCurrentUser();
         $search = $_GET['search'] ?? '';
+        $limit = (int)($_GET['limit'] ?? 50);
         
-        // Dados de demonstração
-        $users = [
-            ['username' => 'admin', 'name' => 'Administrador', 'email' => 'admin@empresa.com', 'status' => 'Ativo', 'department' => 'TI', 'last_logon' => '2024-01-15 10:30:00'],
-            ['username' => 'joao.silva', 'name' => 'João Silva', 'email' => 'joao@empresa.com', 'status' => 'Ativo', 'department' => 'Vendas', 'last_logon' => '2024-01-14 16:20:00'],
-            ['username' => 'maria.santos', 'name' => 'Maria Santos', 'email' => 'maria@empresa.com', 'status' => 'Bloqueado', 'department' => 'RH', 'last_logon' => '2024-01-10 09:15:00'],
-            ['username' => 'carlos.pereira', 'name' => 'Carlos Pereira', 'email' => 'carlos@empresa.com', 'status' => 'Ativo', 'department' => 'Financeiro', 'last_logon' => '2024-01-13 14:45:00'],
-            ['username' => 'ana.costa', 'name' => 'Ana Costa', 'email' => 'ana@empresa.com', 'status' => 'Ativo', 'department' => 'Marketing', 'last_logon' => '2024-01-12 11:30:00']
-        ];
-        
-        if (!empty($search)) {
-            $users = array_filter($users, function($user) use ($search) {
-                return stripos($user['name'], $search) !== false || 
-                       stripos($user['username'], $search) !== false ||
-                       stripos($user['email'], $search) !== false;
-            });
+        try {
+            // Buscar usuários do LDAP
+            $users = $this->ldapModel->getUsers($search, $limit);
+            
+            logMessage('INFO', 'Carregados ' . count($users) . ' usuários do LDAP');
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao carregar usuários: ' . $e->getMessage());
+            $users = [];
         }
         
         $data = [
@@ -37,6 +34,7 @@ class UsersController {
             'current_user' => $currentUser,
             'users' => $users,
             'search' => $search,
+            'limit' => $limit,
             'total_users' => count($users),
             'csrf_token' => generateCSRFToken()
         ];
@@ -47,49 +45,199 @@ class UsersController {
     public function search() {
         header('Content-Type: application/json');
         
-        $search = $_GET['q'] ?? '';
-        $users = [
-            ['username' => 'admin', 'name' => 'Administrador', 'email' => 'admin@empresa.com', 'status' => 'Ativo', 'department' => 'TI', 'last_logon' => '2024-01-15 10:30:00'],
-            ['username' => 'joao.silva', 'name' => 'João Silva', 'email' => 'joao@empresa.com', 'status' => 'Ativo', 'department' => 'Vendas', 'last_logon' => '2024-01-14 16:20:00'],
-            ['username' => 'maria.santos', 'name' => 'Maria Santos', 'email' => 'maria@empresa.com', 'status' => 'Bloqueado', 'department' => 'RH', 'last_logon' => '2024-01-10 09:15:00']
-        ];
-        
-        if (!empty($search)) {
-            $users = array_filter($users, function($user) use ($search) {
-                return stripos($user['name'], $search) !== false || 
-                       stripos($user['username'], $search) !== false;
-            });
+        if (!$this->authModel->isLoggedIn()) {
+            echo json_encode(['success' => false, 'message' => 'Não autenticado']);
+            exit;
         }
         
-        echo json_encode(['success' => true, 'users' => array_values($users)]);
+        $search = $_GET['q'] ?? '';
+        $limit = (int)($_GET['limit'] ?? 20);
+        
+        try {
+            $users = $this->ldapModel->getUsers($search, $limit);
+            
+            logMessage('INFO', 'Busca realizada: "' . $search . '" - ' . count($users) . ' resultados');
+            
+            echo json_encode([
+                'success' => true,
+                'users' => $users,
+                'total' => count($users)
+            ]);
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro na busca de usuários: ' . $e->getMessage());
+            
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erro ao buscar usuários: ' . $e->getMessage()
+            ]);
+        }
     }
     
     public function toggleStatus() {
         header('Content-Type: application/json');
-        echo json_encode(['success' => true, 'message' => 'Status alterado com sucesso (simulação)']);
+        
+        if (!$this->authModel->isLoggedIn() || !$this->authModel->isAdmin()) {
+            echo json_encode(['success' => false, 'message' => 'Acesso negado']);
+            exit;
+        }
+        
+        if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+            echo json_encode(['success' => false, 'message' => 'Token CSRF inválido']);
+            exit;
+        }
+        
+        $username = $_POST['username'] ?? '';
+        $enable = ($_POST['action'] ?? '') === 'enable';
+        
+        if (empty($username)) {
+            echo json_encode(['success' => false, 'message' => 'Nome de usuário não informado']);
+            exit;
+        }
+        
+        try {
+            $result = $this->ldapModel->toggleUserStatus($username, $enable);
+            
+            logMessage('INFO', "Status do usuário {$username} alterado por {$this->authModel->getCurrentUser()['username']}");
+            
+            echo json_encode($result);
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao alterar status do usuário: ' . $e->getMessage());
+            
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erro ao alterar status: ' . $e->getMessage()
+            ]);
+        }
     }
     
     public function resetPassword() {
         header('Content-Type: application/json');
-        echo json_encode(['success' => true, 'message' => 'Senha redefinida com sucesso (simulação)']);
+        
+        if (!$this->authModel->isLoggedIn() || !$this->authModel->isAdmin()) {
+            echo json_encode(['success' => false, 'message' => 'Acesso negado']);
+            exit;
+        }
+        
+        if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+            echo json_encode(['success' => false, 'message' => 'Token CSRF inválido']);
+            exit;
+        }
+        
+        $username = $_POST['username'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        
+        if (empty($username) || empty($newPassword)) {
+            echo json_encode(['success' => false, 'message' => 'Dados incompletos']);
+            exit;
+        }
+        
+        // Validar força da senha
+        if (strlen($newPassword) < 8) {
+            echo json_encode(['success' => false, 'message' => 'Senha deve ter pelo menos 8 caracteres']);
+            exit;
+        }
+        
+        try {
+            $result = $this->ldapModel->resetPassword($username, $newPassword);
+            
+            logMessage('INFO', "Senha resetada para usuário {$username} por {$this->authModel->getCurrentUser()['username']}");
+            
+            echo json_encode($result);
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao resetar senha: ' . $e->getMessage());
+            
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erro ao resetar senha: ' . $e->getMessage()
+            ]);
+        }
     }
     
     public function getUser() {
         header('Content-Type: application/json');
+        
+        if (!$this->authModel->isLoggedIn()) {
+            echo json_encode(['success' => false, 'message' => 'Não autenticado']);
+            exit;
+        }
+        
         $username = $_GET['username'] ?? '';
         
-        $user = [
-            'username' => $username,
-            'name' => 'Usuário ' . $username,
-            'email' => $username . '@empresa.com',
-            'status' => 'Ativo',
-            'department' => 'Demonstração',
-            'created' => '2024-01-01 10:00:00',
-            'last_logon' => '2024-01-15 14:30:00',
-            'dn' => "CN=$username,OU=Users,DC=empresa,DC=local"
+        if (empty($username)) {
+            echo json_encode(['success' => false, 'message' => 'Nome de usuário não informado']);
+            exit;
+        }
+        
+        try {
+            $user = $this->ldapModel->getUser($username);
+            
+            if (!$user) {
+                echo json_encode(['success' => false, 'message' => 'Usuário não encontrado']);
+            } else {
+                echo json_encode(['success' => true, 'user' => $user]);
+            }
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao buscar usuário: ' . $e->getMessage());
+            
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erro ao buscar usuário: ' . $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Criar novo usuário
+     */
+    public function create() {
+        header('Content-Type: application/json');
+        
+        if (!$this->authModel->isLoggedIn() || !$this->authModel->isAdmin()) {
+            echo json_encode(['success' => false, 'message' => 'Acesso negado']);
+            exit;
+        }
+        
+        if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+            echo json_encode(['success' => false, 'message' => 'Token CSRF inválido']);
+            exit;
+        }
+        
+        $userData = [
+            'username' => $_POST['username'] ?? '',
+            'name' => $_POST['name'] ?? '',
+            'email' => $_POST['email'] ?? '',
+            'description' => $_POST['description'] ?? '',
+            'phone' => $_POST['phone'] ?? '',
+            'department' => $_POST['department'] ?? ''
         ];
         
-        echo json_encode(['success' => true, 'user' => $user]);
+        // Validações básicas
+        if (empty($userData['username']) || empty($userData['name'])) {
+            echo json_encode(['success' => false, 'message' => 'Nome de usuário e nome completo são obrigatórios']);
+            exit;
+        }
+        
+        try {
+            $result = $this->ldapModel->createUser($userData);
+            
+            if ($result['success']) {
+                logMessage('INFO', "Usuário {$userData['username']} criado por {$this->authModel->getCurrentUser()['username']}");
+            }
+            
+            echo json_encode($result);
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao criar usuário: ' . $e->getMessage());
+            
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erro ao criar usuário: ' . $e->getMessage()
+            ]);
+        }
     }
     
     private function loadView($view, $data = []) {
