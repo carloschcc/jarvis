@@ -1,5 +1,45 @@
 [
     {
+        "id": "68d2f26fcb837",
+        "timestamp": "2025-09-23 16:18:07",
+        "action": "LOGIN",
+        "user": "admin",
+        "details": "Login como administrador padr\u00e3o",
+        "ip": "10.12.62.164"
+    },
+    {
+        "id": "68d2f26a8f752",
+        "timestamp": "2025-09-23 16:18:02",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "10.12.62.164"
+    },
+    {
+        "id": "68d2f1446f129",
+        "timestamp": "2025-09-23 16:13:08",
+        "action": "LOGOUT",
+        "user": "admin",
+        "details": "Logout do sistema",
+        "ip": "10.12.62.164"
+    },
+    {
+        "id": "68d2b44739826",
+        "timestamp": "2025-09-23 11:52:55",
+        "action": "LOGIN",
+        "user": "admin",
+        "details": "Login como administrador padr\u00e3o",
+        "ip": "10.12.3.78"
+    },
+    {
+        "id": "68d2b43dd7584",
+        "timestamp": "2025-09-23 11:52:45",
+        "action": "LOGOUT",
+        "user": "admin",
+        "details": "Logout do sistema",
+        "ip": "10.12.3.78"
+    },
+    {
         "id": "68d1a308e97cc",
         "timestamp": "2025-09-22 16:27:04",
         "action": "LOGIN",

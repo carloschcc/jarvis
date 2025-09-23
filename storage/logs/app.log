@@ -1,3 +1,20 @@
 [2025-09-22 16:26:03] [INFO] Login realizado - Admin padrão - {"username":"admin","ip":"10.12.214.222"}
 [2025-09-22 16:26:57] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.214.222"}
 [2025-09-22 16:27:04] [INFO] Login realizado - Admin padrão - {"username":"admin","ip":"10.12.214.222"}
+[2025-09-23 11:52:45] [INFO] Logout realizado - {"username":"admin","ip":"10.12.3.78"}
+[2025-09-23 11:52:55] [INFO] Login realizado - Admin padrão - {"username":"admin","ip":"10.12.3.78"}
+[2025-09-23 11:53:01] [INFO] Tentando conectar ao LDAP: ldap://servidor.empresa.com.br:389
+[2025-09-23 11:53:01] [INFO] Conexão LDAP estabelecida com sucesso
+[2025-09-23 11:53:01] [INFO] Executando busca LDAP: (&(objectClass=user)(!(objectClass=computer))) em DC=empresa,DC=com,DC=br
+[2025-09-23 11:53:01] [ERROR] Erro na busca LDAP: Can't contact LDAP server
+[2025-09-23 11:53:01] [WARNING] Usando dados de fallback - LDAP não disponível
+[2025-09-23 11:53:02] [INFO] Carregados 1 usuários do LDAP com filtros aplicados
+[2025-09-23 16:13:08] [INFO] Logout realizado - {"username":"admin","ip":"10.12.62.164"}
+[2025-09-23 16:18:02] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.62.164"}
+[2025-09-23 16:18:07] [INFO] Login realizado - Admin padrão - {"username":"admin","ip":"10.12.62.164"}
+[2025-09-23 16:18:14] [INFO] Tentando conectar ao LDAP: ldap://servidor.empresa.com.br:389
+[2025-09-23 16:18:14] [INFO] Conexão LDAP estabelecida com sucesso
+[2025-09-23 16:18:14] [INFO] Executando busca LDAP: (&(objectClass=user)(!(objectClass=computer))) em DC=empresa,DC=com,DC=br
+[2025-09-23 16:18:14] [ERROR] Erro na busca LDAP: Can't contact LDAP server
+[2025-09-23 16:18:14] [WARNING] Usando dados de fallback - LDAP não disponível
+[2025-09-23 16:18:14] [INFO] Carregados 1 usuários do LDAP com filtros aplicados
