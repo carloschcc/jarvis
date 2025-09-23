@@ -251,9 +251,9 @@ class LdapModel {
             
             // Filtro de status
             if (isset($filters['status'])) {
-                if ($filters['status'] === 'active') {
+                if ($filters['status'] === 'Ativo') {
                     $filterParts[] = "(!(userAccountControl:1.2.840.113556.1.4.803:=2))";
-                } elseif ($filters['status'] === 'disabled') {
+                } elseif ($filters['status'] === 'Bloqueado') {
                     $filterParts[] = "(userAccountControl:1.2.840.113556.1.4.803:=2)";
                 }
             }
@@ -890,10 +890,10 @@ class LdapModel {
                     $userStatus = strtolower($user['status']);
                     $filterStatus = strtolower($filters['status']);
                     
-                    if ($filterStatus === 'active' && $userStatus !== 'ativo') {
+                    if ($filterStatus === 'ativo' && $userStatus !== 'ativo') {
                         return false;
                     }
-                    if ($filterStatus === 'disabled' && $userStatus !== 'bloqueado') {
+                    if ($filterStatus === 'bloqueado' && $userStatus !== 'bloqueado') {
                         return false;
                     }
                 }

@@ -94,10 +94,10 @@ ob_start();
                     </label>
                     <select id="filter-status" class="filter-select">
                         <option value="">Todos os Status</option>
-                        <option value="active" <?= ($filters['status'] ?? '') === 'active' ? 'selected' : '' ?>>
+                        <option value="Ativo" <?= ($filters['status'] ?? '') === 'Ativo' ? 'selected' : '' ?>>
                             Ativo
                         </option>
-                        <option value="disabled" <?= ($filters['status'] ?? '') === 'disabled' ? 'selected' : '' ?>>
+                        <option value="Bloqueado" <?= ($filters['status'] ?? '') === 'Bloqueado' ? 'selected' : '' ?>>
                             Bloqueado
                         </option>
                     </select>
