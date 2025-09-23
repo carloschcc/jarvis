@@ -55,11 +55,11 @@ function getLdapConfig() {
     
     // Configuração padrão para demonstração
     $defaultConfig = [
-        'server' => 'servidor.empresa.com.br',
+        'server' => '',
         'port' => 389,
-        'domain' => 'empresa.com.br',
-        'base_dn' => 'DC=empresa,DC=com,DC=br',
-        'admin_user' => 'admin@empresa.com.br',
+        'domain' => '',
+        'base_dn' => '',
+        'admin_user' => '',
         'admin_pass' => '',
         'use_ssl' => false,
         'configured' => false

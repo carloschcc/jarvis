@@ -196,10 +196,18 @@ class LdapModel {
      */
     public function getUsers($search = '', $limit = 100, $filters = []) {
         try {
-            if (!$this->isConnected && !$this->connect()) {
+            // Sempre tentar conectar primeiro
+            if (!$this->isConnected) {
+                $this->connect();
+            }
+            
+            // Se ainda não conseguiu conectar, usar fallback
+            if (!$this->isConnected) {
                 logMessage('WARNING', 'Conexão LDAP não disponível, usando dados de fallback');
                 return $this->getFallbackUsers($limit, $search, $filters);
             }
+            
+            logMessage('INFO', 'Usando dados reais do LDAP/Active Directory');
             
             $baseDn = $this->config['base_dn'] ?? 'DC=empresa,DC=local';
             
