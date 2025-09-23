@@ -319,12 +319,6 @@ ob_start();
                         </td>
                         <td>
                             <div class="actions-container">
-                                <!-- Botão Ver Detalhes -->
-                                <button onclick="viewUser('<?= htmlspecialchars($user['username']) ?>')" 
-                                        class="action-btn btn-view" title="Ver detalhes completos">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                
                                 <!-- Botão Status -->
                                 <?php if ($user['status'] === 'Ativo'): ?>
                                 <button onclick="toggleStatus('<?= htmlspecialchars($user['username']) ?>', false)" 
@@ -338,16 +332,16 @@ ob_start();
                                 </button>
                                 <?php endif; ?>
                                 
-                                <!-- Botão Reset Senha -->
-                                <button onclick="resetPassword('<?= htmlspecialchars($user['username']) ?>')" 
-                                        class="action-btn btn-reset" title="Redefinir senha">
-                                    <i class="fas fa-key"></i>
-                                </button>
-                                
                                 <!-- Botão Editar -->
                                 <button onclick="editUser('<?= htmlspecialchars($user['username']) ?>')" 
                                         class="action-btn btn-edit" title="Editar usuário">
                                     <i class="fas fa-edit"></i>
+                                </button>
+                                
+                                <!-- Botão Reset Senha -->
+                                <button onclick="resetPassword('<?= htmlspecialchars($user['username']) ?>')" 
+                                        class="action-btn btn-reset" title="Redefinir senha">
+                                    <i class="fas fa-key"></i>
                                 </button>
                                 
                                 <!-- Botão Grupos -->
@@ -989,50 +983,41 @@ function loadMore() {
     font-size: 13px;
 }
 
-/* Container de ações dos usuários */
+/* Container de ações dos usuários - Layout horizontal */
 .actions-container {
     display: flex;
-    gap: 2px;
+    gap: 3px;
     justify-content: flex-start;
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 /* Botões de ação uniformes */
 .action-btn {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     border: none;
-    border-radius: 3px;
+    border-radius: 4px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    font-size: 10px;
+    font-size: 11px;
     padding: 0;
-    margin: 1px;
+    margin: 0;
 }
 
 .action-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 
 .action-btn:active {
     transform: translateY(0);
 }
 
-/* Cores específicas para cada ação */
-.btn-view {
-    background-color: #17a2b8;
-    color: white;
-}
-
-.btn-view:hover {
-    background-color: #138496;
-}
-
+/* Cores específicas para cada ação conforme solicitado */
 .btn-block {
     background-color: #ffc107;
     color: #212529;
@@ -1051,6 +1036,15 @@ function loadMore() {
     background-color: #218838;
 }
 
+.btn-edit {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #0056b3;
+}
+
 .btn-reset {
     background-color: #dc3545;
     color: white;
@@ -1058,15 +1052,6 @@ function loadMore() {
 
 .btn-reset:hover {
     background-color: #c82333;
-}
-
-.btn-edit {
-    background-color: #007bff;
-    color: white;
-}
-
-.btn-edit:hover {
-    background-color: #0069d9;
 }
 
 .btn-groups {
@@ -1079,17 +1064,17 @@ function loadMore() {
 }
 
 .btn-delete {
-    background-color: #6c757d;
+    background-color: #dc3545;
     color: white;
 }
 
 .btn-delete:hover {
-    background-color: #5a6268;
+    background-color: #c82333;
 }
 
-/* Ícones menores */
+/* Ícones ajustados */
 .action-btn i {
-    font-size: 9px;
+    font-size: 12px;
 }
 
 .user-row:hover {
@@ -1146,17 +1131,17 @@ function loadMore() {
     
     /* Ações responsivas */
     .actions-container {
-        gap: 1px;
+        gap: 2px;
     }
     
     .action-btn {
-        width: 20px;
-        height: 20px;
-        font-size: 8px;
+        width: 24px;
+        height: 24px;
+        font-size: 9px;
     }
     
     .action-btn i {
-        font-size: 8px;
+        font-size: 10px;
     }
 }
 
