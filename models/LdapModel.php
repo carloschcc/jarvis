@@ -284,21 +284,43 @@ class LdapModel {
             
             logMessage('INFO', "Executando busca LDAP: {$filter} em {$baseDn}");
             
-            // Executar busca
+            // Executar busca com reconexão se necessário
             $result = @ldap_search($this->connection, $baseDn, $filter, $attributes, 0, $limit);
             
+            // Se falhar, tentar reconectar uma vez
             if (!$result) {
                 $error = ldap_error($this->connection);
-                logMessage('ERROR', "Erro na busca LDAP: {$error}");
-                return $this->getFallbackUsers($limit, $search);
+                logMessage('WARNING', "Primeira tentativa de busca falhou: {$error}. Tentando reconectar...");
+                
+                // Fechar conexão atual
+                if ($this->connection) {
+                    ldap_close($this->connection);
+                }
+                
+                // Resetar estado e tentar reconectar
+                $this->isConnected = false;
+                if ($this->connect()) {
+                    logMessage('INFO', "Reconexão bem-sucedida. Tentando busca novamente...");
+                    $result = @ldap_search($this->connection, $baseDn, $filter, $attributes, 0, $limit);
+                }
+                
+                // Se ainda falhar, usar fallback
+                if (!$result) {
+                    $error = ldap_error($this->connection);
+                    logMessage('ERROR', "Erro na busca LDAP após reconexão: {$error}");
+                    return $this->getFallbackUsers($limit, $search, $filters);
+                }
             }
             
             $entries = ldap_get_entries($this->connection, $result);
             
             if ($entries['count'] == 0) {
-                logMessage('INFO', 'Nenhum usuário encontrado no LDAP');
+                logMessage('INFO', 'Nenhum usuário encontrado no LDAP com os filtros aplicados');
+                // Se não houver resultados com filtros, retornar array vazio ao invés de fallback
                 return [];
             }
+            
+            logMessage('INFO', "Processando {$entries['count']} usuários do LDAP");
             
             $users = [];
             
@@ -332,12 +354,15 @@ class LdapModel {
                 $users[] = $user;
             }
             
-            logMessage('INFO', 'Encontrados ' . count($users) . ' usuários no LDAP');
+            logMessage('INFO', 'Processamento concluído: ' . count($users) . ' usuários válidos encontrados no LDAP');
+            logMessage('DEBUG', 'Filtros aplicados no LDAP: ' . json_encode($filters));
             return $users;
             
         } catch (Exception $e) {
             logMessage('ERROR', 'Erro ao buscar usuários: ' . $e->getMessage());
-            return $this->getFallbackUsers($limit, $search);
+            // Para debug: não usar fallback quando houver exceção, retornar erro
+            logMessage('ERROR', 'ATENÇÃO: Usando fallback devido a exceção. LDAP pode estar mal configurado.');
+            return $this->getFallbackUsers($limit, $search, $filters);
         }
     }
     
