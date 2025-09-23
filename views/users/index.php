@@ -39,131 +39,133 @@ ob_start();
     </div>
     
     <div class="card-body">
-        <!-- Linha 1: Busca por texto -->
-        <div class="row mb-3">
-            <div class="col-12">
-                <label for="user-search" class="form-label">
-                    <i class="fas fa-search"></i> Busca Geral
-                </label>
-                <input 
-                    type="search" 
-                    id="user-search" 
-                    class="form-control" 
-                    placeholder="Digite nome, usuário, email, departamento, cidade, função..."
-                    value="<?= htmlspecialchars($search ?? '') ?>"
-                >
-                <small class="text-muted">Busque por qualquer campo: nome, usuário, email, departamento, cidade, função, etc.</small>
-            </div>
-        </div>
-        
-        <!-- Linha 2: Filtros principais (conforme imagem) -->
-        <div class="row mb-3">
-            <div class="col-md-3">
-                <label for="filter-department" class="form-label">
-                    <i class="fas fa-building"></i> Departamento:
-                </label>
-                <select id="filter-department" class="form-control">
-                    <option value="">Todos os Departamentos</option>
-                    <?php foreach ($departments as $dept): ?>
-                        <option value="<?= htmlspecialchars($dept) ?>" 
-                                <?= ($filters['department'] ?? '') === $dept ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($dept) ?>
+        <!-- Layout Horizontal dos Filtros (conforme imagem de referência) -->
+        <div class="filters-horizontal-layout">
+            <!-- Linha 1: Filtros principais em uma única linha -->
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label for="filter-department">
+                        <i class="fas fa-building"></i> Departamento:
+                    </label>
+                    <select id="filter-department" class="filter-select">
+                        <option value="">Todos os Departamentos</option>
+                        <?php foreach ($departments as $dept): ?>
+                            <option value="<?= htmlspecialchars($dept) ?>" 
+                                    <?= ($filters['department'] ?? '') === $dept ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($dept) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filter-company">
+                        <i class="fas fa-industry"></i> Organização:
+                    </label>
+                    <select id="filter-company" class="filter-select">
+                        <option value="">Todas as Organizações</option>
+                        <?php foreach ($companies as $company): ?>
+                            <option value="<?= htmlspecialchars($company) ?>" 
+                                    <?= ($filters['company'] ?? '') === $company ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($company) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filter-city">
+                        <i class="fas fa-map-marker-alt"></i> Cidade:
+                    </label>
+                    <select id="filter-city" class="filter-select">
+                        <option value="">Todas as Cidades</option>
+                        <?php foreach ($cities as $city): ?>
+                            <option value="<?= htmlspecialchars($city) ?>" 
+                                    <?= ($filters['city'] ?? '') === $city ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($city) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filter-status">
+                        <i class="fas fa-toggle-on"></i> Status:
+                    </label>
+                    <select id="filter-status" class="filter-select">
+                        <option value="">Todos os Status</option>
+                        <option value="active" <?= ($filters['status'] ?? '') === 'active' ? 'selected' : '' ?>>
+                            Ativo
                         </option>
-                    <?php endforeach; ?>
-                </select>
+                        <option value="disabled" <?= ($filters['status'] ?? '') === 'disabled' ? 'selected' : '' ?>>
+                            Bloqueado
+                        </option>
+                    </select>
+                </div>
+                
+                <div class="filter-actions">
+                    <button onclick="applyFilters()" class="btn-apply">
+                        <i class="fas fa-check"></i> Aplicar
+                    </button>
+                    <button onclick="clearAllFilters()" class="btn-clear">
+                        <i class="fas fa-broom"></i> Limpar
+                    </button>
+                </div>
             </div>
             
-            <div class="col-md-3">
-                <label for="filter-company" class="form-label">
-                    <i class="fas fa-industry"></i> Organização:
-                </label>
-                <select id="filter-company" class="form-control">
-                    <option value="">Todas as Organizações</option>
-                    <?php foreach ($companies as $company): ?>
-                        <option value="<?= htmlspecialchars($company) ?>" 
-                                <?= ($filters['company'] ?? '') === $company ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($company) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            
-            <div class="col-md-3">
-                <label for="filter-city" class="form-label">
-                    <i class="fas fa-map-marker-alt"></i> Cidade:
-                </label>
-                <select id="filter-city" class="form-control">
-                    <option value="">Todas as Cidades</option>
-                    <?php foreach ($cities as $city): ?>
-                        <option value="<?= htmlspecialchars($city) ?>" 
-                                <?= ($filters['city'] ?? '') === $city ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($city) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            
-            <div class="col-md-3">
-                <label for="filter-status" class="form-label">
-                    <i class="fas fa-toggle-on"></i> Status:
-                </label>
-                <select id="filter-status" class="form-control">
-                    <option value="">Todos os Status</option>
-                    <option value="active" <?= ($filters['status'] ?? '') === 'active' ? 'selected' : '' ?>>
-                        <span class="status status-ativo">Ativo</span>
-                    </option>
-                    <option value="disabled" <?= ($filters['status'] ?? '') === 'disabled' ? 'selected' : '' ?>>
-                        <span class="status status-bloqueado">Bloqueado</span>
-                    </option>
-                </select>
-            </div>
-        </div>
-        
-        <!-- Linha 3: Filtros adicionais -->
-        <div class="row mb-3">
-            <div class="col-md-4">
-                <label for="filter-title" class="form-label">
-                    <i class="fas fa-briefcase"></i> Função/Cargo:
-                </label>
-                <select id="filter-title" class="form-control">
-                    <option value="">Todas as Funções</option>
-                    <?php foreach ($titles as $title): ?>
-                        <option value="<?= htmlspecialchars($title) ?>" 
-                                <?= ($filters['title'] ?? '') === $title ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($title) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            
-            <div class="col-md-4">
-                <label for="filter-office" class="form-label">
-                    <i class="fas fa-door-open"></i> Escritório:
-                </label>
-                <select id="filter-office" class="form-control">
-                    <option value="">Todos os Escritórios</option>
-                    <?php foreach ($offices as $office): ?>
-                        <option value="<?= htmlspecialchars($office) ?>" 
-                                <?= ($filters['office'] ?? '') === $office ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($office) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            
-            <div class="col-md-4">
-                <label for="filter-manager" class="form-label">
-                    <i class="fas fa-user-tie"></i> Possui Gerente:
-                </label>
-                <select id="filter-manager" class="form-control">
-                    <option value="">Todos</option>
-                    <option value="yes" <?= ($filters['manager'] ?? '') === 'yes' ? 'selected' : '' ?>>
-                        Com Gerente
-                    </option>
-                    <option value="no" <?= ($filters['manager'] ?? '') === 'no' ? 'selected' : '' ?>>
-                        Sem Gerente
-                    </option>
-                </select>
+            <!-- Linha 2: Busca e filtros adicionais -->
+            <div class="search-row">
+                <div class="search-group">
+                    <label for="user-search">
+                        <i class="fas fa-search"></i> Buscar:
+                    </label>
+                    <input 
+                        type="search" 
+                        id="user-search" 
+                        class="search-input" 
+                        placeholder="Nome, usuário, email, função..."
+                        value="<?= htmlspecialchars($search ?? '') ?>"
+                    >
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filter-title">
+                        <i class="fas fa-briefcase"></i> Função:
+                    </label>
+                    <select id="filter-title" class="filter-select">
+                        <option value="">Todas as Funções</option>
+                        <?php foreach ($titles as $title): ?>
+                            <option value="<?= htmlspecialchars($title) ?>" 
+                                    <?= ($filters['title'] ?? '') === $title ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($title) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filter-office">
+                        <i class="fas fa-door-open"></i> Escritório:
+                    </label>
+                    <select id="filter-office" class="filter-select">
+                        <option value="">Todos os Escritórios</option>
+                        <?php foreach ($offices as $office): ?>
+                            <option value="<?= htmlspecialchars($office) ?>" 
+                                    <?= ($filters['office'] ?? '') === $office ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($office) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <div class="results-info">
+                    <span class="results-count">
+                        <i class="fas fa-users"></i> <?= count($users) ?> usuário(s)
+                    </span>
+                    <button onclick="refreshUsers()" class="btn-refresh">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
             </div>
         </div>
         
@@ -685,7 +687,174 @@ function loadMore() {
 </script>
 
 <style>
-/* Estilos adicionais para a nova interface */
+/* Layout Horizontal dos Filtros */
+.filters-horizontal-layout {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #e9ecef;
+}
+
+.filters-row {
+    display: flex;
+    align-items: end;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.search-row {
+    display: flex;
+    align-items: end;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 180px;
+    flex: 1;
+}
+
+.search-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 250px;
+    flex: 2;
+}
+
+.filter-group label,
+.search-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.filter-select {
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 13px;
+    color: #495057;
+    min-height: 36px;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 8px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 32px;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.search-input {
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 13px;
+    color: #495057;
+    min-height: 36px;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.filter-actions {
+    display: flex;
+    gap: 8px;
+    align-items: end;
+}
+
+.btn-apply {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 36px;
+    transition: all 0.2s;
+}
+
+.btn-apply:hover {
+    background: #218838;
+    transform: translateY(-1px);
+}
+
+.btn-clear {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 36px;
+    transition: all 0.2s;
+}
+
+.btn-clear:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+.results-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.results-count {
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-refresh {
+    background: transparent;
+    border: 1px solid #ced4da;
+    padding: 8px 10px;
+    border-radius: 4px;
+    color: #6c757d;
+    cursor: pointer;
+    min-height: 36px;
+    transition: all 0.2s;
+}
+
+.btn-refresh:hover {
+    background: #e9ecef;
+    color: #495057;
+}
+
+/* Estilos da tabela */
 .user-avatar {
     width: 32px;
     height: 32px;
@@ -760,17 +929,50 @@ function loadMore() {
     background-color: var(--light-blue);
 }
 
-.form-label {
-    font-weight: 600;
-    font-size: 12px;
-    margin-bottom: 5px;
-}
-
-.form-control {
-    font-size: 13px;
+/* Responsividade */
+@media (max-width: 1200px) {
+    .filters-row,
+    .search-row {
+        flex-wrap: wrap;
+    }
+    
+    .filter-group {
+        min-width: 140px;
+    }
+    
+    .search-group {
+        min-width: 200px;
+    }
 }
 
 @media (max-width: 768px) {
+    .filters-horizontal-layout {
+        padding: 15px;
+    }
+    
+    .filters-row,
+    .search-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-group,
+    .search-group {
+        min-width: unset;
+        width: 100%;
+    }
+    
+    .filter-actions {
+        justify-content: center;
+        margin-top: 10px;
+    }
+    
+    .results-info {
+        margin-left: 0;
+        justify-content: center;
+        margin-top: 10px;
+    }
+    
     .table-responsive {
         font-size: 11px;
     }
@@ -779,6 +981,23 @@ function loadMore() {
         padding: 2px 6px;
         font-size: 10px;
     }
+}
+
+/* Loading state */
+#filter-loading {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 </style>
 
