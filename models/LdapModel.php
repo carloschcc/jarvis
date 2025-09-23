@@ -887,13 +887,10 @@ class LdapModel {
                 
                 // Filtro por status
                 if (!empty($filters['status'])) {
-                    $userStatus = strtolower($user['status']);
-                    $filterStatus = strtolower($filters['status']);
+                    $userStatus = $user['status'];
+                    $filterStatus = $filters['status'];
                     
-                    if ($filterStatus === 'ativo' && $userStatus !== 'ativo') {
-                        return false;
-                    }
-                    if ($filterStatus === 'bloqueado' && $userStatus !== 'bloqueado') {
+                    if ($filterStatus !== $userStatus) {
                         return false;
                     }
                 }

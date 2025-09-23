@@ -29,10 +29,22 @@ class UsersController {
             'status' => $_GET['status'] ?? ''
         ];
         
-        // Remover filtros vazios
+        // Debug dos filtros recebidos
+        logMessage('DEBUG', 'Filtros recebidos: ' . json_encode($filters));
+        
+        // Remover filtros vazios e valores padrão
         $filters = array_filter($filters, function($value) {
-            return !empty($value) && $value !== 'all';
+            return !empty($value) && 
+                   $value !== 'all' && 
+                   $value !== 'Todos os Departamentos' && 
+                   $value !== 'Todas as Organizações' && 
+                   $value !== 'Todas as Cidades' && 
+                   $value !== 'Todos os Status' &&
+                   $value !== 'Todas as Funções' &&
+                   $value !== 'Todos os Escritórios';
         });
+        
+        logMessage('DEBUG', 'Filtros após limpeza: ' . json_encode($filters));
         
         try {
             // Buscar usuários do LDAP com filtros
@@ -99,10 +111,22 @@ class UsersController {
             'status' => $_GET['status'] ?? ''
         ];
         
-        // Remover filtros vazios
+        // Debug dos filtros recebidos
+        logMessage('DEBUG', 'Filtros recebidos: ' . json_encode($filters));
+        
+        // Remover filtros vazios e valores padrão
         $filters = array_filter($filters, function($value) {
-            return !empty($value) && $value !== 'all';
+            return !empty($value) && 
+                   $value !== 'all' && 
+                   $value !== 'Todos os Departamentos' && 
+                   $value !== 'Todas as Organizações' && 
+                   $value !== 'Todas as Cidades' && 
+                   $value !== 'Todos os Status' &&
+                   $value !== 'Todas as Funções' &&
+                   $value !== 'Todos os Escritórios';
         });
+        
+        logMessage('DEBUG', 'Filtros após limpeza: ' . json_encode($filters));
         
         try {
             $users = $this->ldapModel->getUsers($search, $limit, $filters);

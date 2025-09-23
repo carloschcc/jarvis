@@ -398,28 +398,30 @@ let selectedUsers = [];
 // Função para aplicar filtros
 function applyFilters() {
     const filters = {
-        search: document.getElementById('user-search').value,
-        department: document.getElementById('filter-department').value,
-        company: document.getElementById('filter-company').value,
-        city: document.getElementById('filter-city').value,
-        status: document.getElementById('filter-status').value,
-        title: document.getElementById('filter-title').value,
-        office: document.getElementById('filter-office').value,
-        manager: document.getElementById('filter-manager').value,
-        limit: document.getElementById('items-per-page').value
+        search: document.getElementById('user-search')?.value || '',
+        department: document.getElementById('filter-department')?.value || '',
+        company: document.getElementById('filter-company')?.value || '',
+        city: document.getElementById('filter-city')?.value || '',
+        status: document.getElementById('filter-status')?.value || '',
+        title: document.getElementById('filter-title')?.value || '',
+        office: document.getElementById('filter-office')?.value || '',
+        limit: document.getElementById('items-per-page')?.value || '50'
     };
+    
+    console.log('Filtros aplicados:', filters);
     
     const params = new URLSearchParams();
     
     // Adicionar apenas filtros não vazios
     Object.keys(filters).forEach(key => {
-        if (filters[key] && filters[key] !== '' && filters[key] !== 'all') {
+        if (filters[key] && filters[key] !== '' && filters[key] !== 'all' && filters[key] !== 'Todos os Departamentos' && filters[key] !== 'Todas as Organizações' && filters[key] !== 'Todas as Cidades' && filters[key] !== 'Todos os Status') {
             params.append(key, filters[key]);
         }
     });
     
     // Mostrar loading
-    document.getElementById('filter-loading').style.display = 'inline-block';
+    const loading = document.getElementById('filter-loading');
+    if (loading) loading.style.display = 'inline-block';
     
     // Redirecionar com filtros
     window.location.href = `index.php?page=users&${params.toString()}`;
@@ -644,10 +646,82 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Funções placeholder para futuras implementações
+// Função de ordenação implementada
 function sortBy(field) {
-    // TODO: Implementar ordenação
     console.log('Sorting by:', field);
+    
+    // Alternar direção da ordenação
+    if (currentSort.field === field) {
+        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSort.field = field;
+        currentSort.direction = 'asc';
+    }
+    
+    // Obter todas as linhas da tabela
+    const tbody = document.querySelector('.table tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr:not(.empty-state)'));
+    
+    // Função de comparação
+    const compare = (a, b) => {
+        let aValue, bValue;
+        
+        switch(field) {
+            case 'username':
+                aValue = a.querySelector('td:nth-child(2) strong')?.textContent || '';
+                bValue = b.querySelector('td:nth-child(2) strong')?.textContent || '';
+                break;
+            case 'name':
+                aValue = a.querySelector('td:nth-child(3)')?.textContent.trim() || '';
+                bValue = b.querySelector('td:nth-child(3)')?.textContent.trim() || '';
+                break;
+            case 'email':
+                aValue = a.querySelector('td:nth-child(4) a')?.textContent || a.querySelector('td:nth-child(4)')?.textContent.trim() || '';
+                bValue = b.querySelector('td:nth-child(4) a')?.textContent || b.querySelector('td:nth-child(4)')?.textContent.trim() || '';
+                break;
+            case 'status':
+                aValue = a.querySelector('td:nth-child(8) .status')?.textContent.trim() || '';
+                bValue = b.querySelector('td:nth-child(8) .status')?.textContent.trim() || '';
+                break;
+            case 'last_logon':
+                aValue = a.querySelector('td:nth-child(9)')?.textContent.trim() || '';
+                bValue = b.querySelector('td:nth-child(9)')?.textContent.trim() || '';
+                break;
+            default:
+                return 0;
+        }
+        
+        // Normalizar valores
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+        
+        if (aValue < bValue) return currentSort.direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return currentSort.direction === 'asc' ? 1 : -1;
+        return 0;
+    };
+    
+    // Ordenar e reorganizar as linhas
+    rows.sort(compare);
+    
+    // Reordenar no DOM
+    rows.forEach(row => tbody.appendChild(row));
+    
+    // Atualizar ícones de ordenação
+    updateSortIcons(field);
+}
+
+// Atualizar ícones de ordenação
+function updateSortIcons(activeField) {
+    // Remover classes de ordenação de todos os cabeçalhos
+    document.querySelectorAll('th .fas.fa-sort, th .fas.fa-sort-up, th .fas.fa-sort-down').forEach(icon => {
+        icon.className = 'fas fa-sort';
+    });
+    
+    // Adicionar classe apropriada ao campo ativo
+    const activeHeader = document.querySelector(`th[onclick="sortBy('${activeField}')"] .fas`);
+    if (activeHeader) {
+        activeHeader.className = currentSort.direction === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+    }
 }
 
 function toggleSelectAll() {
