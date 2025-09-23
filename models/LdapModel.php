@@ -745,8 +745,8 @@ class LdapModel {
                 'department' => 'TI',
                 'title' => 'Administrador de Sistemas',
                 'city' => 'São Paulo',
-                'company' => 'Empresa Exemplo Ltda',
-                'office' => 'Sala 101',
+                'company' => 'Empresa Principal',
+                'office' => 'Escritório Central',
                 'address' => 'Rua Exemplo, 123',
                 'postal_code' => '01234-567',
                 'state' => 'SP',
@@ -757,33 +757,131 @@ class LdapModel {
                 'last_logon' => date('Y-m-d H:i:s', strtotime('-1 hour')),
                 'status' => 'Ativo',
                 'account_control' => 512
+            ],
+            [
+                'dn' => 'CN=João Silva,CN=Users,DC=empresa,DC=local',
+                'username' => 'joao.silva',
+                'name' => 'João Silva',
+                'email' => 'joao.silva@empresa.local',
+                'description' => 'Desenvolvedor Senior',
+                'phone' => '+55 11 9999-0002',
+                'department' => 'TI',
+                'title' => 'Desenvolvedor',
+                'city' => 'São Paulo',
+                'company' => 'Empresa Principal',
+                'office' => 'Escritório Central',
+                'address' => 'Rua Exemplo, 123',
+                'postal_code' => '01234-567',
+                'state' => 'SP',
+                'country' => 'BR',
+                'employee_id' => 'DEV001',
+                'manager' => 'CN=Administrador,CN=Users,DC=empresa,DC=local',
+                'created' => '2024-01-15 09:00:00',
+                'last_logon' => date('Y-m-d H:i:s', strtotime('-30 minutes')),
+                'status' => 'Ativo',
+                'account_control' => 512
+            ],
+            [
+                'dn' => 'CN=Maria Santos,CN=Users,DC=empresa,DC=local',
+                'username' => 'maria.santos',
+                'name' => 'Maria Santos',
+                'email' => 'maria.santos@empresa.local',
+                'description' => 'Analista de RH',
+                'phone' => '+55 11 9999-0003',
+                'department' => 'RH',
+                'title' => 'Analista',
+                'city' => 'Rio de Janeiro',
+                'company' => 'Filial RJ',
+                'office' => 'Sede São Paulo',
+                'address' => 'Av. Rio Branco, 456',
+                'postal_code' => '20040-020',
+                'state' => 'RJ',
+                'country' => 'BR',
+                'employee_id' => 'RH001',
+                'manager' => '',
+                'created' => '2024-02-01 14:00:00',
+                'last_logon' => date('Y-m-d H:i:s', strtotime('-2 hours')),
+                'status' => 'Ativo',
+                'account_control' => 512
+            ],
+            [
+                'dn' => 'CN=Pedro Costa,CN=Users,DC=empresa,DC=local',
+                'username' => 'pedro.costa',
+                'name' => 'Pedro Costa',
+                'email' => 'pedro.costa@empresa.local',
+                'description' => 'Gerente de Vendas',
+                'phone' => '+55 11 9999-0004',
+                'department' => 'Vendas',
+                'title' => 'Gerente',
+                'city' => 'Belo Horizonte',
+                'company' => 'Filial SP',
+                'office' => 'Filial Rio de Janeiro',
+                'address' => 'Rua das Flores, 789',
+                'postal_code' => '30112-000',
+                'state' => 'MG',
+                'country' => 'BR',
+                'employee_id' => 'VEN001',
+                'manager' => '',
+                'created' => '2024-01-20 11:00:00',
+                'last_logon' => date('Y-m-d H:i:s', strtotime('-3 days')),
+                'status' => 'Bloqueado',
+                'account_control' => 514
+            ],
+            [
+                'dn' => 'CN=Ana Oliveira,CN=Users,DC=empresa,DC=local',
+                'username' => 'ana.oliveira',
+                'name' => 'Ana Oliveira',
+                'email' => 'ana.oliveira@empresa.local',
+                'description' => 'Coordenadora Financeiro',
+                'phone' => '+55 11 9999-0005',
+                'department' => 'Financeiro',
+                'title' => 'Coordenador',
+                'city' => 'Brasília',
+                'company' => 'Empresa Principal',
+                'office' => 'Escritório Central',
+                'address' => 'SQN 200, Bloco A',
+                'postal_code' => '70040-010',
+                'state' => 'DF',
+                'country' => 'BR',
+                'employee_id' => 'FIN001',
+                'manager' => '',
+                'created' => '2024-03-01 08:00:00',
+                'last_logon' => date('Y-m-d H:i:s', strtotime('-1 day')),
+                'status' => 'Ativo',
+                'account_control' => 512
             ]
         ];
         
         // Aplicar filtros se fornecidos
         if (!empty($filters)) {
             $users = array_filter($users, function($user) use ($filters) {
-                // Filtro por departamento
+                // Filtro por departamento (comparação exata)
                 if (!empty($filters['department']) && 
-                    stripos($user['department'], $filters['department']) === false) {
+                    strcasecmp($user['department'], $filters['department']) !== 0) {
                     return false;
                 }
                 
-                // Filtro por cidade
+                // Filtro por cidade (comparação exata)
                 if (!empty($filters['city']) && 
-                    stripos($user['city'], $filters['city']) === false) {
+                    strcasecmp($user['city'], $filters['city']) !== 0) {
                     return false;
                 }
                 
-                // Filtro por função/título
+                // Filtro por função/título (comparação exata)
                 if (!empty($filters['title']) && 
-                    stripos($user['title'], $filters['title']) === false) {
+                    strcasecmp($user['title'], $filters['title']) !== 0) {
                     return false;
                 }
                 
-                // Filtro por empresa/organização
+                // Filtro por empresa/organização (comparação exata)
                 if (!empty($filters['company']) && 
-                    stripos($user['company'], $filters['company']) === false) {
+                    strcasecmp($user['company'], $filters['company']) !== 0) {
+                    return false;
+                }
+                
+                // Filtro por escritório (comparação exata)
+                if (!empty($filters['office']) && 
+                    strcasecmp($user['office'], $filters['office']) !== 0) {
                     return false;
                 }
                 
