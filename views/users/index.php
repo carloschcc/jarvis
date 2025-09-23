@@ -318,50 +318,49 @@ ob_start();
                             <?php endif; ?>
                         </td>
                         <td>
-                            <div class="btn-group" style="display: flex; gap: 3px;">
+                            <div class="actions-container">
                                 <!-- Botão Ver Detalhes -->
                                 <button onclick="viewUser('<?= htmlspecialchars($user['username']) ?>')" 
-                                        class="btn btn-info btn-sm" title="Ver detalhes completos">
+                                        class="action-btn btn-view" title="Ver detalhes completos">
                                     <i class="fas fa-eye"></i>
                                 </button>
                                 
                                 <!-- Botão Status -->
                                 <?php if ($user['status'] === 'Ativo'): ?>
                                 <button onclick="toggleStatus('<?= htmlspecialchars($user['username']) ?>', false)" 
-                                        class="btn btn-warning btn-sm" title="Bloquear usuário">
-                                    <i class="fas fa-user-times"></i>
+                                        class="action-btn btn-block" title="Bloquear usuário">
+                                    <i class="fas fa-ban"></i>
                                 </button>
                                 <?php else: ?>
                                 <button onclick="toggleStatus('<?= htmlspecialchars($user['username']) ?>', true)" 
-                                        class="btn btn-success btn-sm" title="Ativar usuário">
-                                    <i class="fas fa-user-check"></i>
+                                        class="action-btn btn-activate" title="Ativar usuário">
+                                    <i class="fas fa-check-circle"></i>
                                 </button>
                                 <?php endif; ?>
                                 
                                 <!-- Botão Reset Senha -->
                                 <button onclick="resetPassword('<?= htmlspecialchars($user['username']) ?>')" 
-                                        class="btn btn-danger btn-sm" title="Redefinir senha">
+                                        class="action-btn btn-reset" title="Redefinir senha">
                                     <i class="fas fa-key"></i>
                                 </button>
                                 
-                                <!-- Dropdown de mais ações -->
-                                <div class="dropdown">
-                                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#" onclick="editUser('<?= htmlspecialchars($user['username']) ?>')">
-                                            <i class="fas fa-edit"></i> Editar
-                                        </a>
-                                        <a class="dropdown-item" href="#" onclick="viewGroups('<?= htmlspecialchars($user['username']) ?>')">
-                                            <i class="fas fa-users"></i> Grupos
-                                        </a>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item text-danger" href="#" onclick="deleteUser('<?= htmlspecialchars($user['username']) ?>')">
-                                            <i class="fas fa-trash"></i> Excluir
-                                        </a>
-                                    </div>
-                                </div>
+                                <!-- Botão Editar -->
+                                <button onclick="editUser('<?= htmlspecialchars($user['username']) ?>')" 
+                                        class="action-btn btn-edit" title="Editar usuário">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                
+                                <!-- Botão Grupos -->
+                                <button onclick="viewGroups('<?= htmlspecialchars($user['username']) ?>')" 
+                                        class="action-btn btn-groups" title="Ver grupos">
+                                    <i class="fas fa-users"></i>
+                                </button>
+                                
+                                <!-- Botão Excluir -->
+                                <button onclick="deleteUser('<?= htmlspecialchars($user['username']) ?>')" 
+                                        class="action-btn btn-delete" title="Excluir usuário">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -990,13 +989,107 @@ function loadMore() {
     font-size: 13px;
 }
 
-.btn-group .btn {
-    padding: 4px 8px;
-    font-size: 11px;
+/* Container de ações dos usuários */
+.actions-container {
+    display: flex;
+    gap: 2px;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
-.dropdown-menu {
-    font-size: 12px;
+/* Botões de ação uniformes */
+.action-btn {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 10px;
+    padding: 0;
+    margin: 1px;
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+}
+
+/* Cores específicas para cada ação */
+.btn-view {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.btn-view:hover {
+    background-color: #138496;
+}
+
+.btn-block {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.btn-block:hover {
+    background-color: #e0a800;
+}
+
+.btn-activate {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-activate:hover {
+    background-color: #218838;
+}
+
+.btn-reset {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-reset:hover {
+    background-color: #c82333;
+}
+
+.btn-edit {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #0069d9;
+}
+
+.btn-groups {
+    background-color: #6f42c1;
+    color: white;
+}
+
+.btn-groups:hover {
+    background-color: #5a32a3;
+}
+
+.btn-delete {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #5a6268;
+}
+
+/* Ícones menores */
+.action-btn i {
+    font-size: 9px;
 }
 
 .user-row:hover {
@@ -1051,9 +1144,19 @@ function loadMore() {
         font-size: 11px;
     }
     
-    .btn-group .btn {
-        padding: 2px 6px;
-        font-size: 10px;
+    /* Ações responsivas */
+    .actions-container {
+        gap: 1px;
+    }
+    
+    .action-btn {
+        width: 20px;
+        height: 20px;
+        font-size: 8px;
+    }
+    
+    .action-btn i {
+        font-size: 8px;
     }
 }
 
