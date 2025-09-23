@@ -18,15 +18,44 @@ class UsersController {
         $search = $_GET['search'] ?? '';
         $limit = (int)($_GET['limit'] ?? 50);
         
+        // Coletar filtros avançados
+        $filters = [
+            'department' => $_GET['department'] ?? '',
+            'city' => $_GET['city'] ?? '',
+            'title' => $_GET['title'] ?? '',
+            'company' => $_GET['company'] ?? '',
+            'office' => $_GET['office'] ?? '',
+            'manager' => $_GET['manager'] ?? '',
+            'status' => $_GET['status'] ?? ''
+        ];
+        
+        // Remover filtros vazios
+        $filters = array_filter($filters, function($value) {
+            return !empty($value) && $value !== 'all';
+        });
+        
         try {
-            // Buscar usuários do LDAP
-            $users = $this->ldapModel->getUsers($search, $limit);
+            // Buscar usuários do LDAP com filtros
+            $users = $this->ldapModel->getUsers($search, $limit, $filters);
             
-            logMessage('INFO', 'Carregados ' . count($users) . ' usuários do LDAP');
+            // Obter listas para os filtros dropdowns
+            $departments = $this->ldapModel->getDepartments();
+            $cities = $this->ldapModel->getCities();
+            $companies = $this->ldapModel->getCompanies();
+            $titles = $this->ldapModel->getTitles();
+            $offices = $this->ldapModel->getOffices();
+            
+            logMessage('INFO', 'Carregados ' . count($users) . ' usuários do LDAP com filtros aplicados');
             
         } catch (Exception $e) {
             logMessage('ERROR', 'Erro ao carregar usuários: ' . $e->getMessage());
             $users = [];
+            // Valores padrão para fallback
+            $departments = ['TI', 'RH', 'Vendas', 'Financeiro', 'Marketing'];
+            $cities = ['São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Brasília'];
+            $companies = ['Empresa Principal', 'Filial SP', 'Filial RJ'];
+            $titles = ['Analista', 'Desenvolvedor', 'Gerente', 'Diretor', 'Coordenador'];
+            $offices = ['Escritório Central', 'Sede São Paulo', 'Filial Rio de Janeiro'];
         }
         
         $data = [
@@ -35,6 +64,12 @@ class UsersController {
             'users' => $users,
             'search' => $search,
             'limit' => $limit,
+            'filters' => $filters,
+            'departments' => $departments,
+            'cities' => $cities,
+            'companies' => $companies,
+            'titles' => $titles,
+            'offices' => $offices,
             'total_users' => count($users),
             'csrf_token' => generateCSRFToken()
         ];
@@ -53,15 +88,32 @@ class UsersController {
         $search = $_GET['q'] ?? '';
         $limit = (int)($_GET['limit'] ?? 20);
         
+        // Coletar filtros avançados
+        $filters = [
+            'department' => $_GET['department'] ?? '',
+            'city' => $_GET['city'] ?? '',
+            'title' => $_GET['title'] ?? '',
+            'company' => $_GET['company'] ?? '',
+            'office' => $_GET['office'] ?? '',
+            'manager' => $_GET['manager'] ?? '',
+            'status' => $_GET['status'] ?? ''
+        ];
+        
+        // Remover filtros vazios
+        $filters = array_filter($filters, function($value) {
+            return !empty($value) && $value !== 'all';
+        });
+        
         try {
-            $users = $this->ldapModel->getUsers($search, $limit);
+            $users = $this->ldapModel->getUsers($search, $limit, $filters);
             
-            logMessage('INFO', 'Busca realizada: "' . $search . '" - ' . count($users) . ' resultados');
+            logMessage('INFO', 'Busca realizada: "' . $search . '" com filtros - ' . count($users) . ' resultados');
             
             echo json_encode([
                 'success' => true,
                 'users' => $users,
-                'total' => count($users)
+                'total' => count($users),
+                'filters_applied' => $filters
             ]);
             
         } catch (Exception $e) {
@@ -236,6 +288,44 @@ class UsersController {
             echo json_encode([
                 'success' => false,
                 'message' => 'Erro ao criar usuário: ' . $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Obter listas para filtros (AJAX)
+     */
+    public function getFilterOptions() {
+        header('Content-Type: application/json');
+        
+        if (!$this->authModel->isLoggedIn()) {
+            echo json_encode(['success' => false, 'message' => 'Não autenticado']);
+            exit;
+        }
+        
+        try {
+            $departments = $this->ldapModel->getDepartments();
+            $cities = $this->ldapModel->getCities();
+            $companies = $this->ldapModel->getCompanies();
+            
+            echo json_encode([
+                'success' => true,
+                'departments' => $departments,
+                'cities' => $cities,
+                'companies' => $companies,
+                'status_options' => [
+                    ['value' => 'all', 'label' => 'Todos os Status'],
+                    ['value' => 'active', 'label' => 'Ativo'],
+                    ['value' => 'disabled', 'label' => 'Bloqueado']
+                ]
+            ]);
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao obter opções de filtro: ' . $e->getMessage());
+            
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erro ao carregar filtros: ' . $e->getMessage()
             ]);
         }
     }

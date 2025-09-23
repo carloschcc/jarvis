@@ -192,30 +192,86 @@ class LdapModel {
     }
     
     /**
-     * Buscar usuários no Active Directory
+     * Buscar usuários no Active Directory com filtros avançados
      */
-    public function getUsers($search = '', $limit = 100) {
+    public function getUsers($search = '', $limit = 100, $filters = []) {
         try {
             if (!$this->isConnected && !$this->connect()) {
                 logMessage('WARNING', 'Conexão LDAP não disponível, usando dados de fallback');
-                return $this->getFallbackUsers($limit, $search);
+                return $this->getFallbackUsers($limit, $search, $filters);
             }
             
             $baseDn = $this->config['base_dn'] ?? 'DC=empresa,DC=local';
             
-            // Construir filtro de busca
-            $filter = '(&(objectClass=user)(!(objectClass=computer))(!(userAccountControl:1.2.840.113556.1.4.803:=2)))';
+            // Construir filtro de busca base
+            $baseFilter = '(&(objectClass=user)(!(objectClass=computer)))';
+            $filterParts = [$baseFilter];
             
+            // Adicionar filtro de busca por texto
             if (!empty($search)) {
                 $searchEscaped = ldap_escape($search, '', LDAP_ESCAPE_FILTER);
-                $filter = "(&(objectClass=user)(!(objectClass=computer))(|(cn=*{$searchEscaped}*)(sAMAccountName=*{$searchEscaped}*)(mail=*{$searchEscaped}*)))";
+                $searchFilter = "(|(cn=*{$searchEscaped}*)(sAMAccountName=*{$searchEscaped}*)(mail=*{$searchEscaped}*)(displayName=*{$searchEscaped}*))";
+                $filterParts[] = $searchFilter;
             }
             
-            // Atributos a serem retornados
+            // Adicionar filtros específicos
+            if (!empty($filters['department'])) {
+                $deptEscaped = ldap_escape($filters['department'], '', LDAP_ESCAPE_FILTER);
+                $filterParts[] = "(department={$deptEscaped})";
+            }
+            
+            if (!empty($filters['city'])) {
+                $cityEscaped = ldap_escape($filters['city'], '', LDAP_ESCAPE_FILTER);
+                $filterParts[] = "(l={$cityEscaped})";
+            }
+            
+            if (!empty($filters['title'])) {
+                $titleEscaped = ldap_escape($filters['title'], '', LDAP_ESCAPE_FILTER);
+                $filterParts[] = "(title={$titleEscaped})";
+            }
+            
+            if (!empty($filters['company'])) {
+                $companyEscaped = ldap_escape($filters['company'], '', LDAP_ESCAPE_FILTER);
+                $filterParts[] = "(company={$companyEscaped})";
+            }
+            
+            if (!empty($filters['office'])) {
+                $officeEscaped = ldap_escape($filters['office'], '', LDAP_ESCAPE_FILTER);
+                $filterParts[] = "(physicalDeliveryOfficeName={$officeEscaped})";
+            }
+            
+            // Filtro de gerente
+            if (isset($filters['manager'])) {
+                if ($filters['manager'] === 'yes') {
+                    $filterParts[] = "(manager=*)";
+                } elseif ($filters['manager'] === 'no') {
+                    $filterParts[] = "(!(manager=*))";
+                }
+            }
+            
+            // Filtro de status
+            if (isset($filters['status'])) {
+                if ($filters['status'] === 'active') {
+                    $filterParts[] = "(!(userAccountControl:1.2.840.113556.1.4.803:=2))";
+                } elseif ($filters['status'] === 'disabled') {
+                    $filterParts[] = "(userAccountControl:1.2.840.113556.1.4.803:=2)";
+                }
+            }
+            
+            // Combinar todos os filtros
+            if (count($filterParts) > 1) {
+                $filter = '(&' . implode('', $filterParts) . ')';
+            } else {
+                $filter = $baseFilter;
+            }
+            
+            // Atributos a serem retornados (expandidos)
             $attributes = [
                 'cn', 'sAMAccountName', 'displayName', 'mail', 'description',
                 'telephoneNumber', 'department', 'whenCreated', 'lastLogon',
-                'userAccountControl', 'distinguishedName'
+                'userAccountControl', 'distinguishedName', 'title', 'l', 
+                'company', 'physicalDeliveryOfficeName', 'streetAddress',
+                'postalCode', 'st', 'c', 'employeeID', 'manager'
             ];
             
             logMessage('INFO', "Executando busca LDAP: {$filter} em {$baseDn}");
@@ -249,6 +305,16 @@ class LdapModel {
                     'description' => $entry['description'][0] ?? '',
                     'phone' => $entry['telephonenumber'][0] ?? '',
                     'department' => $entry['department'][0] ?? '',
+                    'title' => $entry['title'][0] ?? '',
+                    'city' => $entry['l'][0] ?? '',
+                    'company' => $entry['company'][0] ?? '',
+                    'office' => $entry['physicaldeliveryofficename'][0] ?? '',
+                    'address' => $entry['streetaddress'][0] ?? '',
+                    'postal_code' => $entry['postalcode'][0] ?? '',
+                    'state' => $entry['st'][0] ?? '',
+                    'country' => $entry['c'][0] ?? '',
+                    'employee_id' => $entry['employeeid'][0] ?? '',
+                    'manager' => $entry['manager'][0] ?? '',
                     'created' => $this->convertLdapDate($entry['whencreated'][0] ?? ''),
                     'last_logon' => $this->convertWindowsTimestamp($entry['lastlogon'][0] ?? ''),
                     'status' => $this->getUserStatus($entry['useraccountcontrol'][0] ?? 512),
@@ -665,7 +731,7 @@ class LdapModel {
     /**
      * Retornar usuários de fallback quando LDAP não está disponível
      */
-    private function getFallbackUsers($limit = 20, $search = '') {
+    private function getFallbackUsers($limit = 20, $search = '', $filters = []) {
         logMessage('WARNING', 'Usando dados de fallback - LDAP não disponível');
         
         $users = [
@@ -677,6 +743,16 @@ class LdapModel {
                 'description' => 'Conta de administrador',
                 'phone' => '+55 11 9999-0001',
                 'department' => 'TI',
+                'title' => 'Administrador de Sistemas',
+                'city' => 'São Paulo',
+                'company' => 'Empresa Exemplo Ltda',
+                'office' => 'Sala 101',
+                'address' => 'Rua Exemplo, 123',
+                'postal_code' => '01234-567',
+                'state' => 'SP',
+                'country' => 'BR',
+                'employee_id' => 'ADM001',
+                'manager' => '',
                 'created' => '2024-01-01 10:00:00',
                 'last_logon' => date('Y-m-d H:i:s', strtotime('-1 hour')),
                 'status' => 'Ativo',
@@ -684,13 +760,60 @@ class LdapModel {
             ]
         ];
         
+        // Aplicar filtros se fornecidos
+        if (!empty($filters)) {
+            $users = array_filter($users, function($user) use ($filters) {
+                // Filtro por departamento
+                if (!empty($filters['department']) && 
+                    stripos($user['department'], $filters['department']) === false) {
+                    return false;
+                }
+                
+                // Filtro por cidade
+                if (!empty($filters['city']) && 
+                    stripos($user['city'], $filters['city']) === false) {
+                    return false;
+                }
+                
+                // Filtro por função/título
+                if (!empty($filters['title']) && 
+                    stripos($user['title'], $filters['title']) === false) {
+                    return false;
+                }
+                
+                // Filtro por empresa/organização
+                if (!empty($filters['company']) && 
+                    stripos($user['company'], $filters['company']) === false) {
+                    return false;
+                }
+                
+                // Filtro por status
+                if (!empty($filters['status'])) {
+                    $userStatus = strtolower($user['status']);
+                    $filterStatus = strtolower($filters['status']);
+                    
+                    if ($filterStatus === 'active' && $userStatus !== 'ativo') {
+                        return false;
+                    }
+                    if ($filterStatus === 'disabled' && $userStatus !== 'bloqueado') {
+                        return false;
+                    }
+                }
+                
+                return true;
+            });
+        }
+        
         // Filtrar por busca se fornecida
         if (!empty($search)) {
             $users = array_filter($users, function($user) use ($search) {
                 $searchLower = strtolower($search);
                 return strpos(strtolower($user['username']), $searchLower) !== false ||
                        strpos(strtolower($user['name']), $searchLower) !== false ||
-                       strpos(strtolower($user['email']), $searchLower) !== false;
+                       strpos(strtolower($user['email']), $searchLower) !== false ||
+                       strpos(strtolower($user['department']), $searchLower) !== false ||
+                       strpos(strtolower($user['title']), $searchLower) !== false ||
+                       strpos(strtolower($user['city']), $searchLower) !== false;
             });
         }
         
@@ -747,6 +870,196 @@ class LdapModel {
             @ldap_close($this->connection);
         }
         $this->isConnected = false;
+    }
+    
+    /**
+     * Obter lista de departamentos únicos
+     */
+    public function getDepartments() {
+        try {
+            if (!$this->isConnected && !$this->connect()) {
+                return ['TI', 'RH', 'Vendas', 'Financeiro', 'Marketing'];
+            }
+            
+            $baseDn = $this->config['base_dn'] ?? 'DC=empresa,DC=local';
+            $filter = '(&(objectClass=user)(!(objectClass=computer))(department=*))';
+            $attributes = ['department'];
+            
+            $result = @ldap_search($this->connection, $baseDn, $filter, $attributes);
+            
+            if (!$result) {
+                return ['TI', 'RH', 'Vendas', 'Financeiro', 'Marketing'];
+            }
+            
+            $entries = ldap_get_entries($this->connection, $result);
+            $departments = [];
+            
+            for ($i = 0; $i < $entries['count']; $i++) {
+                $dept = $entries[$i]['department'][0] ?? '';
+                if (!empty($dept) && !in_array($dept, $departments)) {
+                    $departments[] = $dept;
+                }
+            }
+            
+            sort($departments);
+            return $departments;
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao buscar departamentos: ' . $e->getMessage());
+            return ['TI', 'RH', 'Vendas', 'Financeiro', 'Marketing'];
+        }
+    }
+    
+    /**
+     * Obter lista de cidades únicas
+     */
+    public function getCities() {
+        try {
+            if (!$this->isConnected && !$this->connect()) {
+                return ['São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Brasília', 'Salvador'];
+            }
+            
+            $baseDn = $this->config['base_dn'] ?? 'DC=empresa,DC=local';
+            $filter = '(&(objectClass=user)(!(objectClass=computer))(l=*))';
+            $attributes = ['l'];
+            
+            $result = @ldap_search($this->connection, $baseDn, $filter, $attributes);
+            
+            if (!$result) {
+                return ['São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Brasília', 'Salvador'];
+            }
+            
+            $entries = ldap_get_entries($this->connection, $result);
+            $cities = [];
+            
+            for ($i = 0; $i < $entries['count']; $i++) {
+                $city = $entries[$i]['l'][0] ?? '';
+                if (!empty($city) && !in_array($city, $cities)) {
+                    $cities[] = $city;
+                }
+            }
+            
+            sort($cities);
+            return $cities;
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao buscar cidades: ' . $e->getMessage());
+            return ['São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Brasília', 'Salvador'];
+        }
+    }
+    
+    /**
+     * Obter lista de empresas/organizações únicas
+     */
+    public function getCompanies() {
+        try {
+            if (!$this->isConnected && !$this->connect()) {
+                return ['Empresa Principal', 'Filial São Paulo', 'Filial Rio de Janeiro'];
+            }
+            
+            $baseDn = $this->config['base_dn'] ?? 'DC=empresa,DC=local';
+            $filter = '(&(objectClass=user)(!(objectClass=computer))(company=*))';
+            $attributes = ['company'];
+            
+            $result = @ldap_search($this->connection, $baseDn, $filter, $attributes);
+            
+            if (!$result) {
+                return ['Empresa Principal', 'Filial São Paulo', 'Filial Rio de Janeiro'];
+            }
+            
+            $entries = ldap_get_entries($this->connection, $result);
+            $companies = [];
+            
+            for ($i = 0; $i < $entries['count']; $i++) {
+                $company = $entries[$i]['company'][0] ?? '';
+                if (!empty($company) && !in_array($company, $companies)) {
+                    $companies[] = $company;
+                }
+            }
+            
+            sort($companies);
+            return $companies;
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao buscar empresas: ' . $e->getMessage());
+            return ['Empresa Principal', 'Filial São Paulo', 'Filial Rio de Janeiro'];
+        }
+    }
+    
+    /**
+     * Obter lista de títulos/funções únicos
+     */
+    public function getTitles() {
+        try {
+            if (!$this->isConnected && !$this->connect()) {
+                return ['Analista', 'Desenvolvedor', 'Gerente', 'Diretor', 'Coordenador', 'Assistente'];
+            }
+            
+            $baseDn = $this->config['base_dn'] ?? 'DC=empresa,DC=local';
+            $filter = '(&(objectClass=user)(!(objectClass=computer))(title=*))';
+            $attributes = ['title'];
+            
+            $result = @ldap_search($this->connection, $baseDn, $filter, $attributes);
+            
+            if (!$result) {
+                return ['Analista', 'Desenvolvedor', 'Gerente', 'Diretor', 'Coordenador', 'Assistente'];
+            }
+            
+            $entries = ldap_get_entries($this->connection, $result);
+            $titles = [];
+            
+            for ($i = 0; $i < $entries['count']; $i++) {
+                $title = $entries[$i]['title'][0] ?? '';
+                if (!empty($title) && !in_array($title, $titles)) {
+                    $titles[] = $title;
+                }
+            }
+            
+            sort($titles);
+            return $titles;
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao buscar títulos: ' . $e->getMessage());
+            return ['Analista', 'Desenvolvedor', 'Gerente', 'Diretor', 'Coordenador', 'Assistente'];
+        }
+    }
+    
+    /**
+     * Obter lista de escritórios únicos
+     */
+    public function getOffices() {
+        try {
+            if (!$this->isConnected && !$this->connect()) {
+                return ['Escritório Central', 'Sede São Paulo', 'Filial Rio de Janeiro', 'Filial Brasília'];
+            }
+            
+            $baseDn = $this->config['base_dn'] ?? 'DC=empresa,DC=local';
+            $filter = '(&(objectClass=user)(!(objectClass=computer))(physicalDeliveryOfficeName=*))';
+            $attributes = ['physicalDeliveryOfficeName'];
+            
+            $result = @ldap_search($this->connection, $baseDn, $filter, $attributes);
+            
+            if (!$result) {
+                return ['Escritório Central', 'Sede São Paulo', 'Filial Rio de Janeiro', 'Filial Brasília'];
+            }
+            
+            $entries = ldap_get_entries($this->connection, $result);
+            $offices = [];
+            
+            for ($i = 0; $i < $entries['count']; $i++) {
+                $office = $entries[$i]['physicaldeliveryofficename'][0] ?? '';
+                if (!empty($office) && !in_array($office, $offices)) {
+                    $offices[] = $office;
+                }
+            }
+            
+            sort($offices);
+            return $offices;
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao buscar escritórios: ' . $e->getMessage());
+            return ['Escritório Central', 'Sede São Paulo', 'Filial Rio de Janeiro', 'Filial Brasília'];
+        }
     }
     
     /**
