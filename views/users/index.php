@@ -831,22 +831,22 @@ function showCreateUser() {
                                         
                                         <div class="form-group">
                                             <label for="createFirstName">Nome (Obrigatório):</label>
-                                            <input type="text" class="form-control" id="createFirstName" placeholder="Ex: Carlos" required>
+                                            <input type="text" class="form-control" id="createFirstName" placeholder="Ex: Carlos" value="João" required>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createLastName">Sobrenome (Obrigatório):</label>
-                                            <input type="text" class="form-control" id="createLastName" placeholder="Ex: Silva" required>
+                                            <input type="text" class="form-control" id="createLastName" placeholder="Ex: Silva" value="Silva" required>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createDisplayName">Nome Completo:</label>
-                                            <input type="text" class="form-control" id="createDisplayName" placeholder="Será preenchido automaticamente" readonly>
+                                            <input type="text" class="form-control" id="createDisplayName" placeholder="Será preenchido automaticamente" value="João Silva" readonly>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createEmail">Email:</label>
-                                            <input type="email" class="form-control" id="createEmail" placeholder="carlos.silva@empresa.com">
+                                            <input type="email" class="form-control" id="createEmail" placeholder="joao.silva@empresa.com" value="joao.silva@empresa.local">
                                         </div>
                                     </div>
                                 </div>
@@ -858,14 +858,14 @@ function showCreateUser() {
                                         
                                         <div class="form-group">
                                             <label for="createUsername">Nome de Usuário (Obrigatório):</label>
-                                            <input type="text" class="form-control" id="createUsername" placeholder="Ex: carlos" required>
+                                            <input type="text" class="form-control" id="createUsername" placeholder="Ex: joao.silva" value="joao.silva" required>
                                             <small class="form-text text-muted">Mínimo 3-4 caracteres, apenas letras e números</small>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createPassword">Senha Inicial (Obrigatório):</label>
                                             <div class="input-group">
-                                                <input type="password" class="form-control" id="createPassword" placeholder="Mínimo 8 caracteres" required>
+                                                <input type="password" class="form-control" id="createPassword" placeholder="Mínimo 8 caracteres" value="TempPass123!" required>
                                                 <div class="input-group-append">
                                                     <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('createPassword')">
                                                         <i class="fas fa-eye"></i>
@@ -900,14 +900,14 @@ function showCreateUser() {
                                         
                                         <div class="form-group">
                                             <label for="createTitle">Função/Cargo:</label>
-                                            <input type="text" class="form-control" id="createTitle" placeholder="Ex: Analista Principal">
+                                            <input type="text" class="form-control" id="createTitle" placeholder="Ex: Analista Principal" value="Analista Jr">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createDepartment">Departamento:</label>
                                             <select class="form-control" id="createDepartment">
                                                 <option value="">Selecione o departamento</option>
-                                                <option value="TI">TI</option>
+                                                <option value="TI" selected>TI</option>
                                                 <option value="RH">RH</option>
                                                 <option value="Financeiro">Financeiro</option>
                                                 <option value="Comercial">Comercial</option>
@@ -920,7 +920,7 @@ function showCreateUser() {
                                             <label for="createCompany">Empresa:</label>
                                             <select class="form-control" id="createCompany">
                                                 <option value="">Selecione a empresa</option>
-                                                <option value="Empresa Principal">Empresa Principal</option>
+                                                <option value="Empresa Principal" selected>Empresa Principal</option>
                                                 <option value="Filial A">Filial A</option>
                                                 <option value="Filial B">Filial B</option>
                                             </select>
@@ -930,7 +930,7 @@ function showCreateUser() {
                                             <label for="createManager">Gestor/Chefe:</label>
                                             <select class="form-control" id="createManager">
                                                 <option value="">Selecione o gestor</option>
-                                                <option value="admin">Administrador</option>
+                                                <option value="admin" selected>Administrador</option>
                                             </select>
                                         </div>
                                     </div>
@@ -947,7 +947,7 @@ function showCreateUser() {
                                             <label for="createCity">Cidade:</label>
                                             <select class="form-control" id="createCity">
                                                 <option value="">Selecione a cidade</option>
-                                                <option value="São Paulo">São Paulo</option>
+                                                <option value="São Paulo" selected>São Paulo</option>
                                                 <option value="Rio de Janeiro">Rio de Janeiro</option>
                                                 <option value="Belo Horizonte">Belo Horizonte</option>
                                                 <option value="Brasília">Brasília</option>
@@ -956,7 +956,7 @@ function showCreateUser() {
                                         
                                         <div class="form-group">
                                             <label for="createOffice">Escritório:</label>
-                                            <input type="text" class="form-control" id="createOffice" placeholder="Ex: Sede Principal">
+                                            <input type="text" class="form-control" id="createOffice" placeholder="Ex: Sede Principal" value="Sede Principal">
                                         </div>
                                     </div>
                                 </div>
@@ -967,12 +967,12 @@ function showCreateUser() {
                                         
                                         <div class="form-group">
                                             <label for="createPhone">Telefone:</label>
-                                            <input type="tel" class="form-control" id="createPhone" placeholder="(11) 99999-9999">
+                                            <input type="tel" class="form-control" id="createPhone" placeholder="(11) 99999-9999" value="(11) 3456-7890">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createMobile">Celular:</label>
-                                            <input type="tel" class="form-control" id="createMobile" placeholder="(11) 99999-9999">
+                                            <input type="tel" class="form-control" id="createMobile" placeholder="(11) 99999-9999" value="(11) 98765-4321">
                                         </div>
                                     </div>
                                 </div>
@@ -1014,7 +1014,7 @@ function showCreateUser() {
                                     <div class="form-section">
                                         <h6 class="section-title"><i class="fas fa-comment"></i> Observações/Descrição</h6>
                                         <div class="form-group">
-                                            <textarea class="form-control" id="createDescription" rows="3" placeholder="Informações adicionais sobre o usuário..."></textarea>
+                                            <textarea class="form-control" id="createDescription" rows="3" placeholder="Informações adicionais sobre o usuário...">Novo funcionário contratado. Acesso inicial aos sistemas básicos da empresa.</textarea>
                                         </div>
                                     </div>
                                 </div>
