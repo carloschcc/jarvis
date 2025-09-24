@@ -905,33 +905,17 @@ function showCreateUser() {
                                         
                                         <div class="form-group">
                                             <label for="createDepartment">Departamento:</label>
-                                            <select class="form-control" id="createDepartment">
-                                                <option value="">Selecione o departamento</option>
-                                                <option value="TI" selected>TI</option>
-                                                <option value="RH">RH</option>
-                                                <option value="Financeiro">Financeiro</option>
-                                                <option value="Comercial">Comercial</option>
-                                                <option value="Marketing">Marketing</option>
-                                                <option value="Operações">Operações</option>
-                                            </select>
+                                            <input type="text" class="form-control" id="createDepartment" placeholder="Ex: TI, RH, Financeiro..." value="TI">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createCompany">Empresa:</label>
-                                            <select class="form-control" id="createCompany">
-                                                <option value="">Selecione a empresa</option>
-                                                <option value="Empresa Principal" selected>Empresa Principal</option>
-                                                <option value="Filial A">Filial A</option>
-                                                <option value="Filial B">Filial B</option>
-                                            </select>
+                                            <input type="text" class="form-control" id="createCompany" placeholder="Ex: Empresa Principal, Filial..." value="Empresa Principal">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createManager">Gestor/Chefe:</label>
-                                            <select class="form-control" id="createManager">
-                                                <option value="">Selecione o gestor</option>
-                                                <option value="admin" selected>Administrador</option>
-                                            </select>
+                                            <input type="text" class="form-control" id="createManager" placeholder="Nome do gestor" value="Administrador">
                                         </div>
                                     </div>
                                 </div>
@@ -945,13 +929,7 @@ function showCreateUser() {
                                         
                                         <div class="form-group">
                                             <label for="createCity">Cidade:</label>
-                                            <select class="form-control" id="createCity">
-                                                <option value="">Selecione a cidade</option>
-                                                <option value="São Paulo" selected>São Paulo</option>
-                                                <option value="Rio de Janeiro">Rio de Janeiro</option>
-                                                <option value="Belo Horizonte">Belo Horizonte</option>
-                                                <option value="Brasília">Brasília</option>
-                                            </select>
+                                            <input type="text" class="form-control" id="createCity" placeholder="Ex: São Paulo, Rio de Janeiro..." value="São Paulo">
                                         </div>
                                         
                                         <div class="form-group">
@@ -1420,10 +1398,10 @@ function createNewUser() {
         password: password,
         email: document.getElementById('createEmail').value.trim(),
         title: document.getElementById('createTitle').value.trim(),
-        department: document.getElementById('createDepartment').value,
-        company: document.getElementById('createCompany').value,
-        manager: document.getElementById('createManager').value,
-        city: document.getElementById('createCity').value,
+        department: document.getElementById('createDepartment').value.trim(),
+        company: document.getElementById('createCompany').value.trim(),
+        manager: document.getElementById('createManager').value.trim(),
+        city: document.getElementById('createCity').value.trim(),
         office: document.getElementById('createOffice').value.trim(),
         phone: document.getElementById('createPhone').value.trim(),
         mobile: document.getElementById('createMobile').value.trim(),
