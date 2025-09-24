@@ -82,8 +82,8 @@ class UsersController {
             'companies' => $companies,
             'titles' => $titles,
             'offices' => $offices,
-            'total_users' => count($users),
-            'csrf_token' => generateCSRFToken()
+            'total_users' => count($users)
+            // csrf_token removido para compatibilidade universal
         ];
         
         $this->loadView('users/index', $data);
@@ -158,10 +158,7 @@ class UsersController {
             exit;
         }
         
-        if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
-            echo json_encode(['success' => false, 'message' => 'Token CSRF inválido']);
-            exit;
-        }
+        // CSRF removido para sistema PHP/XAMPP tradicional
         
         $username = $_POST['username'] ?? '';
         $enable = ($_POST['action'] ?? '') === 'enable';
@@ -196,10 +193,7 @@ class UsersController {
             exit;
         }
         
-        if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
-            echo json_encode(['success' => false, 'message' => 'Token CSRF inválido']);
-            exit;
-        }
+        // CSRF removido para sistema PHP/XAMPP tradicional
         
         $username = $_POST['username'] ?? '';
         $newPassword = $_POST['new_password'] ?? '';
@@ -278,10 +272,7 @@ class UsersController {
             exit;
         }
         
-        if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
-            echo json_encode(['success' => false, 'message' => 'Token CSRF inválido']);
-            exit;
-        }
+        // CSRF removido para sistema PHP/XAMPP tradicional
         
         $userData = [
             'username' => $_POST['username'] ?? '',
@@ -328,10 +319,7 @@ class UsersController {
             exit;
         }
         
-        if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
-            echo json_encode(['success' => false, 'message' => 'Token CSRF inválido']);
-            exit;
-        }
+        // CSRF removido para sistema PHP/XAMPP tradicional
         
         // Decodificar dados do usuário do frontend
         $userDataJson = $_POST['user_data'] ?? '{}';
@@ -438,7 +426,48 @@ class UsersController {
     }
     
     /**
-     * Atualizar usuário
+     * Atualizar informações do usuário (sem modificar RDN)
+     */
+    public function updateUserInfo() {
+        header('Content-Type: application/json');
+        
+        if (!$this->authModel->isLoggedIn() || !$this->authModel->isAdmin()) {
+            echo json_encode(['success' => false, 'message' => 'Acesso negado']);
+            exit;
+        }
+        
+        // CSRF removido para sistema PHP/XAMPP tradicional
+        
+        $username = $_POST['username'] ?? '';
+        $userData = json_decode($_POST['user_data'] ?? '{}', true);
+        
+        if (empty($username)) {
+            echo json_encode(['success' => false, 'message' => 'Nome de usuário não informado']);
+            exit;
+        }
+        
+        try {
+            // Usar método específico que não modifica RDN
+            $result = $this->ldapModel->updateUserAttributes($username, $userData);
+            
+            if ($result['success']) {
+                logMessage('INFO', "Informações do usuário {$username} atualizadas por {$this->authModel->getCurrentUser()['username']}");
+            }
+            
+            echo json_encode($result);
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao atualizar informações do usuário: ' . $e->getMessage());
+            
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erro ao atualizar: ' . $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Atualizar usuário (método original)
      */
     public function updateUser() {
         header('Content-Type: application/json');
@@ -448,10 +477,7 @@ class UsersController {
             exit;
         }
         
-        if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
-            echo json_encode(['success' => false, 'message' => 'Token CSRF inválido']);
-            exit;
-        }
+        // CSRF removido para sistema PHP/XAMPP tradicional
         
         $username = $_POST['username'] ?? '';
         $userData = json_decode($_POST['user_data'] ?? '{}', true);
@@ -491,10 +517,7 @@ class UsersController {
             exit;
         }
         
-        if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
-            echo json_encode(['success' => false, 'message' => 'Token CSRF inválido']);
-            exit;
-        }
+        // CSRF removido para sistema PHP/XAMPP tradicional
         
         $username = $_POST['username'] ?? '';
         

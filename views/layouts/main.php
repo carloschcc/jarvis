@@ -105,10 +105,12 @@
         </div>
     </footer>
     
-    <!-- Scripts -->
+    <!-- Scripts Essenciais -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="assets/js/script.js"></script>
+    
+    <!-- AD Manager - Solução Definitiva (substitui todos os outros JS) -->
+    <script src="assets/js/ad-manager-definitive.js"></script>
     
     <?php if (isset($additional_scripts)): ?>
         <?= $additional_scripts ?>

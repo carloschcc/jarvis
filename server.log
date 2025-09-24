@@ -1,0 +1,38 @@
+[Wed Sep 24 13:13:58 2025] PHP 8.2.29 Development Server (http://localhost:8004) started
+[Wed Sep 24 13:14:09 2025] [::1]:33062 Accepted
+[Wed Sep 24 13:14:09 2025] [::1]:33062 [200]: GET /
+[Wed Sep 24 13:14:09 2025] [::1]:33062 Closing
+[Wed Sep 24 13:14:09 2025] [::1]:33072 Accepted
+[Wed Sep 24 13:14:09 2025] [::1]:33072 Closing
+[Wed Sep 24 13:14:09 2025] [::1]:33086 Accepted
+[Wed Sep 24 13:14:09 2025] [::1]:33086 Closing
+[Wed Sep 24 13:14:09 2025] [::1]:33092 Accepted
+[Wed Sep 24 13:14:09 2025] [::1]:33092 Closing
+[Wed Sep 24 13:14:25 2025] [::1]:49098 Accepted
+[Wed Sep 24 13:14:25 2025] DEBUG: Tentativa de login - Usuario: admin, Senha: [HIDDEN]
+[Wed Sep 24 13:14:25 2025] DEBUG: DEFAULT_ADMIN_USER: admin
+[Wed Sep 24 13:14:25 2025] DEBUG: DEFAULT_ADMIN_PASS: admin123
+[Wed Sep 24 13:14:25 2025] DEBUG: Login admin padrão detectado
+[Wed Sep 24 13:14:25 2025] [::1]:49098 [200]: POST /index.php?page=auth&action=login
+[Wed Sep 24 13:14:25 2025] [::1]:49098 Closing
+[Wed Sep 24 13:14:30 2025] [::1]:49110 Accepted
+[Wed Sep 24 13:14:30 2025] [::1]:49110 [200]: GET /index.php?page=users
+[Wed Sep 24 13:14:30 2025] [::1]:49110 Closing
+[Wed Sep 24 13:14:39 2025] [::1]:60988 Accepted
+[Wed Sep 24 13:14:39 2025] [::1]:60988 [302]: GET /index.php?page=users&username=admin&password=admin123
+[Wed Sep 24 13:14:39 2025] [::1]:60988 Closing
+[Wed Sep 24 13:14:39 2025] [::1]:32770 Accepted
+[Wed Sep 24 13:14:39 2025] [::1]:32770 [200]: GET /index.php?page=login
+[Wed Sep 24 13:14:39 2025] [::1]:32770 Closing
+[Wed Sep 24 13:14:39 2025] [::1]:32782 Accepted
+[Wed Sep 24 13:14:39 2025] [::1]:32784 Accepted
+[Wed Sep 24 13:14:39 2025] [::1]:32782 Closing
+[Wed Sep 24 13:14:39 2025] [::1]:32784 Closing
+[Wed Sep 24 13:14:39 2025] [::1]:32788 Accepted
+[Wed Sep 24 13:14:39 2025] [::1]:32788 Closing
+[Wed Sep 24 13:14:54 2025] [::1]:60312 Accepted
+[Wed Sep 24 13:14:54 2025] [::1]:60312 [200]: POST /index.php?page=users&action=updateUser
+[Wed Sep 24 13:14:54 2025] [::1]:60312 Closing
+[Wed Sep 24 13:15:01 2025] [::1]:34286 Accepted
+[Wed Sep 24 13:15:01 2025] [::1]:34286 [200]: POST /index.php?page=users&action=createUser
+[Wed Sep 24 13:15:01 2025] [::1]:34286 Closing

@@ -1086,6 +1086,144 @@ class LdapModel {
     }
     
     /**
+     * Atualizar atributos do usuário (sem modificar RDN - evita erro "Operation not allowed on RDN")
+     */
+    public function updateUserAttributes($username, $userData) {
+        try {
+            if (!$this->isConnected && !$this->connect()) {
+                return [
+                    'success' => false,
+                    'message' => 'Conexão LDAP não disponível'
+                ];
+            }
+            
+            // Buscar o usuário para obter o DN
+            $user = $this->getUser($username);
+            
+            if (!$user) {
+                return [
+                    'success' => false,
+                    'message' => 'Usuário não encontrado'
+                ];
+            }
+            
+            // Preparar apenas atributos seguros (não RDN)
+            $attributes = [];
+            
+            // Email (mail)
+            if (isset($userData['email'])) {
+                if (!empty($userData['email'])) {
+                    $attributes['mail'] = $userData['email'];
+                } else {
+                    $attributes['mail'] = [];
+                }
+            }
+            
+            // Telefone (telephoneNumber)
+            if (isset($userData['phone'])) {
+                if (!empty($userData['phone'])) {
+                    $attributes['telephoneNumber'] = $userData['phone'];
+                } else {
+                    $attributes['telephoneNumber'] = [];
+                }
+            }
+            
+            // Função/Cargo (title)
+            if (isset($userData['title'])) {
+                if (!empty($userData['title'])) {
+                    $attributes['title'] = $userData['title'];
+                } else {
+                    $attributes['title'] = [];
+                }
+            }
+            
+            // Departamento (department)
+            if (isset($userData['department'])) {
+                if (!empty($userData['department'])) {
+                    $attributes['department'] = $userData['department'];
+                } else {
+                    $attributes['department'] = [];
+                }
+            }
+            
+            // Empresa (company)
+            if (isset($userData['company'])) {
+                if (!empty($userData['company'])) {
+                    $attributes['company'] = $userData['company'];
+                } else {
+                    $attributes['company'] = [];
+                }
+            }
+            
+            // Cidade (l - locality)
+            if (isset($userData['city'])) {
+                if (!empty($userData['city'])) {
+                    $attributes['l'] = $userData['city'];
+                } else {
+                    $attributes['l'] = [];
+                }
+            }
+            
+            // Escritório (physicalDeliveryOfficeName)
+            if (isset($userData['office'])) {
+                if (!empty($userData['office'])) {
+                    $attributes['physicalDeliveryOfficeName'] = $userData['office'];
+                } else {
+                    $attributes['physicalDeliveryOfficeName'] = [];
+                }
+            }
+            
+            // Descrição (description)
+            if (isset($userData['description'])) {
+                if (!empty($userData['description'])) {
+                    $attributes['description'] = $userData['description'];
+                } else {
+                    $attributes['description'] = [];
+                }
+            }
+            
+            // Se não há atributos para atualizar
+            if (empty($attributes)) {
+                return [
+                    'success' => true,
+                    'message' => 'Nenhuma alteração necessária'
+                ];
+            }
+            
+            logMessage('INFO', "Atualizando atributos seguros do usuário: {$username}");
+            logMessage('DEBUG', "Atributos: " . json_encode($attributes));
+            
+            // Realizar atualização LDAP
+            $result = @ldap_modify($this->connection, $user['dn'], $attributes);
+            
+            if (!$result) {
+                $error = ldap_error($this->connection);
+                logMessage('ERROR', "Falha ao atualizar atributos do usuário: {$error}");
+                
+                return [
+                    'success' => false,
+                    'message' => 'Erro LDAP: ' . $error
+                ];
+            }
+            
+            logMessage('INFO', "Atributos do usuário {$username} atualizados com sucesso");
+            
+            return [
+                'success' => true,
+                'message' => 'Informações atualizadas com sucesso'
+            ];
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao atualizar atributos do usuário: ' . $e->getMessage());
+            
+            return [
+                'success' => false,
+                'message' => 'Erro ao atualizar informações: ' . $e->getMessage()
+            ];
+        }
+    }
+    
+    /**
      * Excluir usuário do Active Directory
      */
     public function deleteUser($username) {

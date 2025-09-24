@@ -9,10 +9,16 @@
 
 session_start();
 
-// Configurações básicas
+// Configurações básicas para XAMPP
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+ini_set('log_errors', 1);
 date_default_timezone_set('America/Sao_Paulo');
+
+// Verificar se o sistema está funcionando
+if (!function_exists('session_start')) {
+    die('ERRO: PHP não está configurado corretamente. Verifique se o XAMPP está rodando.');
+}
 
 // Definir constantes do sistema
 define('ROOT_PATH', __DIR__);
@@ -23,7 +29,20 @@ define('VIEWS_PATH', ROOT_PATH . '/views');
 define('ASSETS_PATH', ROOT_PATH . '/assets');
 define('STORAGE_PATH', ROOT_PATH . '/storage');
 
-// Incluir arquivos de configuração
+// Incluir arquivos de configuração com verificação
+if (!file_exists(CONFIG_PATH . '/database.php')) {
+    die('ERRO: Arquivo de configuração não encontrado. Verifique se descompactou todos os arquivos na pasta htdocs.');
+}
+
+if (!file_exists(CONFIG_PATH . '/app.php')) {
+    die('ERRO: Arquivo app.php não encontrado. Verifique a instalação.');
+}
+
+// Incluir configurações XAMPP se existirem
+if (file_exists(CONFIG_PATH . '/xampp.php')) {
+    require_once CONFIG_PATH . '/xampp.php';
+}
+
 require_once CONFIG_PATH . '/database.php';
 require_once CONFIG_PATH . '/app.php';
 

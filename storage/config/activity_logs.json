@@ -1,5 +1,197 @@
 [
     {
+        "id": "68d43607cad1a",
+        "timestamp": "2025-09-24 15:18:47",
+        "action": "LOGIN",
+        "user": "admin",
+        "details": "Login como administrador padr\u00e3o",
+        "ip": "10.12.87.150"
+    },
+    {
+        "id": "68d43196988e4",
+        "timestamp": "2025-09-24 14:59:50",
+        "action": "LOGIN",
+        "user": "admin",
+        "details": "Login como administrador padr\u00e3o",
+        "ip": "10.12.87.150"
+    },
+    {
+        "id": "68d42a96986b7",
+        "timestamp": "2025-09-24 14:29:58",
+        "action": "LOGIN",
+        "user": "admin",
+        "details": "Login como administrador padr\u00e3o",
+        "ip": "10.12.87.150"
+    },
+    {
+        "id": "68d42a7ea89e9",
+        "timestamp": "2025-09-24 14:29:34",
+        "action": "LOGIN",
+        "user": "admin",
+        "details": "Login como administrador padr\u00e3o",
+        "ip": "10.12.87.150"
+    },
+    {
+        "id": "68d42a7a11654",
+        "timestamp": "2025-09-24 14:29:30",
+        "action": "LOGOUT",
+        "user": "admin",
+        "details": "Logout do sistema",
+        "ip": "10.12.87.150"
+    },
+    {
+        "id": "68d3f825a7e4e",
+        "timestamp": "2025-09-24 10:54:45",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "10.12.89.188"
+    },
+    {
+        "id": "68d3f2376d080",
+        "timestamp": "2025-09-24 10:29:27",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "10.12.89.188"
+    },
+    {
+        "id": "68d3f230a4262",
+        "timestamp": "2025-09-24 10:29:20",
+        "action": "LOGIN",
+        "user": "admin",
+        "details": "Login como administrador padr\u00e3o",
+        "ip": "10.12.89.188"
+    },
+    {
+        "id": "68d3f21126dd0",
+        "timestamp": "2025-09-24 10:28:49",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "10.12.89.188"
+    },
+    {
+        "id": "68d3f1f7eaa6f",
+        "timestamp": "2025-09-24 10:28:23",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "10.12.89.188"
+    },
+    {
+        "id": "68d3eebfa9ea6",
+        "timestamp": "2025-09-24 10:14:39",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "::1"
+    },
+    {
+        "id": "68d3eeb1d40c1",
+        "timestamp": "2025-09-24 10:14:25",
+        "action": "LOGIN",
+        "user": "admin",
+        "details": "Login como administrador padr\u00e3o",
+        "ip": "::1"
+    },
+    {
+        "id": "68d3eea179ca1",
+        "timestamp": "2025-09-24 10:14:09",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "::1"
+    },
+    {
+        "id": "68d3ee18a19b2",
+        "timestamp": "2025-09-24 10:11:52",
+        "action": "LOGIN",
+        "user": "admin",
+        "details": "Login como administrador padr\u00e3o",
+        "ip": "::1"
+    },
+    {
+        "id": "68d3ee09585f3",
+        "timestamp": "2025-09-24 10:11:37",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "::1"
+    },
+    {
+        "id": "68d3ecaaa6d04",
+        "timestamp": "2025-09-24 10:05:46",
+        "action": "LOGIN",
+        "user": "admin",
+        "details": "Login como administrador padr\u00e3o",
+        "ip": "::1"
+    },
+    {
+        "id": "68d3eca5c27ca",
+        "timestamp": "2025-09-24 10:05:41",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "::1"
+    },
+    {
+        "id": "68d3ec008391d",
+        "timestamp": "2025-09-24 10:02:56",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "::1"
+    },
+    {
+        "id": "68d3ebed2b908",
+        "timestamp": "2025-09-24 10:02:37",
+        "action": "LOGIN",
+        "user": "admin",
+        "details": "Login como administrador padr\u00e3o",
+        "ip": "::1"
+    },
+    {
+        "id": "68d3e1c212703",
+        "timestamp": "2025-09-24 09:19:14",
+        "action": "LOGIN",
+        "user": "admin",
+        "details": "Login como administrador padr\u00e3o",
+        "ip": "::1"
+    },
+    {
+        "id": "68d3e1bd5f8cd",
+        "timestamp": "2025-09-24 09:19:09",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "::1"
+    },
+    {
+        "id": "68d3e03ac17fd",
+        "timestamp": "2025-09-24 09:12:42",
+        "action": "LOGIN",
+        "user": "admin",
+        "details": "Login como administrador padr\u00e3o",
+        "ip": "::1"
+    },
+    {
+        "id": "68d3e01b4c318",
+        "timestamp": "2025-09-24 09:12:11",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "::1"
+    },
+    {
+        "id": "68d3dea72b783",
+        "timestamp": "2025-09-24 09:05:59",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "10.12.89.188"
+    },
+    {
         "id": "68d2f26fcb837",
         "timestamp": "2025-09-23 16:18:07",
         "action": "LOGIN",

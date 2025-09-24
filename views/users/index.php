@@ -183,7 +183,7 @@ ob_start();
                         Exportar
                     </button>
                     
-                    <button onclick="showCreateUser()" class="btn btn-info">
+                    <button onclick="openCreateUserModal()" class="btn btn-info" id="btn-create-user">
                         <i class="fas fa-user-plus"></i>
                         Novo Usuário
                     </button>
@@ -333,13 +333,13 @@ ob_start();
                                 <?php endif; ?>
                                 
                                 <!-- Botão Editar -->
-                                <button onclick="editUser('<?= htmlspecialchars($user['username']) ?>')" 
+                                <button onclick="openEditUserModal('<?= htmlspecialchars($user['username']) ?>')" 
                                         class="action-btn btn-edit" title="Editar usuário">
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 
                                 <!-- Botão Reset Senha -->
-                                <button onclick="resetPassword('<?= htmlspecialchars($user['username']) ?>')" 
+                                <button onclick="openResetPasswordModal('<?= htmlspecialchars($user['username']) ?>')" 
                                         class="action-btn btn-reset" title="Redefinir senha">
                                     <i class="fas fa-key"></i>
                                 </button>
@@ -382,7 +382,10 @@ ob_start();
     <?php endif; ?>
 </div>
 
-<!-- Scripts -->
+<!-- SCRIPT DEFINITIVO - AD MANAGER SOLUTION -->
+<script src="<?= ASSETS_PATH ?>/js/ad-manager-definitive.js"></script>
+
+<!-- Scripts complementares -->
 <script>
 // Variáveis globais
 let currentSort = { field: 'name', direction: 'asc' };
@@ -447,7 +450,7 @@ function toggleStatus(username, enable) {
         fetch('index.php?page=users&action=toggleStatus', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: `username=${username}&action=${enable ? 'enable' : 'disable'}&csrf_token=<?= $csrf_token ?>`
+            body: `username=${username}&action=${enable ? 'enable' : 'disable'}`
         })
         .then(response => response.json())
         .then(data => {
@@ -559,7 +562,7 @@ function executePasswordReset(username) {
     fetch('index.php?page=users&action=resetPassword', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `username=${encodeURIComponent(username)}&new_password=${encodeURIComponent(newPassword)}&force_change=${forceChange}&csrf_token=<?= $csrf_token ?>`
+        body: `username=${encodeURIComponent(username)}&new_password=${encodeURIComponent(newPassword)}&force_change=${forceChange}`
     })
     .then(response => {
         if (!response.ok) {
@@ -659,7 +662,7 @@ function showUserModal(user) {
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                        <button type="button" class="btn btn-primary" onclick="editUser('${user.username}')">Editar</button>
+                        <button type="button" class="btn btn-primary" onclick="openEditUserModal('${user.username}')">Editar</button>
                     </div>
                 </div>
             </div>
@@ -834,215 +837,11 @@ function exportResults() {
     console.log('Export results');
 }
 
-// Função para mostrar modal de criação de usuário
-function showCreateUser() {
-    showCreateUserModal();
-}
+// REMOVIDA: função duplicada - usando ad-manager-fix.js
 
-// Modal para criar novo usuário
-function showCreateUserModal() {
-    const modalHtml = `
-        <div class="modal fade" id="createUserModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            <i class="fas fa-user-plus"></i> Criar Novo Usuário
-                        </h5>
-                        <button type="button" class="close" data-dismiss="modal">
-                            <span>&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="createUserForm">
-                            <div class="alert alert-info">
-                                <strong>Campos Obrigatórios:</strong> Nome, Sobrenome, Nome de Usuário e Email são obrigatórios.
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="createGivenName">Nome (GivenName): <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="createGivenName" placeholder="Ex: Carlos" required>
-                                        <small class="form-text text-muted">Primeiro nome do usuário</small>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="createSurname">Sobrenome (Surname): <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="createSurname" placeholder="Ex: Silva" required>
-                                        <small class="form-text text-muted">Sobrenome do usuário</small>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="createUsername">Nome de Usuário: <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="createUsername" placeholder="Ex: carlos.silva" required>
-                                        <small class="form-text text-muted">Login do usuário no sistema</small>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="createEmail">Email (UserPrincipalName): <span class="text-danger">*</span></label>
-                                        <input type="email" class="form-control" id="createEmail" placeholder="Ex: carlos.silva@empresa.com" required>
-                                        <small class="form-text text-muted">Email principal do usuário</small>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="createPassword">Senha Inicial: <span class="text-danger">*</span></label>
-                                        <input type="password" class="form-control" id="createPassword" placeholder="Mínimo 8 caracteres" minlength="8" required>
-                                        <small class="form-text text-muted">Senha temporária para primeiro acesso</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="createDepartment">Departamento:</label>
-                                        <input type="text" class="form-control" id="createDepartment" placeholder="Ex: TI">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="createCompany">Empresa:</label>
-                                        <input type="text" class="form-control" id="createCompany" placeholder="Ex: Empresa Principal">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="createTitle">Função/Cargo:</label>
-                                        <input type="text" class="form-control" id="createTitle" placeholder="Ex: Analista de Sistemas">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="createPhone">Telefone:</label>
-                                        <input type="tel" class="form-control" id="createPhone" placeholder="Ex: (11) 99999-9999">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="createPath">Unidade Organizacional (OU):</label>
-                                        <select class="form-control" id="createPath">
-                                            <option value="CN=Users,DC=empresa,DC=com">Users (Padrão)</option>
-                                            <option value="OU=TI,DC=empresa,DC=com">TI</option>
-                                            <option value="OU=RH,DC=empresa,DC=com">RH</option>
-                                            <option value="OU=Vendas,DC=empresa,DC=com">Vendas</option>
-                                            <option value="OU=Financeiro,DC=empresa,DC=com">Financeiro</option>
-                                        </select>
-                                        <small class="form-text text-muted">Local onde o usuário será criado no AD</small>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label for="createDescription">Descrição:</label>
-                                        <textarea class="form-control" id="createDescription" rows="3" placeholder="Informações adicionais sobre o usuário..."></textarea>
-                                    </div>
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="createForcePasswordChange" checked>
-                                        <label class="form-check-label" for="createForcePasswordChange">
-                                            Forçar mudança de senha no primeiro login
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-success" onclick="executeCreateUser()">
-                            <i class="fas fa-user-plus"></i> Criar Usuário
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Remover modal existente
-    const existingModal = document.getElementById('createUserModal');
-    if (existingModal) existingModal.remove();
-    
-    // Adicionar e mostrar novo modal
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    $('#createUserModal').modal('show');
-}
+// REMOVIDA: função duplicada - usando ad-manager-fix.js
 
-// Executar criação de usuário
-function executeCreateUser() {
-    const givenName = document.getElementById('createGivenName').value.trim();
-    const surname = document.getElementById('createSurname').value.trim();
-    const username = document.getElementById('createUsername').value.trim();
-    const email = document.getElementById('createEmail').value.trim();
-    const password = document.getElementById('createPassword').value;
-    
-    // Validações básicas
-    if (!givenName || !surname || !username || !email || !password) {
-        showNotification('Todos os campos obrigatórios devem ser preenchidos', 'error');
-        return;
-    }
-    
-    if (password.length < 8) {
-        showNotification('A senha deve ter pelo menos 8 caracteres', 'error');
-        return;
-    }
-    
-    // Validar formato do email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        showNotification('Email deve ter um formato válido', 'error');
-        return;
-    }
-    
-    // Coletar todos os dados do formulário
-    const userData = {
-        givenName: givenName,
-        surname: surname,
-        name: `${givenName} ${surname}`,
-        username: username,
-        email: email,
-        password: password,
-        department: document.getElementById('createDepartment').value.trim(),
-        company: document.getElementById('createCompany').value.trim(),
-        title: document.getElementById('createTitle').value.trim(),
-        phone: document.getElementById('createPhone').value.trim(),
-        path: document.getElementById('createPath').value,
-        description: document.getElementById('createDescription').value.trim(),
-        forcePasswordChange: document.getElementById('createForcePasswordChange').checked
-    };
-    
-    // Mostrar loading
-    const createButton = document.querySelector('#createUserModal .btn-success');
-    const originalText = createButton.innerHTML;
-    createButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando...';
-    createButton.disabled = true;
-    
-    fetch('index.php?page=users&action=createUser', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `user_data=${encodeURIComponent(JSON.stringify(userData))}&csrf_token=<?= $csrf_token ?>`
-    })
-    .then(response => response.json())
-    .then(data => {
-        createButton.innerHTML = originalText;
-        createButton.disabled = false;
-        
-        if (data.success) {
-            $('#createUserModal').modal('hide');
-            showNotification(data.message, 'success');
-            setTimeout(() => window.location.reload(), 1500);
-        } else {
-            showNotification('Erro ao criar usuário: ' + data.message, 'error');
-        }
-    })
-    .catch(error => {
-        createButton.innerHTML = originalText;
-        createButton.disabled = false;
-        showNotification('Erro de comunicação: ' + error.message, 'error');
-    });
-}
-
-// Função para editar usuário
-function editUser(username) {
-    fetch(`index.php?page=users&action=getUser&username=${username}`)
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showEditUserModal(data.user);
-        } else {
-            showNotification('Erro ao carregar usuário: ' + data.message, 'error');
-        }
-    })
-    .catch(error => {
-        showNotification('Erro de comunicação: ' + error.message, 'error');
-    });
-}
+// REMOVIDAS: funções duplicadas - usando ad-manager-fix.js
 
 // Modal para editar usuário
 function showEditUserModal(user) {
@@ -1106,7 +905,7 @@ function showEditUserModal(user) {
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-primary" onclick="saveUserEdit('${user.username}')">Salvar Alterações</button>
+                        <button type="button" class="btn btn-primary" onclick="executeUserEdit('${user.username}')">Salvar Alterações</button>
                     </div>
                 </div>
             </div>
@@ -1124,70 +923,120 @@ function showEditUserModal(user) {
 
 // Salvar edição do usuário
 function saveUserEdit(username) {
-    // Validar campos obrigatórios
-    const name = document.getElementById('editName').value.trim();
-    if (!name) {
-        showNotification('Nome completo é obrigatório', 'error');
-        return;
-    }
+    console.log('saveUserEdit() chamada para usuário:', username);
     
-    // Validar email se fornecido
-    const email = document.getElementById('editEmail').value.trim();
-    if (email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            showNotification('Email deve ter um formato válido', 'error');
+    try {
+        // Verificar se os campos existem
+        const nameEl = document.getElementById('editName');
+        const emailEl = document.getElementById('editEmail');
+        const phoneEl = document.getElementById('editPhone');
+        const titleEl = document.getElementById('editTitle');
+        const departmentEl = document.getElementById('editDepartment');
+        const companyEl = document.getElementById('editCompany');
+        const cityEl = document.getElementById('editCity');
+        const officeEl = document.getElementById('editOffice');
+        const descriptionEl = document.getElementById('editDescription');
+        
+        if (!nameEl) {
+            throw new Error('Campo nome não encontrado');
+        }
+        
+        // Validar campos obrigatórios
+        const name = nameEl.value.trim();
+        if (!name) {
+            showNotification('Nome completo é obrigatório', 'error');
             return;
         }
-    }
-    
-    const userData = {
-        name: name,
-        email: email,
-        phone: document.getElementById('editPhone').value.trim(),
-        title: document.getElementById('editTitle').value.trim(),
-        department: document.getElementById('editDepartment').value.trim(),
-        company: document.getElementById('editCompany').value.trim(),
-        city: document.getElementById('editCity').value.trim(),
-        office: document.getElementById('editOffice').value.trim(),
-        description: document.getElementById('editDescription').value.trim()
-    };
-    
-    // Mostrar loading
-    const saveButton = document.querySelector('#editUserModal .btn-primary');
-    const originalText = saveButton.innerHTML;
-    saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
-    saveButton.disabled = true;
-    
-    fetch('index.php?page=users&action=updateUser', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `username=${encodeURIComponent(username)}&user_data=${encodeURIComponent(JSON.stringify(userData))}&csrf_token=<?= $csrf_token ?>`
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        saveButton.innerHTML = originalText;
-        saveButton.disabled = false;
         
-        if (data.success) {
-            $('#editUserModal').modal('hide');
-            showNotification(data.message || 'Usuário atualizado com sucesso', 'success');
-            setTimeout(() => window.location.reload(), 1500);
-        } else {
-            showNotification('Erro ao salvar: ' + (data.message || 'Erro desconhecido'), 'error');
+        // Validar email se fornecido
+        const email = emailEl ? emailEl.value.trim() : '';
+        if (email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showNotification('Email deve ter um formato válido', 'error');
+                return;
+            }
         }
-    })
-    .catch(error => {
-        saveButton.innerHTML = originalText;
-        saveButton.disabled = false;
-        console.error('Erro na atualização:', error);
-        showNotification('Erro de comunicação: ' + error.message, 'error');
-    });
+        
+        const userData = {
+            name: name,
+            email: email,
+            phone: phoneEl ? phoneEl.value.trim() : '',
+            title: titleEl ? titleEl.value.trim() : '',
+            department: departmentEl ? departmentEl.value.trim() : '',
+            company: companyEl ? companyEl.value.trim() : '',
+            city: cityEl ? cityEl.value.trim() : '',
+            office: officeEl ? officeEl.value.trim() : '',
+            description: descriptionEl ? descriptionEl.value.trim() : ''
+        };
+        
+        console.log('Dados do usuário coletados:', userData);
+        
+        // Mostrar loading
+        const saveButton = document.querySelector('#editUserModal .btn-primary');
+        if (!saveButton) {
+            throw new Error('Botão salvar não encontrado');
+        }
+        
+        const originalText = saveButton.innerHTML;
+        saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+        saveButton.disabled = true;
+        
+        // CSRF token removido para compatibilidade universal
+        const requestBody = `username=${encodeURIComponent(username)}&user_data=${encodeURIComponent(JSON.stringify(userData))}`;
+        console.log('Enviando requisição...');
+        
+        fetch('index.php?page=users&action=updateUserInfo', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: requestBody
+        })
+        .then(response => {
+            console.log('Resposta recebida:', response.status, response.statusText);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            return response.text().then(text => {
+                console.log('Texto da resposta:', text);
+                
+                try {
+                    return JSON.parse(text);
+                } catch (parseError) {
+                    console.error('Erro ao fazer parse do JSON:', parseError);
+                    throw new Error('Resposta não é JSON válido: ' + text.substring(0, 200));
+                }
+            });
+        })
+        .then(data => {
+            saveButton.innerHTML = originalText;
+            saveButton.disabled = false;
+            
+            console.log('Dados recebidos:', data);
+            
+            if (data.success) {
+                $('#editUserModal').modal('hide');
+                showNotification(data.message || 'Usuário atualizado com sucesso', 'success');
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showNotification('Erro ao salvar: ' + (data.message || 'Erro desconhecido'), 'error');
+            }
+        })
+        .catch(error => {
+            saveButton.innerHTML = originalText;
+            saveButton.disabled = false;
+            console.error('Erro na atualização:', error);
+            showNotification('Erro de comunicação: ' + error.message, 'error');
+        });
+        
+    } catch (error) {
+        console.error('Erro em saveUserEdit:', error);
+        showNotification('Erro interno: ' + error.message, 'error');
+    }
 }
 
 // Função para ver grupos do usuário
@@ -1267,7 +1116,7 @@ function deleteUser(username) {
         fetch('index.php?page=users&action=deleteUser', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: `username=${username}&csrf_token=<?= $csrf_token ?>`
+            body: `username=${username}`
         })
         .then(response => response.json())
         .then(data => {
@@ -1699,6 +1548,74 @@ function loadMore() {
     100% { transform: rotate(360deg); }
 }
 </style>
+
+<!-- Script de Inicialização e Debug -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('=== AD MANAGER DEBUG INIT ===');
+    
+    // Testar dependências
+    if (typeof $ === 'undefined') {
+        console.error('❌ jQuery NÃO carregado!');
+        alert('ERRO CRÍTICO: jQuery não carregado. Recarregue a página.');
+        return;
+    } else {
+        console.log('✅ jQuery carregado:', $.fn.jquery);
+    }
+    
+    if (typeof $.fn.modal === 'undefined') {
+        console.error('❌ Bootstrap Modal NÃO carregado!');
+        alert('ERRO CRÍTICO: Bootstrap não carregado. Recarregue a página.');
+        return;
+    } else {
+        console.log('✅ Bootstrap Modal carregado');
+    }
+    
+    // Testar funções principais
+    if (typeof openCreateUserModal !== 'function') {
+        console.error('❌ Função openCreateUserModal não definida!');
+    } else {
+        console.log('✅ Função openCreateUserModal definida');
+    }
+    
+    if (typeof executeUserEdit !== 'function') {
+        console.error('❌ Função executeUserEdit não definida!');
+    } else {
+        console.log('✅ Função executeUserEdit definida');
+    }
+    
+    // Testar botão Novo Usuário
+    const newUserBtn = document.querySelector('button[onclick="openCreateUserModal()"]');
+    if (!newUserBtn) {
+        console.error('❌ Botão Novo Usuário não encontrado!');
+    } else {
+        console.log('✅ Botão Novo Usuário encontrado:', newUserBtn);
+    }
+    
+    console.log('=== FIM DEBUG INIT ===');
+    
+    // Adicionar listener de clique alternativo no botão (fallback)
+    if (newUserBtn) {
+        newUserBtn.addEventListener('click', function(e) {
+            console.log('Click alternativo no botão Novo Usuário');
+            if (typeof openCreateUserModal === 'function') {
+                e.preventDefault();
+                openCreateUserModal();
+            }
+        });
+    }
+});
+
+// Função de teste global
+window.testCreateUserModal = function() {
+    console.log('Teste manual do modal...');
+    if (typeof openCreateUserModal === 'function') {
+        openCreateUserModal();
+    } else {
+        console.error('openCreateUserModal não está definida!');
+    }
+};
+</script>
 
 <?php
 $content = ob_get_clean();

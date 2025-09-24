@@ -58,7 +58,7 @@
         
         <!-- Formulário de login -->
         <form id="login-form" class="login-form" method="POST" action="index.php?page=auth&action=login">
-            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token ?? '') ?>">
+            <!-- CSRF token removido para compatibilidade universal -->
             
             <div class="form-group">
                 <label for="username" class="form-label">Usuário</label>

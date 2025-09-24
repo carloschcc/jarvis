@@ -31,8 +31,8 @@ class ConfigController {
             'title' => 'Configurações LDAP - ' . APP_NAME,
             'current_user' => $currentUser,
             'ldap_config' => $ldapConfig,
-            'ldap_extension_loaded' => extension_loaded('ldap'),
-            'csrf_token' => generateCSRFToken()
+            'ldap_extension_loaded' => extension_loaded('ldap')
+            // csrf_token removido para compatibilidade universal
         ];
         
         $this->loadView('config/index', $data);
@@ -46,10 +46,7 @@ class ConfigController {
             exit;
         }
         
-        if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
-            echo json_encode(['success' => false, 'message' => 'Token CSRF inválido']);
-            exit;
-        }
+        // CSRF removido para sistema PHP/XAMPP tradicional
         
         $config = [
             'server' => trim($_POST['server'] ?? ''),
@@ -117,10 +114,7 @@ class ConfigController {
             exit;
         }
         
-        if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
-            echo json_encode(['success' => false, 'message' => 'Token CSRF inválido']);
-            exit;
-        }
+        // CSRF removido para sistema PHP/XAMPP tradicional
         
         // Primeiro verificar se a extensão LDAP está disponível
         if (!extension_loaded('ldap')) {
