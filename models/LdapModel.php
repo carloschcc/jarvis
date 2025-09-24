@@ -464,22 +464,49 @@ class LdapModel {
                 logMessage('WARNING', 'LDAP não disponível - simulando criação de usuário');
                 
                 // Modo de desenvolvimento/demonstração - simular sucesso
+                $simulatedDn = "CN={$userData['displayName']},CN=Users,DC=empresa,DC=local";
+                
+                logMessage('INFO', 'MODO SIMULAÇÃO: Usuário seria criado no AD', [
+                    'username' => $userData['username'],
+                    'display_name' => $userData['displayName'],
+                    'simulated_dn' => $simulatedDn,
+                    'department' => $userData['department'] ?? 'N/A'
+                ]);
+                
                 return [
                     'success' => true,
-                    'message' => "Usuário '{$userData['displayName']}' seria criado no AD (LDAP não configurado)",
+                    'message' => "✅ SIMULAÇÃO: Usuário '{$userData['displayName']}' seria criado com sucesso no Active Directory! (LDAP não configurado - modo demonstração)",
                     'mode' => 'simulation',
+                    'username' => $userData['username'],
+                    'dn' => $simulatedDn,
                     'details' => [
-                        'username' => $userData['username'],
                         'display_name' => $userData['displayName'],
                         'email' => $userData['email'] ?? 'N/A',
-                        'department' => $userData['department'] ?? 'N/A'
-                    ]
+                        'department' => $userData['department'] ?? 'N/A',
+                        'title' => $userData['title'] ?? 'N/A',
+                        'city' => $userData['city'] ?? 'N/A',
+                        'company' => $userData['company'] ?? 'N/A'
+                    ],
+                    'note' => 'Para usar com AD real, configure as credenciais LDAP em Configurações.'
                 ];
             }
             
             $baseDn = $this->config['base_dn'] ?? 'DC=empresa,DC=local';
             $displayName = $userData['displayName'] ?: $userData['firstName'] . ' ' . $userData['lastName'];
-            $userDn = "CN={$displayName},CN=Users,{$baseDn}";
+            
+            // Tentar diferentes estruturas de OU para criação de usuários
+            $possibleContainers = [
+                "CN=Users,{$baseDn}",                    // Container padrão Users
+                "OU=Users,{$baseDn}",                    // OU Users
+                "OU=Usuarios,{$baseDn}",                 // OU Usuarios (português)
+                "OU=Funcionarios,{$baseDn}",             // OU Funcionarios
+                "OU=People,{$baseDn}",                   // OU People
+                $baseDn                                  // Diretamente na raiz do domínio
+            ];
+            
+            // Usar o primeiro container válido ou o padrão
+            $userContainer = $this->findValidContainer($possibleContainers) ?: "CN=Users,{$baseDn}";
+            $userDn = "CN={$displayName},{$userContainer}";
             
             // Calcular userAccountControl baseado nas configurações
             $userAccountControl = 544; // NORMAL_ACCOUNT + PASSWD_NOTREQD (padrão)
@@ -561,6 +588,11 @@ class LdapModel {
                 'account_control' => $attributes['userAccountControl']
             ]);
             
+            logMessage('INFO', "Tentando criar usuário no container: {$userContainer}", [
+                'user_dn' => $userDn,
+                'username' => $userData['username']
+            ]);
+            
             // Tentar criar o usuário
             $result = @ldap_add($this->connection, $userDn, $attributes);
             
@@ -570,17 +602,53 @@ class LdapModel {
                 
                 logMessage('ERROR', "Falha ao criar usuário no AD: {$error} (Código: {$errorCode})", [
                     'username' => $userData['username'],
-                    'user_dn' => $userDn
+                    'user_dn' => $userDn,
+                    'container' => $userContainer
                 ]);
                 
-                // Tratar erros específicos do AD
-                $errorMessage = $this->parseADError($error, $errorCode);
+                // Se falhou no container padrão, tentar nos outros containers
+                if (strpos($userContainer, 'CN=Users') !== false) {
+                    logMessage('INFO', 'Tentando container alternativo devido à falha no container padrão');
+                    
+                    $alternativeContainers = [
+                        "OU=Users,{$baseDn}",
+                        "OU=Usuarios,{$baseDn}",
+                        "OU=Funcionarios,{$baseDn}",
+                        $baseDn
+                    ];
+                    
+                    foreach ($alternativeContainers as $altContainer) {
+                        $altUserDn = "CN={$displayName},{$altContainer}";
+                        
+                        logMessage('INFO', "Tentando container alternativo: {$altContainer}");
+                        
+                        $altResult = @ldap_add($this->connection, $altUserDn, $attributes);
+                        
+                        if ($altResult) {
+                            logMessage('INFO', "Usuário criado com sucesso no container alternativo: {$altContainer}");
+                            
+                            return [
+                                'success' => true,
+                                'message' => "Usuário '{$displayName}' criado com sucesso no Active Directory",
+                                'username' => $userData['username'],
+                                'dn' => $altUserDn,
+                                'container_used' => $altContainer,
+                                'groups_added' => []
+                            ];
+                        }
+                    }
+                }
+                
+                // Se chegou aqui, falhou em todos os containers
+                $errorMessage = $this->parseADError($error, $errorCode, $userContainer);
                 
                 return [
                     'success' => false,
                     'message' => $errorMessage,
                     'error_code' => $errorCode,
-                    'ldap_error' => $error
+                    'ldap_error' => $error,
+                    'attempted_dn' => $userDn,
+                    'suggestion' => 'Verifique se o container/OU existe no Active Directory ou entre em contato com o administrador.'
                 ];
             }
             
@@ -628,22 +696,29 @@ class LdapModel {
     /**
      * Interpretar erros específicos do Active Directory
      */
-    private function parseADError($error, $errorCode) {
+    private function parseADError($error, $errorCode, $container = '') {
         switch ($errorCode) {
             case 68: // LDAP_ALREADY_EXISTS
-                return 'Usuário já existe no Active Directory';
+                return 'Usuário já existe no Active Directory. Tente um nome de usuário diferente.';
             case 19: // LDAP_CONSTRAINT_VIOLATION
-                return 'Violação de regra do AD (senha muito simples, nome inválido, etc.)';
+                return 'Violação de regra do AD. Possíveis causas: senha muito simples, nome inválido ou caracteres especiais no nome.';
             case 53: // LDAP_UNWILLING_TO_PERFORM
-                return 'Servidor AD recusou a operação (verifique permissões)';
+                return 'Servidor AD recusou a operação. Verifique se a conta de serviço tem permissões para criar usuários.';
             case 32: // LDAP_NO_SUCH_OBJECT
-                return 'Contêiner ou OU não encontrada no AD';
+                $containerMsg = $container ? " (Container: {$container})" : "";
+                return "Container ou OU não encontrada no Active Directory{$containerMsg}. Verifique se a estrutura organizacional existe.";
             case 50: // LDAP_INSUFFICIENT_ACCESS
-                return 'Permissões insuficientes para criar usuário';
+                return 'Permissões insuficientes para criar usuário. A conta de serviço precisa de direitos de criação no AD.';
             case 21: // LDAP_INVALID_DN_SYNTAX
-                return 'Estrutura DN inválida';
+                return 'Estrutura DN inválida. Verifique se há caracteres especiais no nome do usuário.';
+            case 34: // LDAP_INVALID_DN_SYNTAX (alternative)
+                return 'Nome DN inválido. Caracteres especiais ou formato incorreto no nome do usuário.';
             default:
-                return "Erro do Active Directory: {$error}";
+                $detailedMsg = "Erro do Active Directory (Código {$errorCode}): {$error}";
+                if ($container) {
+                    $detailedMsg .= " | Container tentado: {$container}";
+                }
+                return $detailedMsg;
         }
     }
     
@@ -683,6 +758,33 @@ class LdapModel {
         } catch (Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
+    }
+    
+    /**
+     * Verificar qual container/OU é válido para criação de usuários
+     */
+    private function findValidContainer($containers) {
+        if (!$this->isConnected) {
+            return null;
+        }
+        
+        foreach ($containers as $container) {
+            try {
+                // Tentar fazer uma busca no container para verificar se existe
+                $search = @ldap_search($this->connection, $container, "(objectClass=*)", ['dn'], 0, 1);
+                
+                if ($search && ldap_count_entries($this->connection, $search) >= 0) {
+                    logMessage('INFO', "Container válido encontrado: {$container}");
+                    return $container;
+                }
+            } catch (Exception $e) {
+                // Continuar para o próximo container
+                continue;
+            }
+        }
+        
+        logMessage('WARNING', 'Nenhum container válido encontrado, usando CN=Users como padrão');
+        return null;
     }
     
     /**

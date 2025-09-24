@@ -1439,10 +1439,24 @@ function createNewUser() {
         
         if (data.success) {
             $('#createUserModal').modal('hide');
-            showNotification(data.message || 'Usuário criado com sucesso!', 'success');
-            setTimeout(() => window.location.reload(), 2000);
+            
+            // Verificar se é modo simulação
+            if (data.mode === 'simulation') {
+                showSimulationSuccess(data);
+            } else {
+                showNotification(data.message || 'Usuário criado com sucesso!', 'success');
+                setTimeout(() => window.location.reload(), 2000);
+            }
         } else {
-            showNotification('Erro: ' + (data.message || 'Falha ao criar usuário'), 'error');
+            // Melhorar exibição de erros
+            let errorMsg = data.message || 'Falha ao criar usuário';
+            if (data.suggestion) {
+                errorMsg += '\n\n💡 Sugestão: ' + data.suggestion;
+            }
+            if (data.attempted_dn) {
+                console.error('DN tentado:', data.attempted_dn);
+            }
+            showNotification('Erro: ' + errorMsg, 'error');
         }
     })
     .catch(error => {
@@ -1464,6 +1478,89 @@ function getSelectedGroups() {
     });
     
     return groups;
+}
+
+// Função para mostrar sucesso da simulação
+function showSimulationSuccess(data) {
+    const modalHtml = `
+        <div class="modal fade" id="simulationResultModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header" style="background: linear-gradient(135deg, #28a745, #20c997); color: white;">
+                        <h5 class="modal-title">
+                            <i class="fas fa-check-circle"></i> Simulação de Criação Realizada com Sucesso!
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-success" style="border-left: 4px solid #28a745;">
+                            <h5><i class="fas fa-info-circle"></i> Modo Demonstração</h5>
+                            <p><strong>${data.message}</strong></p>
+                            ${data.note ? `<p><em>${data.note}</em></p>` : ''}
+                        </div>
+                        
+                        <h6><i class="fas fa-user"></i> Dados do Usuário Simulado:</h6>
+                        <table class="table table-sm table-bordered">
+                            <tr><td><strong>Nome de Usuário:</strong></td><td>${data.username}</td></tr>
+                            <tr><td><strong>Nome Completo:</strong></td><td>${data.details?.display_name || 'N/A'}</td></tr>
+                            <tr><td><strong>Email:</strong></td><td>${data.details?.email || 'N/A'}</td></tr>
+                            <tr><td><strong>Departamento:</strong></td><td>${data.details?.department || 'N/A'}</td></tr>
+                            <tr><td><strong>Função:</strong></td><td>${data.details?.title || 'N/A'}</td></tr>
+                            <tr><td><strong>Empresa:</strong></td><td>${data.details?.company || 'N/A'}</td></tr>
+                            <tr><td><strong>Cidade:</strong></td><td>${data.details?.city || 'N/A'}</td></tr>
+                            <tr><td><strong>DN Simulado:</strong></td><td style="font-family: monospace; font-size: 11px;">${data.dn}</td></tr>
+                        </table>
+                        
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-cogs"></i> Para usar com Active Directory real:</h6>
+                            <ol>
+                                <li>Acesse <strong>Configurações</strong> no menu</li>
+                                <li>Configure as <strong>credenciais LDAP/AD</strong></li>
+                                <li>Teste a <strong>conectividade</strong></li>
+                                <li>Execute novamente a <strong>criação de usuário</strong></li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <i class="fas fa-times"></i> Fechar
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="goToConfig()">
+                            <i class="fas fa-cog"></i> Ir para Configurações
+                        </button>
+                        <button type="button" class="btn btn-success" data-dismiss="modal" onclick="createAnotherUser()">
+                            <i class="fas fa-user-plus"></i> Criar Outro Usuário
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remover modal existente
+    const existingModal = document.getElementById('simulationResultModal');
+    if (existingModal) existingModal.remove();
+    
+    // Adicionar e mostrar novo modal
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    $('#simulationResultModal').modal('show');
+    
+    // Também mostrar notificação
+    showNotification('🎭 Simulação realizada com sucesso! Usuário seria criado no AD.', 'success');
+}
+
+// Função para ir às configurações
+function goToConfig() {
+    window.location.href = 'index.php?page=config';
+}
+
+// Função para criar outro usuário
+function createAnotherUser() {
+    setTimeout(() => {
+        showCreateUser();
+    }, 500);
 }
 </script>
 
