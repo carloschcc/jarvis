@@ -203,6 +203,7 @@ class UsersController {
         
         $username = $_POST['username'] ?? '';
         $newPassword = $_POST['new_password'] ?? '';
+        $forceChange = isset($_POST['force_change']) && $_POST['force_change'] === 'true';
         
         if (empty($username) || empty($newPassword)) {
             echo json_encode(['success' => false, 'message' => 'Dados incompletos']);
@@ -216,7 +217,7 @@ class UsersController {
         }
         
         try {
-            $result = $this->ldapModel->resetPassword($username, $newPassword);
+            $result = $this->ldapModel->resetPassword($username, $newPassword, $forceChange);
             
             logMessage('INFO', "Senha resetada para usuário {$username} por {$this->authModel->getCurrentUser()['username']}");
             
@@ -350,6 +351,127 @@ class UsersController {
             echo json_encode([
                 'success' => false,
                 'message' => 'Erro ao carregar filtros: ' . $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Atualizar usuário
+     */
+    public function updateUser() {
+        header('Content-Type: application/json');
+        
+        if (!$this->authModel->isLoggedIn() || !$this->authModel->isAdmin()) {
+            echo json_encode(['success' => false, 'message' => 'Acesso negado']);
+            exit;
+        }
+        
+        if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+            echo json_encode(['success' => false, 'message' => 'Token CSRF inválido']);
+            exit;
+        }
+        
+        $username = $_POST['username'] ?? '';
+        $userData = json_decode($_POST['user_data'] ?? '{}', true);
+        
+        if (empty($username)) {
+            echo json_encode(['success' => false, 'message' => 'Nome de usuário não informado']);
+            exit;
+        }
+        
+        try {
+            $result = $this->ldapModel->updateUser($username, $userData);
+            
+            if ($result['success']) {
+                logMessage('INFO', "Usuário {$username} atualizado por {$this->authModel->getCurrentUser()['username']}");
+            }
+            
+            echo json_encode($result);
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao atualizar usuário: ' . $e->getMessage());
+            
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erro ao atualizar usuário: ' . $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Excluir usuário
+     */
+    public function deleteUser() {
+        header('Content-Type: application/json');
+        
+        if (!$this->authModel->isLoggedIn() || !$this->authModel->isAdmin()) {
+            echo json_encode(['success' => false, 'message' => 'Acesso negado']);
+            exit;
+        }
+        
+        if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+            echo json_encode(['success' => false, 'message' => 'Token CSRF inválido']);
+            exit;
+        }
+        
+        $username = $_POST['username'] ?? '';
+        
+        if (empty($username)) {
+            echo json_encode(['success' => false, 'message' => 'Nome de usuário não informado']);
+            exit;
+        }
+        
+        try {
+            $result = $this->ldapModel->deleteUser($username);
+            
+            if ($result['success']) {
+                logMessage('INFO', "Usuário {$username} excluído por {$this->authModel->getCurrentUser()['username']}");
+            }
+            
+            echo json_encode($result);
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao excluir usuário: ' . $e->getMessage());
+            
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erro ao excluir usuário: ' . $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Obter grupos do usuário
+     */
+    public function getUserGroups() {
+        header('Content-Type: application/json');
+        
+        if (!$this->authModel->isLoggedIn()) {
+            echo json_encode(['success' => false, 'message' => 'Não autenticado']);
+            exit;
+        }
+        
+        $username = $_GET['username'] ?? '';
+        
+        if (empty($username)) {
+            echo json_encode(['success' => false, 'message' => 'Nome de usuário não informado']);
+            exit;
+        }
+        
+        try {
+            $groups = $this->ldapModel->getUserGroups($username);
+            
+            echo json_encode([
+                'success' => true,
+                'groups' => $groups
+            ]);
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao buscar grupos do usuário: ' . $e->getMessage());
+            
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erro ao buscar grupos: ' . $e->getMessage()
             ]);
         }
     }

@@ -464,28 +464,95 @@ function toggleStatus(username, enable) {
     }
 }
 
-// Função para resetar senha
+// Função para resetar senha com modal
 function resetPassword(username) {
-    const newPassword = prompt(`Digite a nova senha para ${username}:`);
+    showResetPasswordModal(username);
+}
+
+// Modal para resetar senha
+function showResetPasswordModal(username) {
+    const modalHtml = `
+        <div class="modal fade" id="resetPasswordModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-key"></i> Redefinir Senha - ${username}
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="resetPasswordForm">
+                            <div class="form-group">
+                                <label for="newPassword">Nova Senha:</label>
+                                <input type="password" class="form-control" id="newPassword" minlength="8" required>
+                                <small class="form-text text-muted">Mínimo 8 caracteres</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirmar Senha:</label>
+                                <input type="password" class="form-control" id="confirmPassword" minlength="8" required>
+                            </div>
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="forceChange">
+                                <label class="form-check-label" for="forceChange">
+                                    Forçar alteração no próximo login
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" onclick="executePasswordReset('${username}')">Redefinir Senha</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
     
-    if (newPassword && newPassword.length >= 8) {
-        if (confirm(`Confirma o reset da senha para ${username}?`)) {
-            fetch('index.php?page=users&action=resetPassword', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: `username=${username}&new_password=${encodeURIComponent(newPassword)}&csrf_token=<?= $csrf_token ?>`
-            })
-            .then(response => response.json())
-            .then(data => {
-                showNotification(data.message, data.success ? 'success' : 'error');
-            })
-            .catch(error => {
-                showNotification('Erro de comunicação: ' + error.message, 'error');
-            });
-        }
-    } else if (newPassword !== null) {
-        showNotification('A senha deve ter pelo menos 8 caracteres', 'warning');
+    // Remover modal existente
+    const existingModal = document.getElementById('resetPasswordModal');
+    if (existingModal) existingModal.remove();
+    
+    // Adicionar e mostrar novo modal
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    $('#resetPasswordModal').modal('show');
+}
+
+// Executar reset de senha
+function executePasswordReset(username) {
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const forceChange = document.getElementById('forceChange').checked;
+    
+    if (newPassword !== confirmPassword) {
+        showNotification('As senhas não coincidem', 'error');
+        return;
     }
+    
+    if (newPassword.length < 8) {
+        showNotification('A senha deve ter pelo menos 8 caracteres', 'error');
+        return;
+    }
+    
+    fetch('index.php?page=users&action=resetPassword', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `username=${username}&new_password=${encodeURIComponent(newPassword)}&force_change=${forceChange}&csrf_token=<?= $csrf_token ?>`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            $('#resetPasswordModal').modal('hide');
+            showNotification(data.message, 'success');
+        } else {
+            showNotification('Erro: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('Erro de comunicação: ' + error.message, 'error');
+    });
 }
 
 // Função para visualizar usuário
@@ -732,19 +799,226 @@ function showCreateUser() {
     console.log('Create new user');
 }
 
+// Função para editar usuário
 function editUser(username) {
-    // TODO: Implementar edição de usuário
-    console.log('Edit user:', username);
+    fetch(`index.php?page=users&action=getUser&username=${username}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showEditUserModal(data.user);
+        } else {
+            showNotification('Erro ao carregar usuário: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('Erro de comunicação: ' + error.message, 'error');
+    });
 }
 
+// Modal para editar usuário
+function showEditUserModal(user) {
+    const modalHtml = `
+        <div class="modal fade" id="editUserModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-edit"></i> Editar Usuário - ${user.username}
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editUserForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="editName">Nome Completo:</label>
+                                        <input type="text" class="form-control" id="editName" value="${user.name || ''}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editEmail">Email:</label>
+                                        <input type="email" class="form-control" id="editEmail" value="${user.email || ''}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editPhone">Telefone:</label>
+                                        <input type="text" class="form-control" id="editPhone" value="${user.phone || ''}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editTitle">Função/Cargo:</label>
+                                        <input type="text" class="form-control" id="editTitle" value="${user.title || ''}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="editDepartment">Departamento:</label>
+                                        <input type="text" class="form-control" id="editDepartment" value="${user.department || ''}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editCompany">Empresa:</label>
+                                        <input type="text" class="form-control" id="editCompany" value="${user.company || ''}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editCity">Cidade:</label>
+                                        <input type="text" class="form-control" id="editCity" value="${user.city || ''}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editOffice">Escritório:</label>
+                                        <input type="text" class="form-control" id="editOffice" value="${user.office || ''}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="editDescription">Descrição:</label>
+                                <textarea class="form-control" id="editDescription" rows="3">${user.description || ''}</textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" onclick="saveUserEdit('${user.username}')">Salvar Alterações</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remover modal existente
+    const existingModal = document.getElementById('editUserModal');
+    if (existingModal) existingModal.remove();
+    
+    // Adicionar e mostrar novo modal
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    $('#editUserModal').modal('show');
+}
+
+// Salvar edição do usuário
+function saveUserEdit(username) {
+    const userData = {
+        name: document.getElementById('editName').value,
+        email: document.getElementById('editEmail').value,
+        phone: document.getElementById('editPhone').value,
+        title: document.getElementById('editTitle').value,
+        department: document.getElementById('editDepartment').value,
+        company: document.getElementById('editCompany').value,
+        city: document.getElementById('editCity').value,
+        office: document.getElementById('editOffice').value,
+        description: document.getElementById('editDescription').value
+    };
+    
+    fetch('index.php?page=users&action=updateUser', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `username=${username}&user_data=${encodeURIComponent(JSON.stringify(userData))}&csrf_token=<?= $csrf_token ?>`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            $('#editUserModal').modal('hide');
+            showNotification(data.message, 'success');
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            showNotification('Erro: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('Erro de comunicação: ' + error.message, 'error');
+    });
+}
+
+// Função para ver grupos do usuário
 function viewGroups(username) {
-    // TODO: Implementar visualização de grupos
-    console.log('View groups for:', username);
+    fetch(`index.php?page=users&action=getUserGroups&username=${username}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showUserGroupsModal(username, data.groups);
+        } else {
+            showNotification('Erro ao carregar grupos: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('Erro de comunicação: ' + error.message, 'error');
+    });
 }
 
+// Modal para ver/gerenciar grupos do usuário
+function showUserGroupsModal(username, groups) {
+    const groupsHtml = groups.length > 0 ? 
+        groups.map(group => `
+            <div class="group-item" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border: 1px solid #ddd; margin: 5px 0; border-radius: 4px;">
+                <div class="group-info">
+                    <strong>${group.name}</strong>
+                    <br><small class="text-muted">${group.description || 'Sem descrição'}</small>
+                </div>
+                <button class="btn btn-sm btn-outline-danger" onclick="removeUserFromGroup('${username}', '${group.dn}')">
+                    <i class="fas fa-times"></i> Remover
+                </button>
+            </div>
+        `).join('') : 
+        '<p class="text-muted">Usuário não pertence a nenhum grupo.</p>';
+    
+    const modalHtml = `
+        <div class="modal fade" id="userGroupsModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-users"></i> Grupos de ${username}
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <button class="btn btn-success" onclick="showAddGroupModal('${username}')">
+                                <i class="fas fa-plus"></i> Adicionar a Grupo
+                            </button>
+                        </div>
+                        <div id="groupsList">
+                            ${groupsHtml}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remover modal existente
+    const existingModal = document.getElementById('userGroupsModal');
+    if (existingModal) existingModal.remove();
+    
+    // Adicionar e mostrar novo modal
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    $('#userGroupsModal').modal('show');
+}
+
+// Função para excluir usuário
 function deleteUser(username) {
-    // TODO: Implementar exclusão de usuário
-    console.log('Delete user:', username);
+    if (confirm(`ATENÇÃO: Deseja realmente EXCLUIR o usuário ${username}?\n\nEsta ação não pode ser desfeita!`)) {
+        fetch('index.php?page=users&action=deleteUser', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: `username=${username}&csrf_token=<?= $csrf_token ?>`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message, 'success');
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showNotification('Erro: ' + data.message, 'error');
+            }
+        })
+        .catch(error => {
+            showNotification('Erro de comunicação: ' + error.message, 'error');
+        });
+    }
 }
 
 function loadMore() {
