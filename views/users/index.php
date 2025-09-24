@@ -890,6 +890,52 @@ function showCreateUser() {
                                                 Conta ativa inicialmente
                                             </label>
                                         </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="createOU">
+                                                <i class="fas fa-sitemap"></i> OU/Container de Destino:
+                                            </label>
+                                            <select class="form-control" id="createOU" style="background: #f8f9fa;">
+                                                <option value="">🔍 Detectar automaticamente (Recomendado)</option>
+                                                <optgroup label="📁 Containers Comuns">
+                                                    <option value="CN=Users">CN=Users (Padrão do Windows)</option>
+                                                    <option value="OU=Users">OU=Users</option>
+                                                    <option value="OU=Usuarios">OU=Usuarios (Português)</option>
+                                                    <option value="OU=Funcionarios">OU=Funcionarios</option>
+                                                    <option value="OU=People">OU=People</option>
+                                                    <option value="OU=Employees">OU=Employees</option>
+                                                </optgroup>
+                                                <optgroup label="🏢 Por Departamento">
+                                                    <option value="OU=TI">OU=TI</option>
+                                                    <option value="OU=RH">OU=RH</option>
+                                                    <option value="OU=Financeiro">OU=Financeiro</option>
+                                                    <option value="OU=Comercial">OU=Comercial</option>
+                                                    <option value="OU=Marketing">OU=Marketing</option>
+                                                </optgroup>
+                                                <optgroup label="⚙️ Personalizado">
+                                                    <option value="custom">✏️ Digitar OU personalizada</option>
+                                                </optgroup>
+                                            </select>
+                                            <small class="form-text text-muted">
+                                                <i class="fas fa-info-circle text-info"></i>
+                                                <strong>Recomendação:</strong> Use detecção automática se não tiver certeza. O sistema tentará os containers mais comuns.
+                                            </small>
+                                        </div>
+                                        
+                                        <div class="form-group" id="customOUGroup" style="display: none;">
+                                            <label for="createCustomOU">
+                                                <i class="fas fa-edit"></i> OU Personalizada:
+                                            </label>
+                                            <input type="text" class="form-control" id="createCustomOU" 
+                                                   placeholder="Ex: OU=TI,OU=Departamentos">
+                                            <small class="form-text text-muted">
+                                                <strong>Exemplos válidos:</strong><br>
+                                                • <code>OU=TI</code> (será completado automaticamente)<br>
+                                                • <code>OU=TI,OU=Departamentos</code> (estrutura hierárquica)<br>
+                                                • <code>CN=Users</code> (container padrão)<br>
+                                                • <code>OU=Funcionarios,OU=Empresa,DC=domain,DC=com</code> (caminho completo)
+                                            </small>
+                                        </div>
                                     </div>
                                 </div>
                                 
@@ -1024,6 +1070,9 @@ function showCreateUser() {
     
     // Configurar auto-preenchimento do email
     setupAutoFillEmail();
+    
+    // Configurar controle da OU personalizada
+    setupOUSelector();
     
     // Mostrar modal
     $('#createUserModal').modal('show');
@@ -1304,6 +1353,23 @@ function setupAutoFillEmail() {
     lastNameInput.addEventListener('blur', updateEmail);
 }
 
+// Função para configurar seletor de OU
+function setupOUSelector() {
+    const ouSelect = document.getElementById('createOU');
+    const customOUGroup = document.getElementById('customOUGroup');
+    const customOUInput = document.getElementById('createCustomOU');
+    
+    ouSelect.addEventListener('change', function() {
+        if (this.value === 'custom') {
+            customOUGroup.style.display = 'block';
+            customOUInput.focus();
+        } else {
+            customOUGroup.style.display = 'none';
+            customOUInput.value = '';
+        }
+    });
+}
+
 // Função para alternar visibilidade da senha
 function togglePasswordVisibility(inputId) {
     const input = document.getElementById(inputId);
@@ -1389,6 +1455,17 @@ function createNewUser() {
         return;
     }
     
+    // Obter OU selecionada
+    const ouSelect = document.getElementById('createOU');
+    const customOU = document.getElementById('createCustomOU').value.trim();
+    let targetOU = '';
+    
+    if (ouSelect.value === 'custom' && customOU) {
+        targetOU = customOU;
+    } else if (ouSelect.value) {
+        targetOU = ouSelect.value;
+    }
+    
     // Coletar dados do formulário
     const userData = {
         firstName: firstName,
@@ -1408,6 +1485,7 @@ function createNewUser() {
         description: document.getElementById('createDescription').value.trim(),
         forcePasswordChange: document.getElementById('createForcePasswordChange').checked,
         accountEnabled: document.getElementById('createAccountEnabled').checked,
+        targetOU: targetOU,
         groups: getSelectedGroups()
     };
     

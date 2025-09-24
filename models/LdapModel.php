@@ -494,18 +494,40 @@ class LdapModel {
             $baseDn = $this->config['base_dn'] ?? 'DC=empresa,DC=local';
             $displayName = $userData['displayName'] ?: $userData['firstName'] . ' ' . $userData['lastName'];
             
-            // Tentar diferentes estruturas de OU para criação de usuários
-            $possibleContainers = [
-                "CN=Users,{$baseDn}",                    // Container padrão Users
-                "OU=Users,{$baseDn}",                    // OU Users
-                "OU=Usuarios,{$baseDn}",                 // OU Usuarios (português)
-                "OU=Funcionarios,{$baseDn}",             // OU Funcionarios
-                "OU=People,{$baseDn}",                   // OU People
-                $baseDn                                  // Diretamente na raiz do domínio
-            ];
+            // Determinar container de destino baseado na escolha do usuário
+            if (!empty($userData['targetOU'])) {
+                // Usuário especificou uma OU
+                $targetOU = $userData['targetOU'];
+                
+                // Se não contém vírgula, assumir que é apenas o prefixo (ex: "OU=TI")
+                if (strpos($targetOU, ',') === false && strpos($targetOU, '=') !== false) {
+                    $userContainer = "{$targetOU},{$baseDn}";
+                } else if (strpos($targetOU, 'DC=') !== false) {
+                    // OU completa fornecida
+                    $userContainer = $targetOU;
+                } else {
+                    // Apenas nome da OU, construir o caminho completo
+                    $userContainer = "{$targetOU},{$baseDn}";
+                }
+                
+                logMessage('INFO', "OU especificada pelo usuário: {$userContainer}");
+            } else {
+                // Auto-detecção (comportamento anterior)
+                $possibleContainers = [
+                    "CN=Users,{$baseDn}",                    // Container padrão Users
+                    "OU=Users,{$baseDn}",                    // OU Users
+                    "OU=Usuarios,{$baseDn}",                 // OU Usuarios (português)
+                    "OU=Funcionarios,{$baseDn}",             // OU Funcionarios
+                    "OU=People,{$baseDn}",                   // OU People
+                    "OU=Employees,{$baseDn}",                // OU Employees
+                    $baseDn                                  // Diretamente na raiz do domínio
+                ];
+                
+                // Usar o primeiro container válido ou o padrão
+                $userContainer = $this->findValidContainer($possibleContainers) ?: "CN=Users,{$baseDn}";
+                logMessage('INFO', "OU auto-detectada: {$userContainer}");
+            }
             
-            // Usar o primeiro container válido ou o padrão
-            $userContainer = $this->findValidContainer($possibleContainers) ?: "CN=Users,{$baseDn}";
             $userDn = "CN={$displayName},{$userContainer}";
             
             // Calcular userAccountControl baseado nas configurações
@@ -588,9 +610,29 @@ class LdapModel {
                 'account_control' => $attributes['userAccountControl']
             ]);
             
+            // Verificar se o container existe antes de tentar criar o usuário
+            if (!$this->verifyContainerExists($userContainer)) {
+                logMessage('WARNING', "Container especificado não existe: {$userContainer}");
+                
+                if (!empty($userData['targetOU'])) {
+                    // Se foi especificado pelo usuário, informar erro específico
+                    return [
+                        'success' => false,
+                        'message' => "A OU/Container especificada não existe no Active Directory: {$userContainer}",
+                        'error_code' => 'OU_NOT_FOUND',
+                        'suggestion' => 'Verifique se a OU existe ou use a detecção automática.',
+                        'attempted_container' => $userContainer
+                    ];
+                } else {
+                    // Se foi auto-detectada, tentar fallback
+                    logMessage('INFO', 'Tentando containers alternativos...');
+                }
+            }
+            
             logMessage('INFO', "Tentando criar usuário no container: {$userContainer}", [
                 'user_dn' => $userDn,
-                'username' => $userData['username']
+                'username' => $userData['username'],
+                'user_specified' => !empty($userData['targetOU'])
             ]);
             
             // Tentar criar o usuário
@@ -723,6 +765,71 @@ class LdapModel {
     }
     
     /**
+     * Listar OUs disponíveis no Active Directory
+     */
+    public function getAvailableOUs() {
+        try {
+            if (!$this->isConnected && !$this->connect()) {
+                return [
+                    'success' => false,
+                    'message' => 'Conexão LDAP não disponível',
+                    'ous' => []
+                ];
+            }
+            
+            $baseDn = $this->config['base_dn'] ?? 'DC=empresa,DC=local';
+            $filter = "(|(objectClass=organizationalUnit)(objectClass=container))";
+            
+            $search = @ldap_search($this->connection, $baseDn, $filter, ['dn', 'name', 'description'], 0, 50);
+            
+            $ous = [];
+            
+            if ($search) {
+                $entries = ldap_get_entries($this->connection, $search);
+                
+                for ($i = 0; $i < $entries['count']; $i++) {
+                    $dn = $entries[$i]['dn'];
+                    $name = $entries[$i]['name'][0] ?? '';
+                    $description = $entries[$i]['description'][0] ?? '';
+                    
+                    // Extrair apenas a parte relevante do DN
+                    $ouPart = explode(',', $dn)[0];
+                    
+                    $ous[] = [
+                        'dn' => $dn,
+                        'name' => $name,
+                        'description' => $description,
+                        'ou_part' => $ouPart,
+                        'display' => $name ? "{$name} ({$ouPart})" : $ouPart
+                    ];
+                }
+            }
+            
+            // Ordenar por nome
+            usort($ous, function($a, $b) {
+                return strcmp($a['display'], $b['display']);
+            });
+            
+            logMessage('INFO', "Encontradas " . count($ous) . " OUs no Active Directory");
+            
+            return [
+                'success' => true,
+                'ous' => $ous,
+                'count' => count($ous)
+            ];
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao listar OUs: ' . $e->getMessage());
+            
+            return [
+                'success' => false,
+                'message' => 'Erro ao listar OUs: ' . $e->getMessage(),
+                'ous' => []
+            ];
+        }
+    }
+    
+    /**
      * Adicionar usuário a um grupo
      */
     private function addUserToGroup($username, $groupName) {
@@ -758,6 +865,29 @@ class LdapModel {
         } catch (Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
+    }
+    
+    /**
+     * Verificar se um container/OU específico existe
+     */
+    private function verifyContainerExists($container) {
+        if (!$this->isConnected) {
+            return false;
+        }
+        
+        try {
+            // Tentar fazer uma busca no container para verificar se existe
+            $search = @ldap_search($this->connection, $container, "(objectClass=*)", ['dn'], 0, 1);
+            
+            if ($search && ldap_count_entries($this->connection, $search) >= 0) {
+                logMessage('INFO', "Container verificado e existe: {$container}");
+                return true;
+            }
+        } catch (Exception $e) {
+            logMessage('WARNING', "Erro ao verificar container {$container}: " . $e->getMessage());
+        }
+        
+        return false;
     }
     
     /**
