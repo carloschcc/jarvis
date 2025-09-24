@@ -50,6 +50,7 @@ RewriteRule ^(config|storage|models|controllers)/ - [F,L]
     php_value post_max_size 10M
     php_flag session.cookie_httponly On
     php_flag session.cookie_secure Off
+    php_value session.cookie_domain ""
     php_value session.gc_maxlifetime 3600
 </IfModule>
 
@@ -63,6 +64,7 @@ RewriteRule ^(config|storage|models|controllers)/ - [F,L]
     php_value post_max_size 10M
     php_flag session.cookie_httponly On
     php_flag session.cookie_secure Off
+    php_value session.cookie_domain ""
     php_value session.gc_maxlifetime 3600
 </IfModule>
 

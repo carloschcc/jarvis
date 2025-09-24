@@ -7,6 +7,13 @@
  * @description Sistema completo para gestão de usuários do Active Directory
  */
 
+// Configurar sessões para funcionar em diferentes IPs
+ini_set('session.cookie_domain', '');
+ini_set('session.cookie_path', '/');
+ini_set('session.cookie_secure', '0'); // Permitir HTTP
+ini_set('session.cookie_httponly', '1'); // Segurança XSS
+ini_set('session.use_strict_mode', '1'); // Segurança
+
 session_start();
 
 // Configurações básicas
