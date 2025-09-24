@@ -526,6 +526,12 @@ function executePasswordReset(username) {
     const confirmPassword = document.getElementById('confirmPassword').value;
     const forceChange = document.getElementById('forceChange').checked;
     
+    // Validações
+    if (!newPassword || !confirmPassword) {
+        showNotification('Todos os campos de senha são obrigatórios', 'error');
+        return;
+    }
+    
     if (newPassword !== confirmPassword) {
         showNotification('As senhas não coincidem', 'error');
         return;
@@ -536,21 +542,46 @@ function executePasswordReset(username) {
         return;
     }
     
+    // Validação de complexidade básica
+    const hasLetter = /[a-zA-Z]/.test(newPassword);
+    const hasNumber = /\d/.test(newPassword);
+    if (!hasLetter || !hasNumber) {
+        showNotification('A senha deve conter pelo menos uma letra e um número', 'error');
+        return;
+    }
+    
+    // Mostrar loading
+    const resetButton = document.querySelector('#resetPasswordModal .btn-danger');
+    const originalText = resetButton.innerHTML;
+    resetButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redefinindo...';
+    resetButton.disabled = true;
+    
     fetch('index.php?page=users&action=resetPassword', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `username=${username}&new_password=${encodeURIComponent(newPassword)}&force_change=${forceChange}&csrf_token=<?= $csrf_token ?>`
+        body: `username=${encodeURIComponent(username)}&new_password=${encodeURIComponent(newPassword)}&force_change=${forceChange}&csrf_token=<?= $csrf_token ?>`
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
     .then(data => {
+        resetButton.innerHTML = originalText;
+        resetButton.disabled = false;
+        
         if (data.success) {
             $('#resetPasswordModal').modal('hide');
-            showNotification(data.message, 'success');
+            showNotification(data.message || 'Senha redefinida com sucesso', 'success');
         } else {
-            showNotification('Erro: ' + data.message, 'error');
+            showNotification('Erro ao redefinir senha: ' + (data.message || 'Erro desconhecido'), 'error');
         }
     })
     .catch(error => {
+        resetButton.innerHTML = originalText;
+        resetButton.disabled = false;
+        console.error('Erro no reset de senha:', error);
         showNotification('Erro de comunicação: ' + error.message, 'error');
     });
 }
@@ -803,9 +834,198 @@ function exportResults() {
     console.log('Export results');
 }
 
+// Função para mostrar modal de criação de usuário
 function showCreateUser() {
-    // TODO: Implementar criação de usuário
-    console.log('Create new user');
+    showCreateUserModal();
+}
+
+// Modal para criar novo usuário
+function showCreateUserModal() {
+    const modalHtml = `
+        <div class="modal fade" id="createUserModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-user-plus"></i> Criar Novo Usuário
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="createUserForm">
+                            <div class="alert alert-info">
+                                <strong>Campos Obrigatórios:</strong> Nome, Sobrenome, Nome de Usuário e Email são obrigatórios.
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="createGivenName">Nome (GivenName): <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="createGivenName" placeholder="Ex: Carlos" required>
+                                        <small class="form-text text-muted">Primeiro nome do usuário</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="createSurname">Sobrenome (Surname): <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="createSurname" placeholder="Ex: Silva" required>
+                                        <small class="form-text text-muted">Sobrenome do usuário</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="createUsername">Nome de Usuário: <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="createUsername" placeholder="Ex: carlos.silva" required>
+                                        <small class="form-text text-muted">Login do usuário no sistema</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="createEmail">Email (UserPrincipalName): <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="createEmail" placeholder="Ex: carlos.silva@empresa.com" required>
+                                        <small class="form-text text-muted">Email principal do usuário</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="createPassword">Senha Inicial: <span class="text-danger">*</span></label>
+                                        <input type="password" class="form-control" id="createPassword" placeholder="Mínimo 8 caracteres" minlength="8" required>
+                                        <small class="form-text text-muted">Senha temporária para primeiro acesso</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="createDepartment">Departamento:</label>
+                                        <input type="text" class="form-control" id="createDepartment" placeholder="Ex: TI">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="createCompany">Empresa:</label>
+                                        <input type="text" class="form-control" id="createCompany" placeholder="Ex: Empresa Principal">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="createTitle">Função/Cargo:</label>
+                                        <input type="text" class="form-control" id="createTitle" placeholder="Ex: Analista de Sistemas">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="createPhone">Telefone:</label>
+                                        <input type="tel" class="form-control" id="createPhone" placeholder="Ex: (11) 99999-9999">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="createPath">Unidade Organizacional (OU):</label>
+                                        <select class="form-control" id="createPath">
+                                            <option value="CN=Users,DC=empresa,DC=com">Users (Padrão)</option>
+                                            <option value="OU=TI,DC=empresa,DC=com">TI</option>
+                                            <option value="OU=RH,DC=empresa,DC=com">RH</option>
+                                            <option value="OU=Vendas,DC=empresa,DC=com">Vendas</option>
+                                            <option value="OU=Financeiro,DC=empresa,DC=com">Financeiro</option>
+                                        </select>
+                                        <small class="form-text text-muted">Local onde o usuário será criado no AD</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="createDescription">Descrição:</label>
+                                        <textarea class="form-control" id="createDescription" rows="3" placeholder="Informações adicionais sobre o usuário..."></textarea>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="createForcePasswordChange" checked>
+                                        <label class="form-check-label" for="createForcePasswordChange">
+                                            Forçar mudança de senha no primeiro login
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" onclick="executeCreateUser()">
+                            <i class="fas fa-user-plus"></i> Criar Usuário
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remover modal existente
+    const existingModal = document.getElementById('createUserModal');
+    if (existingModal) existingModal.remove();
+    
+    // Adicionar e mostrar novo modal
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    $('#createUserModal').modal('show');
+}
+
+// Executar criação de usuário
+function executeCreateUser() {
+    const givenName = document.getElementById('createGivenName').value.trim();
+    const surname = document.getElementById('createSurname').value.trim();
+    const username = document.getElementById('createUsername').value.trim();
+    const email = document.getElementById('createEmail').value.trim();
+    const password = document.getElementById('createPassword').value;
+    
+    // Validações básicas
+    if (!givenName || !surname || !username || !email || !password) {
+        showNotification('Todos os campos obrigatórios devem ser preenchidos', 'error');
+        return;
+    }
+    
+    if (password.length < 8) {
+        showNotification('A senha deve ter pelo menos 8 caracteres', 'error');
+        return;
+    }
+    
+    // Validar formato do email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showNotification('Email deve ter um formato válido', 'error');
+        return;
+    }
+    
+    // Coletar todos os dados do formulário
+    const userData = {
+        givenName: givenName,
+        surname: surname,
+        name: `${givenName} ${surname}`,
+        username: username,
+        email: email,
+        password: password,
+        department: document.getElementById('createDepartment').value.trim(),
+        company: document.getElementById('createCompany').value.trim(),
+        title: document.getElementById('createTitle').value.trim(),
+        phone: document.getElementById('createPhone').value.trim(),
+        path: document.getElementById('createPath').value,
+        description: document.getElementById('createDescription').value.trim(),
+        forcePasswordChange: document.getElementById('createForcePasswordChange').checked
+    };
+    
+    // Mostrar loading
+    const createButton = document.querySelector('#createUserModal .btn-success');
+    const originalText = createButton.innerHTML;
+    createButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando...';
+    createButton.disabled = true;
+    
+    fetch('index.php?page=users&action=createUser', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `user_data=${encodeURIComponent(JSON.stringify(userData))}&csrf_token=<?= $csrf_token ?>`
+    })
+    .then(response => response.json())
+    .then(data => {
+        createButton.innerHTML = originalText;
+        createButton.disabled = false;
+        
+        if (data.success) {
+            $('#createUserModal').modal('hide');
+            showNotification(data.message, 'success');
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            showNotification('Erro ao criar usuário: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        createButton.innerHTML = originalText;
+        createButton.disabled = false;
+        showNotification('Erro de comunicação: ' + error.message, 'error');
+    });
 }
 
 // Função para editar usuário
@@ -904,34 +1124,68 @@ function showEditUserModal(user) {
 
 // Salvar edição do usuário
 function saveUserEdit(username) {
+    // Validar campos obrigatórios
+    const name = document.getElementById('editName').value.trim();
+    if (!name) {
+        showNotification('Nome completo é obrigatório', 'error');
+        return;
+    }
+    
+    // Validar email se fornecido
+    const email = document.getElementById('editEmail').value.trim();
+    if (email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showNotification('Email deve ter um formato válido', 'error');
+            return;
+        }
+    }
+    
     const userData = {
-        name: document.getElementById('editName').value,
-        email: document.getElementById('editEmail').value,
-        phone: document.getElementById('editPhone').value,
-        title: document.getElementById('editTitle').value,
-        department: document.getElementById('editDepartment').value,
-        company: document.getElementById('editCompany').value,
-        city: document.getElementById('editCity').value,
-        office: document.getElementById('editOffice').value,
-        description: document.getElementById('editDescription').value
+        name: name,
+        email: email,
+        phone: document.getElementById('editPhone').value.trim(),
+        title: document.getElementById('editTitle').value.trim(),
+        department: document.getElementById('editDepartment').value.trim(),
+        company: document.getElementById('editCompany').value.trim(),
+        city: document.getElementById('editCity').value.trim(),
+        office: document.getElementById('editOffice').value.trim(),
+        description: document.getElementById('editDescription').value.trim()
     };
+    
+    // Mostrar loading
+    const saveButton = document.querySelector('#editUserModal .btn-primary');
+    const originalText = saveButton.innerHTML;
+    saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+    saveButton.disabled = true;
     
     fetch('index.php?page=users&action=updateUser', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `username=${username}&user_data=${encodeURIComponent(JSON.stringify(userData))}&csrf_token=<?= $csrf_token ?>`
+        body: `username=${encodeURIComponent(username)}&user_data=${encodeURIComponent(JSON.stringify(userData))}&csrf_token=<?= $csrf_token ?>`
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
     .then(data => {
+        saveButton.innerHTML = originalText;
+        saveButton.disabled = false;
+        
         if (data.success) {
             $('#editUserModal').modal('hide');
-            showNotification(data.message, 'success');
+            showNotification(data.message || 'Usuário atualizado com sucesso', 'success');
             setTimeout(() => window.location.reload(), 1500);
         } else {
-            showNotification('Erro: ' + data.message, 'error');
+            showNotification('Erro ao salvar: ' + (data.message || 'Erro desconhecido'), 'error');
         }
     })
     .catch(error => {
+        saveButton.innerHTML = originalText;
+        saveButton.disabled = false;
+        console.error('Erro na atualização:', error);
         showNotification('Erro de comunicação: ' + error.message, 'error');
     });
 }

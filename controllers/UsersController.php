@@ -318,6 +318,88 @@ class UsersController {
     }
     
     /**
+     * Criar novo usuário (método alternativo para compatibilidade)
+     */
+    public function createUser() {
+        header('Content-Type: application/json');
+        
+        if (!$this->authModel->isLoggedIn() || !$this->authModel->isAdmin()) {
+            echo json_encode(['success' => false, 'message' => 'Acesso negado']);
+            exit;
+        }
+        
+        if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+            echo json_encode(['success' => false, 'message' => 'Token CSRF inválido']);
+            exit;
+        }
+        
+        // Decodificar dados do usuário do frontend
+        $userDataJson = $_POST['user_data'] ?? '{}';
+        $userData = json_decode($userDataJson, true);
+        
+        if (!$userData) {
+            echo json_encode(['success' => false, 'message' => 'Dados do usuário inválidos']);
+            exit;
+        }
+        
+        // Validações obrigatórias
+        $required = ['givenName', 'surname', 'username', 'email', 'password'];
+        foreach ($required as $field) {
+            if (empty($userData[$field])) {
+                echo json_encode(['success' => false, 'message' => "Campo obrigatório faltando: {$field}"]);
+                exit;
+            }
+        }
+        
+        // Validar formato do email
+        if (!filter_var($userData['email'], FILTER_VALIDATE_EMAIL)) {
+            echo json_encode(['success' => false, 'message' => 'Email inválido']);
+            exit;
+        }
+        
+        // Validar complexidade da senha
+        if (strlen($userData['password']) < 8) {
+            echo json_encode(['success' => false, 'message' => 'Senha deve ter pelo menos 8 caracteres']);
+            exit;
+        }
+        
+        try {
+            // Preparar dados para o LDAP Model
+            $ldapUserData = [
+                'username' => $userData['username'],
+                'name' => $userData['name'],
+                'givenName' => $userData['givenName'],
+                'surname' => $userData['surname'],
+                'email' => $userData['email'],
+                'password' => $userData['password'],
+                'department' => $userData['department'] ?? '',
+                'company' => $userData['company'] ?? '',
+                'title' => $userData['title'] ?? '',
+                'phone' => $userData['phone'] ?? '',
+                'description' => $userData['description'] ?? '',
+                'path' => $userData['path'] ?? 'CN=Users,DC=empresa,DC=com',
+                'forcePasswordChange' => $userData['forcePasswordChange'] ?? true
+            ];
+            
+            $result = $this->ldapModel->createUser($ldapUserData);
+            
+            if ($result['success']) {
+                logMessage('INFO', "Usuário {$userData['username']} criado por {$this->authModel->getCurrentUser()['username']}");
+            }
+            
+            echo json_encode($result);
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao criar usuário: ' . $e->getMessage());
+            
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erro ao criar usuário: ' . $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
      * Obter listas para filtros (AJAX)
      */
     public function getFilterOptions() {
