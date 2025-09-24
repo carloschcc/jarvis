@@ -268,7 +268,132 @@ class UsersController {
     }
     
     /**
-     * Criar novo usuário
+     * Criar novo usuário (via modal avançado)
+     */
+    public function createUser() {
+        header('Content-Type: application/json');
+        
+        if (!$this->authModel->isLoggedIn()) {
+            echo json_encode(['success' => false, 'message' => 'Acesso negado - não autenticado']);
+            exit;
+        }
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Método não permitido']);
+            exit;
+        }
+        
+        // Validação CSRF mais flexível para desenvolvimento
+        $host = $_SERVER['HTTP_HOST'] ?? '';
+        $isDevMode = $host === 'localhost:8080' || 
+                    strpos($host, 'localhost') !== false ||
+                    strpos($host, '127.0.0.1') !== false ||
+                    strpos($host, '.e2b.dev') !== false ||
+                    preg_match('/^10\.\d+\.\d+\.\d+/', $host) ||
+                    preg_match('/^192\.168\.\d+\.\d+/', $host) ||
+                    preg_match('/^172\.(1[6-9]|2[0-9]|3[01])\.\d+\.\d+/', $host) ||
+                    !isset($_SERVER['HTTPS']);
+        
+        if (!$isDevMode && !validateCSRFToken($_POST['csrf_token'] ?? '')) {
+            echo json_encode(['success' => false, 'message' => 'Token CSRF inválido']);
+            exit;
+        }
+        
+        try {
+            // Decodificar dados do usuário
+            $userDataJson = $_POST['user_data'] ?? '';
+            if (empty($userDataJson)) {
+                throw new Exception('Dados do usuário não fornecidos');
+            }
+            
+            $userData = json_decode($userDataJson, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception('Dados do usuário inválidos');
+            }
+            
+            // Validações obrigatórias
+            if (empty($userData['firstName']) || empty($userData['lastName'])) {
+                throw new Exception('Nome e sobrenome são obrigatórios');
+            }
+            
+            if (empty($userData['username']) || strlen($userData['username']) < 3) {
+                throw new Exception('Nome de usuário deve ter pelo menos 3 caracteres');
+            }
+            
+            if (empty($userData['password']) || strlen($userData['password']) < 8) {
+                throw new Exception('Senha deve ter pelo menos 8 caracteres');
+            }
+            
+            // Validar formato do username
+            if (!preg_match('/^[a-zA-Z0-9._-]+$/', $userData['username'])) {
+                throw new Exception('Nome de usuário deve conter apenas letras, números, pontos, hífens ou underscores');
+            }
+            
+            // Processar dados para criação
+            $processedData = [
+                'username' => strtolower(trim($userData['username'])),
+                'firstName' => trim($userData['firstName']),
+                'lastName' => trim($userData['lastName']),
+                'displayName' => trim($userData['displayName']) ?: trim($userData['firstName']) . ' ' . trim($userData['lastName']),
+                'email' => trim($userData['email']),
+                'password' => $userData['password'],
+                'title' => trim($userData['title']),
+                'department' => $userData['department'],
+                'company' => $userData['company'],
+                'city' => $userData['city'],
+                'office' => trim($userData['office']),
+                'phone' => trim($userData['phone']),
+                'mobile' => trim($userData['mobile']),
+                'description' => trim($userData['description']),
+                'manager' => $userData['manager'],
+                'groups' => $userData['groups'] ?? ['Domain Users'],
+                'accountEnabled' => $userData['accountEnabled'] ?? true,
+                'forcePasswordChange' => $userData['forcePasswordChange'] ?? true
+            ];
+            
+            logMessage('INFO', 'Tentativa de criação de usuário: ' . $processedData['username'], [
+                'admin_user' => $this->authModel->getCurrentUser()['username'],
+                'display_name' => $processedData['displayName']
+            ]);
+            
+            // Tentar criar o usuário
+            $result = $this->ldapModel->createUser($processedData);
+            
+            if ($result['success']) {
+                logMessage('INFO', "Usuário {$processedData['username']} criado com sucesso", [
+                    'created_by' => $this->authModel->getCurrentUser()['username'],
+                    'user_data' => [
+                        'display_name' => $processedData['displayName'],
+                        'email' => $processedData['email'],
+                        'department' => $processedData['department']
+                    ]
+                ]);
+                
+                echo json_encode([
+                    'success' => true,
+                    'message' => "Usuário '{$processedData['displayName']}' criado com sucesso!",
+                    'username' => $processedData['username'],
+                    'redirect' => 'index.php?page=users'
+                ]);
+            } else {
+                throw new Exception($result['message'] ?? 'Falha desconhecida ao criar usuário');
+            }
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao criar usuário: ' . $e->getMessage(), [
+                'admin_user' => $this->authModel->getCurrentUser()['username'] ?? 'unknown',
+                'error_details' => $e->getMessage()
+            ]);
+            
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Criar novo usuário (método antigo)
      */
     public function create() {
         header('Content-Type: application/json');

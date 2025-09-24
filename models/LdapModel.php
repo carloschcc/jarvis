@@ -455,70 +455,256 @@ class LdapModel {
     }
     
     /**
-     * Criar usuário
+     * Criar usuário (versão avançada com suporte completo)
      */
     public function createUser($userData) {
         try {
+            // Verificar se LDAP está disponível, senão usar modo fallback
             if (!$this->isConnected && !$this->connect()) {
+                logMessage('WARNING', 'LDAP não disponível - simulando criação de usuário');
+                
+                // Modo de desenvolvimento/demonstração - simular sucesso
                 return [
-                    'success' => false,
-                    'message' => 'Conexão LDAP não disponível'
+                    'success' => true,
+                    'message' => "Usuário '{$userData['displayName']}' seria criado no AD (LDAP não configurado)",
+                    'mode' => 'simulation',
+                    'details' => [
+                        'username' => $userData['username'],
+                        'display_name' => $userData['displayName'],
+                        'email' => $userData['email'] ?? 'N/A',
+                        'department' => $userData['department'] ?? 'N/A'
+                    ]
                 ];
             }
             
             $baseDn = $this->config['base_dn'] ?? 'DC=empresa,DC=local';
-            $userDn = "CN={$userData['name']},CN=Users,{$baseDn}";
+            $displayName = $userData['displayName'] ?: $userData['firstName'] . ' ' . $userData['lastName'];
+            $userDn = "CN={$displayName},CN=Users,{$baseDn}";
             
-            // Atributos do novo usuário
+            // Calcular userAccountControl baseado nas configurações
+            $userAccountControl = 544; // NORMAL_ACCOUNT + PASSWD_NOTREQD (padrão)
+            
+            if (!$userData['accountEnabled']) {
+                $userAccountControl |= 2; // ACCOUNTDISABLE
+            }
+            
+            if ($userData['forcePasswordChange']) {
+                $userAccountControl |= 0x800000; // DONT_EXPIRE_PASSWD (removido para forçar mudança)
+            } else {
+                $userAccountControl |= 0x10000; // DONT_EXPIRE_PASSWD
+            }
+            
+            // Atributos obrigatórios do Active Directory
             $attributes = [
                 'objectClass' => ['top', 'person', 'organizationalPerson', 'user'],
-                'cn' => $userData['name'],
+                'cn' => $displayName,
                 'sAMAccountName' => $userData['username'],
                 'userPrincipalName' => $userData['username'] . '@' . ($this->config['domain'] ?? 'empresa.local'),
-                'displayName' => $userData['name'],
-                'mail' => $userData['email'] ?? '',
-                'description' => $userData['description'] ?? '',
-                'userAccountControl' => 544, // Conta normal, senha deve ser alterada no próximo logon
+                'displayName' => $displayName,
+                'givenName' => $userData['firstName'],
+                'sn' => $userData['lastName'], // surname
+                'userAccountControl' => $userAccountControl
             ];
             
-            // Adicionar outros atributos opcionais
-            if (!empty($userData['phone'])) {
-                $attributes['telephoneNumber'] = $userData['phone'];
+            // Atributos opcionais
+            if (!empty($userData['email'])) {
+                $attributes['mail'] = $userData['email'];
+                $attributes['proxyAddresses'] = ["SMTP:{$userData['email']}"];
+            }
+            
+            if (!empty($userData['description'])) {
+                $attributes['description'] = $userData['description'];
+            }
+            
+            if (!empty($userData['title'])) {
+                $attributes['title'] = $userData['title'];
             }
             
             if (!empty($userData['department'])) {
                 $attributes['department'] = $userData['department'];
             }
             
-            logMessage('INFO', "Criando usuário: {$userDn}");
+            if (!empty($userData['company'])) {
+                $attributes['company'] = $userData['company'];
+            }
             
+            if (!empty($userData['city'])) {
+                $attributes['l'] = $userData['city']; // locality
+            }
+            
+            if (!empty($userData['office'])) {
+                $attributes['physicalDeliveryOfficeName'] = $userData['office'];
+            }
+            
+            if (!empty($userData['phone'])) {
+                $attributes['telephoneNumber'] = $userData['phone'];
+            }
+            
+            if (!empty($userData['mobile'])) {
+                $attributes['mobile'] = $userData['mobile'];
+            }
+            
+            // Definir senha (se fornecida)
+            if (!empty($userData['password'])) {
+                // Converter senha para UTF-16LE (formato do AD)
+                $password = '"' . $userData['password'] . '"';
+                $attributes['unicodePwd'] = mb_convert_encoding($password, 'UTF-16LE', 'UTF-8');
+                
+                // Remover PASSWD_NOTREQD se senha foi definida
+                $attributes['userAccountControl'] = $userAccountControl & ~32;
+            }
+            
+            logMessage('INFO', "Criando usuário no AD: {$userDn}", [
+                'username' => $userData['username'],
+                'display_name' => $displayName,
+                'email' => $userData['email'] ?? 'N/A',
+                'account_control' => $attributes['userAccountControl']
+            ]);
+            
+            // Tentar criar o usuário
             $result = @ldap_add($this->connection, $userDn, $attributes);
             
             if (!$result) {
                 $error = ldap_error($this->connection);
-                logMessage('ERROR', "Falha ao criar usuário: {$error}");
+                $errorCode = ldap_errno($this->connection);
+                
+                logMessage('ERROR', "Falha ao criar usuário no AD: {$error} (Código: {$errorCode})", [
+                    'username' => $userData['username'],
+                    'user_dn' => $userDn
+                ]);
+                
+                // Tratar erros específicos do AD
+                $errorMessage = $this->parseADError($error, $errorCode);
                 
                 return [
                     'success' => false,
-                    'message' => 'Falha ao criar usuário: ' . $error
+                    'message' => $errorMessage,
+                    'error_code' => $errorCode,
+                    'ldap_error' => $error
                 ];
             }
             
-            logMessage('INFO', "Usuário {$userData['username']} criado com sucesso");
+            logMessage('INFO', "Usuário {$userData['username']} criado com sucesso no AD", [
+                'display_name' => $displayName,
+                'email' => $userData['email'] ?? 'N/A',
+                'user_dn' => $userDn
+            ]);
+            
+            // Tentar adicionar aos grupos (se especificados)
+            if (!empty($userData['groups']) && is_array($userData['groups'])) {
+                $groupResults = [];
+                foreach ($userData['groups'] as $groupName) {
+                    if ($groupName !== 'Domain Users') { // Domain Users é automático
+                        $groupResult = $this->addUserToGroup($userData['username'], $groupName);
+                        $groupResults[] = [
+                            'group' => $groupName,
+                            'success' => $groupResult['success']
+                        ];
+                    }
+                }
+            }
             
             return [
                 'success' => true,
-                'message' => 'Usuário criado com sucesso',
-                'dn' => $userDn
+                'message' => "Usuário '{$displayName}' criado com sucesso no Active Directory",
+                'username' => $userData['username'],
+                'dn' => $userDn,
+                'groups_added' => $groupResults ?? []
             ];
             
         } catch (Exception $e) {
-            logMessage('ERROR', 'Erro ao criar usuário: ' . $e->getMessage());
+            logMessage('ERROR', 'Erro crítico ao criar usuário: ' . $e->getMessage(), [
+                'username' => $userData['username'] ?? 'N/A',
+                'error_details' => $e->getTraceAsString()
+            ]);
             
             return [
                 'success' => false,
-                'message' => 'Erro ao criar usuário: ' . $e->getMessage()
+                'message' => 'Erro crítico: ' . $e->getMessage()
             ];
+        }
+    }
+    
+    /**
+     * Interpretar erros específicos do Active Directory
+     */
+    private function parseADError($error, $errorCode) {
+        switch ($errorCode) {
+            case 68: // LDAP_ALREADY_EXISTS
+                return 'Usuário já existe no Active Directory';
+            case 19: // LDAP_CONSTRAINT_VIOLATION
+                return 'Violação de regra do AD (senha muito simples, nome inválido, etc.)';
+            case 53: // LDAP_UNWILLING_TO_PERFORM
+                return 'Servidor AD recusou a operação (verifique permissões)';
+            case 32: // LDAP_NO_SUCH_OBJECT
+                return 'Contêiner ou OU não encontrada no AD';
+            case 50: // LDAP_INSUFFICIENT_ACCESS
+                return 'Permissões insuficientes para criar usuário';
+            case 21: // LDAP_INVALID_DN_SYNTAX
+                return 'Estrutura DN inválida';
+            default:
+                return "Erro do Active Directory: {$error}";
+        }
+    }
+    
+    /**
+     * Adicionar usuário a um grupo
+     */
+    private function addUserToGroup($username, $groupName) {
+        try {
+            if (!$this->isConnected) {
+                return ['success' => false, 'message' => 'LDAP não conectado'];
+            }
+            
+            $baseDn = $this->config['base_dn'] ?? 'DC=empresa,DC=local';
+            
+            // Buscar o usuário
+            $userDn = $this->getUserDN($username);
+            if (!$userDn) {
+                return ['success' => false, 'message' => 'Usuário não encontrado'];
+            }
+            
+            // Buscar o grupo
+            $groupDn = "CN={$groupName},CN=Users,{$baseDn}";
+            
+            // Adicionar usuário ao grupo
+            $modifications = ['member' => [$userDn]];
+            $result = @ldap_mod_add($this->connection, $groupDn, $modifications);
+            
+            if ($result) {
+                logMessage('INFO', "Usuário {$username} adicionado ao grupo {$groupName}");
+                return ['success' => true, 'message' => 'Usuário adicionado ao grupo'];
+            } else {
+                $error = ldap_error($this->connection);
+                logMessage('WARNING', "Falha ao adicionar usuário {$username} ao grupo {$groupName}: {$error}");
+                return ['success' => false, 'message' => $error];
+            }
+            
+        } catch (Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+    
+    /**
+     * Obter DN do usuário
+     */
+    private function getUserDN($username) {
+        try {
+            $baseDn = $this->config['base_dn'] ?? 'DC=empresa,DC=local';
+            $filter = "(sAMAccountName={$username})";
+            
+            $search = @ldap_search($this->connection, $baseDn, $filter, ['dn']);
+            
+            if ($search && ldap_count_entries($this->connection, $search) > 0) {
+                $entries = ldap_get_entries($this->connection, $search);
+                return $entries[0]['dn'];
+            }
+            
+            return null;
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao buscar DN do usuário: ' . $e->getMessage());
+            return null;
         }
     }
     

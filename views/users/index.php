@@ -804,8 +804,251 @@ function exportResults() {
 }
 
 function showCreateUser() {
-    // TODO: Implementar criação de usuário
-    console.log('Create new user');
+    const modalHtml = `
+        <div class="modal fade" id="createUserModal" tabindex="-1" style="z-index: 9999;">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header" style="background: #0078d4; color: white;">
+                        <h5 class="modal-title">
+                            <i class="fas fa-user-plus"></i> Criar Novo Usuário no Active Directory
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" style="color: white; opacity: 0.8;">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info" style="border-left: 4px solid #0078d4;">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Campos Obrigatórios:</strong> Nome Sobrenome, Nome de Usuário e Senha inicial são obrigatórios para criar o usuário no AD.
+                        </div>
+                        
+                        <form id="createUserForm">
+                            <!-- Seção: Dados Pessoais -->
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-section">
+                                        <h6 class="section-title"><i class="fas fa-user"></i> Dados Pessoais</h6>
+                                        
+                                        <div class="form-group">
+                                            <label for="createFirstName">Nome (Obrigatório):</label>
+                                            <input type="text" class="form-control" id="createFirstName" placeholder="Ex: Carlos" required>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="createLastName">Sobrenome (Obrigatório):</label>
+                                            <input type="text" class="form-control" id="createLastName" placeholder="Ex: Silva" required>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="createDisplayName">Nome Completo:</label>
+                                            <input type="text" class="form-control" id="createDisplayName" placeholder="Será preenchido automaticamente" readonly>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="createEmail">Email:</label>
+                                            <input type="email" class="form-control" id="createEmail" placeholder="carlos.silva@empresa.com">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Seção: Dados do Sistema -->
+                                <div class="col-md-4">
+                                    <div class="form-section">
+                                        <h6 class="section-title"><i class="fas fa-cog"></i> Dados do Sistema</h6>
+                                        
+                                        <div class="form-group">
+                                            <label for="createUsername">Nome de Usuário (Obrigatório):</label>
+                                            <input type="text" class="form-control" id="createUsername" placeholder="Ex: carlos" required>
+                                            <small class="form-text text-muted">Mínimo 3-4 caracteres, apenas letras e números</small>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="createPassword">Senha Inicial (Obrigatório):</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control" id="createPassword" placeholder="Mínimo 8 caracteres" required>
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('createPassword')">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" onclick="generateRandomPassword()">
+                                                        <i class="fas fa-dice"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group form-check">
+                                            <input type="checkbox" class="form-check-input" id="createForcePasswordChange" checked>
+                                            <label class="form-check-label" for="createForcePasswordChange">
+                                                Forçar mudança de senha no primeiro login
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="form-group form-check">
+                                            <input type="checkbox" class="form-check-input" id="createAccountEnabled" checked>
+                                            <label class="form-check-label" for="createAccountEnabled">
+                                                Conta ativa inicialmente
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Seção: Dados Profissionais -->
+                                <div class="col-md-4">
+                                    <div class="form-section">
+                                        <h6 class="section-title"><i class="fas fa-briefcase"></i> Dados Profissionais</h6>
+                                        
+                                        <div class="form-group">
+                                            <label for="createTitle">Função/Cargo:</label>
+                                            <input type="text" class="form-control" id="createTitle" placeholder="Ex: Analista Principal">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="createDepartment">Departamento:</label>
+                                            <select class="form-control" id="createDepartment">
+                                                <option value="">Selecione o departamento</option>
+                                                <option value="TI">TI</option>
+                                                <option value="RH">RH</option>
+                                                <option value="Financeiro">Financeiro</option>
+                                                <option value="Comercial">Comercial</option>
+                                                <option value="Marketing">Marketing</option>
+                                                <option value="Operações">Operações</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="createCompany">Empresa:</label>
+                                            <select class="form-control" id="createCompany">
+                                                <option value="">Selecione a empresa</option>
+                                                <option value="Empresa Principal">Empresa Principal</option>
+                                                <option value="Filial A">Filial A</option>
+                                                <option value="Filial B">Filial B</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="createManager">Gestor/Chefe:</label>
+                                            <select class="form-control" id="createManager">
+                                                <option value="">Selecione o gestor</option>
+                                                <option value="admin">Administrador</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Seção: Localização -->
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <div class="form-section">
+                                        <h6 class="section-title"><i class="fas fa-map-marker-alt"></i> Localização</h6>
+                                        
+                                        <div class="form-group">
+                                            <label for="createCity">Cidade:</label>
+                                            <select class="form-control" id="createCity">
+                                                <option value="">Selecione a cidade</option>
+                                                <option value="São Paulo">São Paulo</option>
+                                                <option value="Rio de Janeiro">Rio de Janeiro</option>
+                                                <option value="Belo Horizonte">Belo Horizonte</option>
+                                                <option value="Brasília">Brasília</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="createOffice">Escritório:</label>
+                                            <input type="text" class="form-control" id="createOffice" placeholder="Ex: Sede Principal">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="form-section">
+                                        <h6 class="section-title"><i class="fas fa-phone"></i> Contato</h6>
+                                        
+                                        <div class="form-group">
+                                            <label for="createPhone">Telefone:</label>
+                                            <input type="tel" class="form-control" id="createPhone" placeholder="(11) 99999-9999">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="createMobile">Celular:</label>
+                                            <input type="tel" class="form-control" id="createMobile" placeholder="(11) 99999-9999">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="form-section">
+                                        <h6 class="section-title"><i class="fas fa-users"></i> Grupos</h6>
+                                        
+                                        <div class="form-group">
+                                            <label for="createGroups">Adicionar aos Grupos:</label>
+                                            <div class="checkbox-group" style="max-height: 150px; overflow-y: auto; border: 1px solid #ced4da; padding: 10px; border-radius: 4px;">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="Domain Users" id="group_domain_users" checked disabled>
+                                                    <label class="form-check-label" for="group_domain_users">
+                                                        Domain Users (Padrão)
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="Funcionarios" id="group_funcionarios">
+                                                    <label class="form-check-label" for="group_funcionarios">
+                                                        Funcionarios
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="VPN Users" id="group_vpn">
+                                                    <label class="form-check-label" for="group_vpn">
+                                                        VPN Users
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Observações -->
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="form-section">
+                                        <h6 class="section-title"><i class="fas fa-comment"></i> Observações/Descrição</h6>
+                                        <div class="form-group">
+                                            <textarea class="form-control" id="createDescription" rows="3" placeholder="Informações adicionais sobre o usuário..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                        <button type="button" class="btn btn-success" onclick="createNewUser()">
+                            <i class="fas fa-user-plus"></i> Criar Usuário
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remover modal existente
+    const existingModal = document.getElementById('createUserModal');
+    if (existingModal) existingModal.remove();
+    
+    // Adicionar e mostrar novo modal
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Configurar auto-preenchimento do nome completo
+    setupAutoFillDisplayName();
+    
+    // Configurar auto-preenchimento do email
+    setupAutoFillEmail();
+    
+    // Mostrar modal
+    $('#createUserModal').modal('show');
 }
 
 // Função para editar usuário
@@ -1033,6 +1276,216 @@ function deleteUser(username) {
 function loadMore() {
     // TODO: Implementar carregamento de mais resultados
     console.log('Load more results');
+}
+
+// Função para configurar preenchimento automático do nome completo
+function setupAutoFillDisplayName() {
+    const firstNameInput = document.getElementById('createFirstName');
+    const lastNameInput = document.getElementById('createLastName');
+    const displayNameInput = document.getElementById('createDisplayName');
+    
+    function updateDisplayName() {
+        const firstName = firstNameInput.value.trim();
+        const lastName = lastNameInput.value.trim();
+        
+        if (firstName && lastName) {
+            displayNameInput.value = `${firstName} ${lastName}`;
+        } else if (firstName) {
+            displayNameInput.value = firstName;
+        } else {
+            displayNameInput.value = '';
+        }
+    }
+    
+    firstNameInput.addEventListener('input', updateDisplayName);
+    lastNameInput.addEventListener('input', updateDisplayName);
+}
+
+// Função para configurar preenchimento automático do email
+function setupAutoFillEmail() {
+    const firstNameInput = document.getElementById('createFirstName');
+    const lastNameInput = document.getElementById('createLastName');
+    const emailInput = document.getElementById('createEmail');
+    
+    function updateEmail() {
+        const firstName = firstNameInput.value.trim().toLowerCase();
+        const lastName = lastNameInput.value.trim().toLowerCase();
+        
+        if (firstName && lastName) {
+            // Remover acentos e caracteres especiais
+            const cleanFirstName = firstName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z]/g, "");
+            const cleanLastName = lastName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z]/g, "");
+            
+            if (cleanFirstName && cleanLastName) {
+                emailInput.value = `${cleanFirstName}.${cleanLastName}@empresa.local`;
+            }
+        }
+    }
+    
+    firstNameInput.addEventListener('blur', updateEmail);
+    lastNameInput.addEventListener('blur', updateEmail);
+}
+
+// Função para alternar visibilidade da senha
+function togglePasswordVisibility(inputId) {
+    const input = document.getElementById(inputId);
+    const icon = event.target.closest('button').querySelector('i');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
+    }
+}
+
+// Função para gerar senha aleatória
+function generateRandomPassword() {
+    const length = 12;
+    const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    let password = '';
+    
+    // Garantir pelo menos um de cada tipo
+    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lower = 'abcdefghijklmnopqrstuvwxyz';
+    const numbers = '0123456789';
+    const symbols = '!@#$%^&*';
+    
+    password += upper.charAt(Math.floor(Math.random() * upper.length));
+    password += lower.charAt(Math.floor(Math.random() * lower.length));
+    password += numbers.charAt(Math.floor(Math.random() * numbers.length));
+    password += symbols.charAt(Math.floor(Math.random() * symbols.length));
+    
+    // Preencher o restante
+    for (let i = 4; i < length; i++) {
+        password += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    
+    // Embaralhar
+    password = password.split('').sort(() => Math.random() - 0.5).join('');
+    
+    document.getElementById('createPassword').value = password;
+    
+    showNotification('Senha gerada automaticamente!', 'success');
+}
+
+// Função principal para criar usuário
+function createNewUser() {
+    const form = document.getElementById('createUserForm');
+    
+    // Validar campos obrigatórios
+    const firstName = document.getElementById('createFirstName').value.trim();
+    const lastName = document.getElementById('createLastName').value.trim();
+    const username = document.getElementById('createUsername').value.trim();
+    const password = document.getElementById('createPassword').value;
+    
+    if (!firstName) {
+        showNotification('Nome é obrigatório', 'error');
+        document.getElementById('createFirstName').focus();
+        return;
+    }
+    
+    if (!lastName) {
+        showNotification('Sobrenome é obrigatório', 'error');
+        document.getElementById('createLastName').focus();
+        return;
+    }
+    
+    if (!username || username.length < 3) {
+        showNotification('Nome de usuário deve ter pelo menos 3 caracteres', 'error');
+        document.getElementById('createUsername').focus();
+        return;
+    }
+    
+    if (!password || password.length < 8) {
+        showNotification('Senha deve ter pelo menos 8 caracteres', 'error');
+        document.getElementById('createPassword').focus();
+        return;
+    }
+    
+    // Validar formato do username (apenas letras, números e alguns caracteres especiais)
+    if (!/^[a-zA-Z0-9._-]+$/.test(username)) {
+        showNotification('Nome de usuário deve conter apenas letras, números, pontos, hífens ou underscores', 'error');
+        document.getElementById('createUsername').focus();
+        return;
+    }
+    
+    // Coletar dados do formulário
+    const userData = {
+        firstName: firstName,
+        lastName: lastName,
+        displayName: document.getElementById('createDisplayName').value.trim(),
+        username: username,
+        password: password,
+        email: document.getElementById('createEmail').value.trim(),
+        title: document.getElementById('createTitle').value.trim(),
+        department: document.getElementById('createDepartment').value,
+        company: document.getElementById('createCompany').value,
+        manager: document.getElementById('createManager').value,
+        city: document.getElementById('createCity').value,
+        office: document.getElementById('createOffice').value.trim(),
+        phone: document.getElementById('createPhone').value.trim(),
+        mobile: document.getElementById('createMobile').value.trim(),
+        description: document.getElementById('createDescription').value.trim(),
+        forcePasswordChange: document.getElementById('createForcePasswordChange').checked,
+        accountEnabled: document.getElementById('createAccountEnabled').checked,
+        groups: getSelectedGroups()
+    };
+    
+    // Confirmar criação
+    const confirmMessage = `Confirmar criação do usuário?\n\nNome: ${userData.displayName}\nUsuário: ${userData.username}\nEmail: ${userData.email}\nDepartamento: ${userData.department || 'N/I'}`;
+    
+    if (!confirm(confirmMessage)) {
+        return;
+    }
+    
+    // Mostrar loading
+    const createBtn = event.target;
+    const originalText = createBtn.innerHTML;
+    createBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando...';
+    createBtn.disabled = true;
+    
+    // Enviar dados para o servidor
+    fetch('index.php?page=users&action=createUser', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `user_data=${encodeURIComponent(JSON.stringify(userData))}&csrf_token=<?= $csrf_token ?>`
+    })
+    .then(response => response.json())
+    .then(data => {
+        createBtn.innerHTML = originalText;
+        createBtn.disabled = false;
+        
+        if (data.success) {
+            $('#createUserModal').modal('hide');
+            showNotification(data.message || 'Usuário criado com sucesso!', 'success');
+            setTimeout(() => window.location.reload(), 2000);
+        } else {
+            showNotification('Erro: ' + (data.message || 'Falha ao criar usuário'), 'error');
+        }
+    })
+    .catch(error => {
+        createBtn.innerHTML = originalText;
+        createBtn.disabled = false;
+        showNotification('Erro de comunicação: ' + error.message, 'error');
+    });
+}
+
+// Função para coletar grupos selecionados
+function getSelectedGroups() {
+    const checkboxes = document.querySelectorAll('#createUserModal .form-check-input:checked');
+    const groups = [];
+    
+    checkboxes.forEach(checkbox => {
+        if (checkbox.value && checkbox.value !== '') {
+            groups.push(checkbox.value);
+        }
+    });
+    
+    return groups;
 }
 </script>
 
@@ -1443,6 +1896,171 @@ function loadMore() {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Estilos para o Modal de Criação de Usuário */
+#createUserModal .modal-dialog {
+    max-width: 1200px;
+    margin: 1.75rem auto;
+}
+
+#createUserModal .modal-content {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+#createUserModal .modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px 8px 0 0;
+}
+
+#createUserModal .modal-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+#createUserModal .modal-body {
+    padding: 25px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+#createUserModal .form-section {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    height: 100%;
+}
+
+#createUserModal .section-title {
+    color: #0078d4;
+    font-weight: 600;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e9ecef;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#createUserModal .form-group {
+    margin-bottom: 15px;
+}
+
+#createUserModal .form-group label {
+    font-weight: 500;
+    color: #495057;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    display: block;
+}
+
+#createUserModal .form-control {
+    font-size: 0.9rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 8px 12px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+#createUserModal .form-control:focus {
+    border-color: #0078d4;
+    box-shadow: 0 0 0 0.2rem rgba(0, 120, 212, 0.25);
+}
+
+#createUserModal .form-control[readonly] {
+    background-color: #f8f9fa;
+    border-color: #e9ecef;
+    color: #6c757d;
+}
+
+#createUserModal .input-group-append .btn {
+    border-left: none;
+    font-size: 0.85rem;
+    padding: 8px 10px;
+}
+
+#createUserModal .form-check {
+    margin-bottom: 8px;
+}
+
+#createUserModal .form-check-label {
+    font-size: 0.9rem;
+    color: #495057;
+    cursor: pointer;
+}
+
+#createUserModal .checkbox-group {
+    background: white;
+}
+
+#createUserModal .checkbox-group .form-check {
+    padding: 5px 0;
+    margin: 0;
+}
+
+#createUserModal .alert {
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+#createUserModal .modal-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 15px 25px;
+}
+
+#createUserModal .btn {
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 4px;
+}
+
+#createUserModal .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+#createUserModal .btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+/* Responsividade do modal */
+@media (max-width: 1200px) {
+    #createUserModal .modal-dialog {
+        max-width: 95%;
+    }
+}
+
+@media (max-width: 768px) {
+    #createUserModal .modal-dialog {
+        margin: 0.5rem;
+        max-width: none;
+        width: auto;
+    }
+    
+    #createUserModal .modal-body {
+        padding: 15px;
+        max-height: 85vh;
+    }
+    
+    #createUserModal .form-section {
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    
+    #createUserModal .section-title {
+        font-size: 0.9rem;
+    }
+    
+    #createUserModal .form-group {
+        margin-bottom: 10px;
+    }
 }
 </style>
 
