@@ -653,20 +653,29 @@ function showNotification(message, type) {
         'info': 'alert-info'
     }[type] || 'alert-info';
     
+    // Remover notificações existentes
+    const existingAlerts = document.querySelectorAll('.alert');
+    existingAlerts.forEach(alert => alert.remove());
+    
     const notification = document.createElement('div');
-    notification.className = `alert ${alertClass} alert-dismissible`;
+    notification.className = `alert ${alertClass} alert-dismissible fade show`;
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.zIndex = '9999';
+    notification.style.minWidth = '300px';
     notification.innerHTML = `
         ${message}
-        <button type="button" class="close" data-dismiss="alert">
+        <button type="button" class="close" onclick="this.parentElement.remove()">
             <span>&times;</span>
         </button>
     `;
     
-    document.querySelector('.page-header').appendChild(notification);
+    document.body.appendChild(notification);
     
     // Auto remover após 5 segundos
     setTimeout(() => {
-        if (notification.parentNode) {
+        if (notification && notification.parentNode) {
             notification.remove();
         }
     }, 5000);
