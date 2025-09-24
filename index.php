@@ -71,8 +71,10 @@ try {
             
             if (method_exists($controller, $action)) {
                 $controller->$action();
-            } else {
+            } else if ($action !== 'index' && method_exists($controller, 'index')) {
                 $controller->index();
+            } else {
+                throw new Exception("Método '$action' não encontrado no controller '$controllerClass'");
             }
         } else {
             throw new Exception("Controller '$controllerClass' não encontrado");
@@ -87,7 +89,20 @@ try {
         exit;
     }
 } catch (Exception $e) {
-    // Em caso de erro, mostrar página de erro ou redirecionar
+    // Log do erro
+    logMessage('ERROR', 'Erro no roteador: ' . $e->getMessage());
+    
+    // Se for uma requisição AJAX, retornar JSON
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => false,
+            'message' => 'Erro interno do sistema: ' . $e->getMessage()
+        ]);
+        exit;
+    }
+    
+    // Caso contrário, mostrar página de erro
     echo "<h1>Erro no Sistema</h1>";
     echo "<p>" . htmlspecialchars($e->getMessage()) . "</p>";
     echo "<p><a href='index.php?page=login'>Voltar ao Login</a></p>";

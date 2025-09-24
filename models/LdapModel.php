@@ -594,7 +594,7 @@ class LdapModel {
     /**
      * Resetar senha
      */
-    public function resetPassword($username, $newPassword) {
+    public function resetPassword($username, $newPassword, $forceChange = false) {
         try {
             if (!$this->isConnected && !$this->connect()) {
                 return [
@@ -619,6 +619,11 @@ class LdapModel {
             $attributes = [
                 'unicodePwd' => $encodedPassword
             ];
+            
+            // Se forçar alteração no próximo login
+            if ($forceChange) {
+                $attributes['pwdLastSet'] = '0';
+            }
             
             logMessage('INFO', "Resetando senha para usuário: {$username}");
             
@@ -946,6 +951,246 @@ class LdapModel {
         }
         
         return array_slice($users, 0, $limit);
+    }
+    
+    /**
+     * Atualizar usuário no Active Directory
+     */
+    public function updateUser($username, $userData) {
+        try {
+            if (!$this->isConnected && !$this->connect()) {
+                return [
+                    'success' => false,
+                    'message' => 'Conexão LDAP não disponível'
+                ];
+            }
+            
+            // Buscar o usuário para obter o DN
+            $user = $this->getUser($username);
+            
+            if (!$user) {
+                return [
+                    'success' => false,
+                    'message' => 'Usuário não encontrado'
+                ];
+            }
+            
+            // Preparar atributos para atualização
+            $attributes = [];
+            
+            if (!empty($userData['name'])) {
+                $attributes['displayName'] = $userData['name'];
+                $attributes['cn'] = $userData['name'];
+            }
+            
+            if (isset($userData['email'])) {
+                if (!empty($userData['email'])) {
+                    $attributes['mail'] = $userData['email'];
+                } else {
+                    $attributes['mail'] = [];
+                }
+            }
+            
+            if (isset($userData['phone'])) {
+                if (!empty($userData['phone'])) {
+                    $attributes['telephoneNumber'] = $userData['phone'];
+                } else {
+                    $attributes['telephoneNumber'] = [];
+                }
+            }
+            
+            if (isset($userData['title'])) {
+                if (!empty($userData['title'])) {
+                    $attributes['title'] = $userData['title'];
+                } else {
+                    $attributes['title'] = [];
+                }
+            }
+            
+            if (isset($userData['department'])) {
+                if (!empty($userData['department'])) {
+                    $attributes['department'] = $userData['department'];
+                } else {
+                    $attributes['department'] = [];
+                }
+            }
+            
+            if (isset($userData['company'])) {
+                if (!empty($userData['company'])) {
+                    $attributes['company'] = $userData['company'];
+                } else {
+                    $attributes['company'] = [];
+                }
+            }
+            
+            if (isset($userData['city'])) {
+                if (!empty($userData['city'])) {
+                    $attributes['l'] = $userData['city'];
+                } else {
+                    $attributes['l'] = [];
+                }
+            }
+            
+            if (isset($userData['office'])) {
+                if (!empty($userData['office'])) {
+                    $attributes['physicalDeliveryOfficeName'] = $userData['office'];
+                } else {
+                    $attributes['physicalDeliveryOfficeName'] = [];
+                }
+            }
+            
+            if (isset($userData['description'])) {
+                if (!empty($userData['description'])) {
+                    $attributes['description'] = $userData['description'];
+                } else {
+                    $attributes['description'] = [];
+                }
+            }
+            
+            if (empty($attributes)) {
+                return [
+                    'success' => false,
+                    'message' => 'Nenhum dado para atualizar'
+                ];
+            }
+            
+            logMessage('INFO', "Atualizando usuário: {$username}");
+            
+            $result = @ldap_modify($this->connection, $user['dn'], $attributes);
+            
+            if (!$result) {
+                $error = ldap_error($this->connection);
+                logMessage('ERROR', "Falha ao atualizar usuário: {$error}");
+                
+                return [
+                    'success' => false,
+                    'message' => 'Falha ao atualizar usuário: ' . $error
+                ];
+            }
+            
+            logMessage('INFO', "Usuário {$username} atualizado com sucesso");
+            
+            return [
+                'success' => true,
+                'message' => 'Usuário atualizado com sucesso'
+            ];
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao atualizar usuário: ' . $e->getMessage());
+            
+            return [
+                'success' => false,
+                'message' => 'Erro ao atualizar usuário: ' . $e->getMessage()
+            ];
+        }
+    }
+    
+    /**
+     * Excluir usuário do Active Directory
+     */
+    public function deleteUser($username) {
+        try {
+            if (!$this->isConnected && !$this->connect()) {
+                return [
+                    'success' => false,
+                    'message' => 'Conexão LDAP não disponível'
+                ];
+            }
+            
+            // Buscar o usuário para obter o DN
+            $user = $this->getUser($username);
+            
+            if (!$user) {
+                return [
+                    'success' => false,
+                    'message' => 'Usuário não encontrado'
+                ];
+            }
+            
+            logMessage('INFO', "Excluindo usuário: {$username}");
+            
+            $result = @ldap_delete($this->connection, $user['dn']);
+            
+            if (!$result) {
+                $error = ldap_error($this->connection);
+                logMessage('ERROR', "Falha ao excluir usuário: {$error}");
+                
+                return [
+                    'success' => false,
+                    'message' => 'Falha ao excluir usuário: ' . $error
+                ];
+            }
+            
+            logMessage('INFO', "Usuário {$username} excluído com sucesso");
+            
+            return [
+                'success' => true,
+                'message' => 'Usuário excluído com sucesso'
+            ];
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao excluir usuário: ' . $e->getMessage());
+            
+            return [
+                'success' => false,
+                'message' => 'Erro ao excluir usuário: ' . $e->getMessage()
+            ];
+        }
+    }
+    
+    /**
+     * Obter grupos do usuário
+     */
+    public function getUserGroups($username) {
+        try {
+            if (!$this->isConnected && !$this->connect()) {
+                logMessage('WARNING', 'Conexão LDAP não disponível para buscar grupos');
+                return [];
+            }
+            
+            // Buscar o usuário para obter o DN
+            $user = $this->getUser($username);
+            
+            if (!$user) {
+                return [];
+            }
+            
+            $baseDn = $this->config['base_dn'] ?? 'DC=empresa,DC=local';
+            
+            // Buscar grupos que contém o usuário como membro
+            $filter = "(&(objectClass=group)(member={$user['dn']}))";
+            $attributes = ['cn', 'distinguishedName', 'description'];
+            
+            logMessage('INFO', "Buscando grupos para usuário: {$username}");
+            
+            $result = @ldap_search($this->connection, $baseDn, $filter, $attributes);
+            
+            if (!$result) {
+                $error = ldap_error($this->connection);
+                logMessage('ERROR', "Erro ao buscar grupos: {$error}");
+                return [];
+            }
+            
+            $entries = ldap_get_entries($this->connection, $result);
+            $groups = [];
+            
+            for ($i = 0; $i < $entries['count']; $i++) {
+                $entry = $entries[$i];
+                
+                $groups[] = [
+                    'name' => $entry['cn'][0] ?? '',
+                    'dn' => $entry['distinguishedname'][0] ?? '',
+                    'description' => $entry['description'][0] ?? ''
+                ];
+            }
+            
+            logMessage('INFO', "Encontrados " . count($groups) . " grupos para {$username}");
+            return $groups;
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao buscar grupos do usuário: ' . $e->getMessage());
+            return [];
+        }
     }
     
     /**
