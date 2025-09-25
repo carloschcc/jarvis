@@ -1019,12 +1019,12 @@ function showCreateUser() {
                                         
                                         <div class="form-group">
                                             <label for="createPhone">Telefone:</label>
-                                            <input type="tel" class="form-control" id="createPhone" placeholder="(11) 99999-9999" value="(11) 3456-7890">
+                                            <input type="tel" class="form-control" id="createPhone" placeholder="(11) 99999-9999">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createMobile">Celular:</label>
-                                            <input type="tel" class="form-control" id="createMobile" placeholder="(11) 99999-9999" value="(11) 98765-4321">
+                                            <input type="tel" class="form-control" id="createMobile" placeholder="(11) 99999-9999">
                                         </div>
                                     </div>
                                 </div>
@@ -1066,7 +1066,7 @@ function showCreateUser() {
                                     <div class="form-section">
                                         <h6 class="section-title"><i class="fas fa-comment"></i> Observações/Descrição</h6>
                                         <div class="form-group">
-                                            <textarea class="form-control" id="createDescription" rows="3" placeholder="Informações adicionais sobre o usuário...">Novo funcionário contratado. Acesso inicial aos sistemas básicos da empresa.</textarea>
+                                            <textarea class="form-control" id="createDescription" rows="3" placeholder="Informações adicionais sobre o usuário..."></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -2225,7 +2225,7 @@ function createAnotherUser() {
 /* Estilos para o Modal de Criação de Usuário */
 #createUserModal .modal-dialog {
     max-width: 1400px;
-    margin: 1rem auto;
+    margin: 0.5rem auto;
 }
 
 #createUserModal .modal-content {
@@ -2246,7 +2246,7 @@ function createAnotherUser() {
 
 #createUserModal .modal-body {
     padding: 25px;
-    max-height: 90vh;
+    max-height: 95vh;
     overflow-y: auto;
 }
 
@@ -2392,10 +2392,32 @@ function createAnotherUser() {
     border-color: #1e7e34;
 }
 
+/* Garantir que o modal use o máximo da viewport */
+#createUserModal {
+    padding: 0 !important;
+}
+
+#createUserModal .modal-dialog {
+    height: 98vh;
+    margin: 1vh auto;
+}
+
+#createUserModal .modal-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#createUserModal .modal-body {
+    flex: 1;
+    overflow-y: auto;
+}
+
 /* Responsividade do modal */
 @media (max-width: 1200px) {
     #createUserModal .modal-dialog {
         max-width: 95%;
+        height: 98vh;
     }
 }
 

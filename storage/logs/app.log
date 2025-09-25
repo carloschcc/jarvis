@@ -59,3 +59,36 @@
 [2025-09-25 10:40:32] [ERROR] Servidor LDAP não configurado
 [2025-09-25 10:40:32] [ERROR] Servidor LDAP não configurado
 [2025-09-25 10:40:32] [INFO] Carregados 5 usuários do LDAP com filtros aplicados
+[2025-09-25 11:27:12] [DEBUG] Filtros recebidos: {"department":"","city":"","title":"","company":"","office":"","manager":"","status":""}
+[2025-09-25 11:27:12] [DEBUG] Filtros após limpeza: []
+[2025-09-25 11:27:12] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:27:12] [WARNING] Conexão LDAP não disponível, usando dados de fallback
+[2025-09-25 11:27:12] [WARNING] Usando dados de fallback - LDAP não disponível
+[2025-09-25 11:27:12] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:27:12] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:27:12] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:27:12] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:27:12] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:27:12] [INFO] Carregados 5 usuários do LDAP com filtros aplicados
+[2025-09-25 11:27:45] [DEBUG] Filtros recebidos: {"department":"","city":"","title":"","company":"","office":"","manager":"","status":""}
+[2025-09-25 11:27:45] [DEBUG] Filtros após limpeza: []
+[2025-09-25 11:27:45] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:27:45] [WARNING] Conexão LDAP não disponível, usando dados de fallback
+[2025-09-25 11:27:45] [WARNING] Usando dados de fallback - LDAP não disponível
+[2025-09-25 11:27:45] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:27:45] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:27:45] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:27:45] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:27:45] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:27:45] [INFO] Carregados 5 usuários do LDAP com filtros aplicados
+[2025-09-25 11:28:42] [DEBUG] Filtros recebidos: {"department":"","city":"","title":"","company":"","office":"","manager":"","status":""}
+[2025-09-25 11:28:42] [DEBUG] Filtros após limpeza: []
+[2025-09-25 11:28:42] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:28:42] [WARNING] Conexão LDAP não disponível, usando dados de fallback
+[2025-09-25 11:28:42] [WARNING] Usando dados de fallback - LDAP não disponível
+[2025-09-25 11:28:42] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:28:42] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:28:42] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:28:42] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:28:42] [ERROR] Servidor LDAP não configurado
+[2025-09-25 11:28:42] [INFO] Carregados 5 usuários do LDAP com filtros aplicados
