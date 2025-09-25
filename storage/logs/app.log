@@ -24,3 +24,38 @@
 [2025-09-23 16:29:09] [ERROR] Erro na busca LDAP: Can't contact LDAP server
 [2025-09-23 16:29:09] [WARNING] Usando dados de fallback - LDAP não disponível
 [2025-09-23 16:29:09] [INFO] Carregados 1 usuários do LDAP com filtros aplicados
+[2025-09-25 10:02:39] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:02:39] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:02:39] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:02:39] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:03:20] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:03:20] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:03:20] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:03:20] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:06:01] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:06:01] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:06:01] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:06:01] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:06:52] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:06:52] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:07:02] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:07:02] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:19:30] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:26:27] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:26:28] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:27:08] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:27:08] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:40:22] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:40:22] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 10:40:28] [INFO] Login realizado - Admin padrão - {"username":"admin","ip":"10.12.206.38"}
+[2025-09-25 10:40:32] [DEBUG] Filtros recebidos: {"department":"","city":"","title":"","company":"","office":"","manager":"","status":""}
+[2025-09-25 10:40:32] [DEBUG] Filtros após limpeza: []
+[2025-09-25 10:40:32] [ERROR] Servidor LDAP não configurado
+[2025-09-25 10:40:32] [WARNING] Conexão LDAP não disponível, usando dados de fallback
+[2025-09-25 10:40:32] [WARNING] Usando dados de fallback - LDAP não disponível
+[2025-09-25 10:40:32] [ERROR] Servidor LDAP não configurado
+[2025-09-25 10:40:32] [ERROR] Servidor LDAP não configurado
+[2025-09-25 10:40:32] [ERROR] Servidor LDAP não configurado
+[2025-09-25 10:40:32] [ERROR] Servidor LDAP não configurado
+[2025-09-25 10:40:32] [ERROR] Servidor LDAP não configurado
+[2025-09-25 10:40:32] [INFO] Carregados 5 usuários do LDAP com filtros aplicados

@@ -929,11 +929,12 @@ function showCreateUser() {
                                             </label>
                                         </div>
                                         
-                                        <div class="form-group">
-                                            <label for="createOU">
-                                                <i class="fas fa-sitemap"></i> OU/Container de Destino:
+                                        <!-- OU Selection Section - DESTACADA -->
+                                        <div class="form-group ou-selector-section" style="background: linear-gradient(135deg, #e3f2fd, #f8f9fa); border: 2px solid #2196f3; border-radius: 8px; padding: 20px; margin: 15px 0; box-shadow: 0 2px 10px rgba(33, 150, 243, 0.1);">
+                                            <label for="createOU" style="font-weight: 600; font-size: 1rem; color: #1976d2;">
+                                                <i class="fas fa-sitemap" style="color: #2196f3;"></i> 📂 OU/Container de Destino:
                                             </label>
-                                            <select class="form-control" id="createOU" style="background: #f8f9fa;">
+                                            <select class="form-control" id="createOU" style="background: #ffffff; border: 2px solid #2196f3; font-size: 0.95rem; padding: 10px;">
                                                 <option value="">🔍 Detectar automaticamente (Recomendado)</option>
                                                 <optgroup label="📁 Containers Comuns">
                                                     <option value="CN=Users">CN=Users (Padrão do Windows)</option>
@@ -954,24 +955,24 @@ function showCreateUser() {
                                                     <option value="custom">✏️ Digitar OU personalizada</option>
                                                 </optgroup>
                                             </select>
-                                            <small class="form-text text-muted">
+                                            <small class="form-text" style="color: #1976d2; font-weight: 500; margin-top: 8px;">
                                                 <i class="fas fa-info-circle text-info"></i>
-                                                <strong>Recomendação:</strong> Use detecção automática se não tiver certeza. O sistema tentará os containers mais comuns.
+                                                <strong>NOVA FUNCIONALIDADE:</strong> Selecione onde criar o usuário no AD. Use detecção automática se não tiver certeza.
                                             </small>
                                         </div>
                                         
-                                        <div class="form-group" id="customOUGroup" style="display: none;">
-                                            <label for="createCustomOU">
-                                                <i class="fas fa-edit"></i> OU Personalizada:
+                                        <div class="form-group" id="customOUGroup" style="display: none; background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 15px; margin-top: 10px;">
+                                            <label for="createCustomOU" style="font-weight: 600; color: #856404;">
+                                                <i class="fas fa-edit" style="color: #ffc107;"></i> ✏️ OU Personalizada:
                                             </label>
                                             <input type="text" class="form-control" id="createCustomOU" 
-                                                   placeholder="Ex: OU=TI,OU=Departamentos">
-                                            <small class="form-text text-muted">
-                                                <strong>Exemplos válidos:</strong><br>
-                                                • <code>OU=TI</code> (será completado automaticamente)<br>
-                                                • <code>OU=TI,OU=Departamentos</code> (estrutura hierárquica)<br>
-                                                • <code>CN=Users</code> (container padrão)<br>
-                                                • <code>OU=Funcionarios,OU=Empresa,DC=domain,DC=com</code> (caminho completo)
+                                                   placeholder="Ex: OU=TI,OU=Departamentos" style="border: 2px solid #ffc107; font-family: monospace;">
+                                            <small class="form-text" style="color: #856404; font-weight: 500; margin-top: 8px;">
+                                                <strong>📝 Exemplos válidos:</strong><br>
+                                                • <code style="background: #fff; padding: 2px 4px; border-radius: 3px; color: #d63384;">OU=TI</code> (será completado automaticamente)<br>
+                                                • <code style="background: #fff; padding: 2px 4px; border-radius: 3px; color: #d63384;">OU=TI,OU=Departamentos</code> (estrutura hierárquica)<br>
+                                                • <code style="background: #fff; padding: 2px 4px; border-radius: 3px; color: #d63384;">CN=Users</code> (container padrão)<br>
+                                                • <code style="background: #fff; padding: 2px 4px; border-radius: 3px; color: #d63384;">OU=Funcionarios,OU=Empresa,DC=domain,DC=com</code> (caminho completo)
                                             </small>
                                         </div>
                                     </div>
@@ -2234,8 +2235,8 @@ function createAnotherUser() {
 
 /* Estilos para o Modal de Criação de Usuário */
 #createUserModal .modal-dialog {
-    max-width: 1200px;
-    margin: 1.75rem auto;
+    max-width: 1400px;
+    margin: 1rem auto;
 }
 
 #createUserModal .modal-content {
@@ -2256,8 +2257,46 @@ function createAnotherUser() {
 
 #createUserModal .modal-body {
     padding: 25px;
-    max-height: 70vh;
+    max-height: 90vh;
     overflow-y: auto;
+}
+
+/* Garantir que campos da OU sejam visíveis e destacados */
+#createOU, #customOUGroup {
+    margin-bottom: 15px !important;
+    z-index: 9999 !important;
+}
+
+#createOU {
+    border: 2px solid #2196f3 !important;
+    background-color: #ffffff !important;
+    font-size: 0.95rem !important;
+    padding: 10px !important;
+}
+
+.ou-selector-section {
+    background: linear-gradient(135deg, #e3f2fd, #f8f9fa) !important;
+    border: 2px solid #2196f3 !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    margin: 15px 0 !important;
+    box-shadow: 0 2px 10px rgba(33, 150, 243, 0.1) !important;
+    position: relative !important;
+}
+
+/* Destacar ainda mais a seção OU */
+.ou-selector-section::before {
+    content: "🆕 NOVO!";
+    position: absolute;
+    top: -8px;
+    right: 10px;
+    background: #ff5722;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 #createUserModal .form-section {
