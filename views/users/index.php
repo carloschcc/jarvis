@@ -844,7 +844,7 @@ function exportResults() {
 function showCreateUser() {
     const modalHtml = `
         <div class="modal fade" id="createUserModal" tabindex="-1" style="z-index: 9999;">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header" style="background: #0078d4; color: white;">
                         <h5 class="modal-title">
@@ -854,8 +854,25 @@ function showCreateUser() {
                             <span>&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body">
-                        <div class="alert alert-info" style="border-left: 4px solid #0078d4;">
+                    <div class="modal-body" style="padding: 15px;">
+                        <style>
+                            @media (max-width: 768px) {
+                                .modal-xl { max-width: 95%; }
+                                .form-section { margin-bottom: 20px; }
+                                .form-group { margin-bottom: 15px; }
+                                .section-title { font-size: 1.1rem; margin-bottom: 15px; }
+                                .groups-container { max-height: 150px !important; }
+                                .modal-body { padding: 10px !important; }
+                            }
+                            @media (max-width: 576px) {
+                                .modal-xl { max-width: 98%; }
+                                .form-control { font-size: 14px; }
+                                .btn-sm { font-size: 12px; padding: 3px 8px; }
+                                .groups-container { max-height: 120px !important; }
+                            }
+                        </style>
+                        
+                        <div class="alert alert-info" style="border-left: 4px solid #0078d4; margin-bottom: 15px;">
                             <i class="fas fa-info-circle"></i>
                             <strong>Campos Obrigatórios:</strong> Nome Sobrenome, Nome de Usuário e Senha inicial são obrigatórios para criar o usuário no AD.
                         </div>
@@ -863,7 +880,7 @@ function showCreateUser() {
                         <form id="createUserForm">
                             <!-- Seção: Dados Pessoais -->
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-lg-4 col-md-6 col-12 mb-3">
                                     <div class="form-section">
                                         <h6 class="section-title"><i class="fas fa-user"></i> Dados Pessoais</h6>
                                         
@@ -897,7 +914,7 @@ function showCreateUser() {
                                 </div>
                                 
                                 <!-- Seção: Dados do Sistema -->
-                                <div class="col-md-4">
+                                <div class="col-lg-4 col-md-6 col-12 mb-3">
                                     <div class="form-section">
                                         <h6 class="section-title"><i class="fas fa-cog"></i> Dados do Sistema</h6>
                                         
@@ -971,7 +988,7 @@ function showCreateUser() {
                                 </div>
                                 
                                 <!-- Seção: Dados Profissionais -->
-                                <div class="col-md-4">
+                                <div class="col-lg-4 col-md-12 col-12 mb-3">
                                     <div class="form-section">
                                         <h6 class="section-title"><i class="fas fa-briefcase"></i> Dados Profissionais</h6>
                                         
@@ -1003,11 +1020,6 @@ function showCreateUser() {
                                         <div class="form-group">
                                             <label for="createOffice">Escritório:</label>
                                             <input type="text" class="form-control" id="createOffice" placeholder="Ex: Sede Principal">
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label for="createPhone">Telefone:</label>
-                                            <input type="tel" class="form-control" id="createPhone" placeholder="(11) 99999-9999">
                                         </div>
                                         
                                         <div class="form-group">
@@ -1574,7 +1586,6 @@ function createNewUser() {
         manager: document.getElementById('createManager').value.trim(),
         city: document.getElementById('createCity').value.trim(),
         office: document.getElementById('createOffice').value.trim(),
-        phone: document.getElementById('createPhone').value.trim(),
         mobile: document.getElementById('createMobile').value.trim(),
         description: document.getElementById('createDescription').value.trim(),
         forcePasswordChange: document.getElementById('createForcePasswordChange').checked,
