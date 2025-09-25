@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Grupos do AD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4><i class="fas fa-users"></i> Teste - Grupos do Active Directory</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>Esta página testa a funcionalidade de busca de grupos do AD.</p>
+                        
+                        <button class="btn btn-primary" onclick="testGroups()">
+                            <i class="fas fa-sync-alt"></i> Buscar Grupos do AD
+                        </button>
+                        
+                        <div class="mt-3">
+                            <div id="loading" class="d-none">
+                                <div class="text-center">
+                                    <div class="spinner-border text-primary" role="status"></div>
+                                    <p class="mt-2">Carregando grupos...</p>
+                                </div>
+                            </div>
+                            
+                            <div id="results" class="mt-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function testGroups() {
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        
+        loading.classList.remove('d-none');
+        results.innerHTML = '';
+        
+        // Simular sessão para teste
+        fetch('index.php?page=groups&action=getGroups', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            loading.classList.add('d-none');
+            
+            if (data.error) {
+                results.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6><i class="fas fa-exclamation-triangle"></i> Erro:</h6>
+                        <p>${data.error}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (data.success && data.groups) {
+                let html = `
+                    <div class="alert alert-success">
+                        <h6><i class="fas fa-check-circle"></i> Sucesso!</h6>
+                        <p>Encontrados <strong>${data.groups.length}</strong> grupos no Active Directory</p>
+                    </div>
+                    
+                    <div class="row">
+                `;
+                
+                data.groups.forEach(group => {
+                    html += `
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="${group.icon}" style="color: ${group.color}; margin-right: 8px;"></i>
+                                        ${group.name}
+                                    </h6>
+                                    <p class="card-text small text-muted">${group.description}</p>
+                                    <small class="text-muted">ID: ${group.id}</small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                results.innerHTML = html;
+            }
+        })
+        .catch(error => {
+            loading.classList.add('d-none');
+            results.innerHTML = `
+                <div class="alert alert-danger">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Erro de Conexão:</h6>
+                    <p>${error.message}</p>
+                </div>
+            `;
+        });
+    }
+    </script>
+</body>
+</html>

@@ -1859,6 +1859,88 @@ class LdapModel {
     }
     
     /**
+     * Buscar grupos do Active Directory
+     */
+    public function getADGroups() {
+        if (!$this->connect()) {
+            logMessage('ERROR', 'Não foi possível conectar ao AD para buscar grupos');
+            return false;
+        }
+        
+        try {
+            $baseDn = $this->config['base_dn'];
+            
+            // Filtro para buscar grupos (objectClass=group)
+            $filter = '(&(objectClass=group)(!(objectClass=computer)))';
+            
+            // Atributos que queremos buscar
+            $attributes = ['cn', 'name', 'description', 'distinguishedName', 'objectClass', 'groupType'];
+            
+            logMessage('INFO', "Buscando grupos AD com filtro: {$filter} em {$baseDn}");
+            
+            // Realizar busca
+            $searchResult = ldap_search($this->connection, $baseDn, $filter, $attributes);
+            
+            if (!$searchResult) {
+                logMessage('ERROR', 'Erro na busca de grupos: ' . ldap_error($this->connection));
+                return false;
+            }
+            
+            // Obter entradas
+            $entries = ldap_get_entries($this->connection, $searchResult);
+            
+            if ($entries['count'] === 0) {
+                logMessage('WARNING', 'Nenhum grupo encontrado no AD');
+                return [];
+            }
+            
+            $groups = [];
+            
+            // Processar cada grupo encontrado
+            for ($i = 0; $i < $entries['count']; $i++) {
+                $entry = $entries[$i];
+                
+                // Extrair informações do grupo
+                $groupName = $entry['cn'][0] ?? $entry['name'][0] ?? null;
+                
+                if (!$groupName) continue; // Pular se não tiver nome
+                
+                // Filtrar grupos do sistema que não devem aparecer para usuários
+                $systemGroups = [
+                    'domain computers', 'domain controllers', 'schema admins', 
+                    'enterprise admins', 'dnsadmins', 'dnsupdateproxy',
+                    'group policy creator owners', 'ras and ias servers',
+                    'certificate service dcom access', 'windows authorization access group'
+                ];
+                
+                if (in_array(strtolower($groupName), $systemGroups)) {
+                    continue;
+                }
+                
+                // Extrair descrição
+                $description = $entry['description'][0] ?? 'Grupo do Active Directory';
+                
+                // Adicionar à lista
+                $groups[] = [
+                    'cn' => [$groupName],
+                    'name' => [$groupName],
+                    'description' => [$description],
+                    'dn' => $entry['distinguishedname'][0] ?? '',
+                    'objectclass' => $entry['objectclass'] ?? [],
+                    'grouptype' => $entry['grouptype'][0] ?? null
+                ];
+            }
+            
+            logMessage('INFO', 'Encontrados ' . count($groups) . ' grupos no AD');
+            return $groups;
+            
+        } catch (Exception $e) {
+            logMessage('ERROR', 'Erro ao buscar grupos do AD: ' . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
      * Destrutor
      */
     public function __destruct() {

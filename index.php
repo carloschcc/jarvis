@@ -76,6 +76,7 @@ $controllers = [
     'login' => 'AuthController',
     'dashboard' => 'DashboardController',
     'users' => 'UsersController',
+    'groups' => 'GroupsController',
     'config' => 'ConfigController',
     'auth' => 'AuthController'
 ];

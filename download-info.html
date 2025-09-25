@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download - AD Manager System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4><i class="fas fa-download"></i> Download AD Manager System</h4>
+                    </div>
+                    <div class="card-body">
+                        <h5>Sistema Completo de Gerenciamento Active Directory</h5>
+                        <p class="text-muted">Baixe o código-fonte completo do sistema com todas as funcionalidades implementadas.</p>
+                        
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle"></i> Funcionalidades Incluídas:</h6>
+                            <ul class="mb-0">
+                                <li>✅ Interface completa para gerenciamento de usuários AD</li>
+                                <li>✅ Modal de criação de usuários com seleção de OU</li>
+                                <li>✅ Sistema de grupos dinâmico com layout multi-colunas</li>
+                                <li>✅ Integração LDAP para Active Directory</li>
+                                <li>✅ Layout responsivo e moderno</li>
+                                <li>✅ Validação CSRF e segurança</li>
+                            </ul>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <h6><i class="fas fa-exclamation-triangle"></i> Requisitos:</h6>
+                            <ul class="mb-0">
+                                <li>PHP 7.4+ com extensão LDAP</li>
+                                <li>Servidor web (Apache/Nginx) ou PHP built-in server</li>
+                                <li>Acesso ao servidor Active Directory</li>
+                            </ul>
+                        </div>
+
+                        <div class="text-center">
+                            <a href="download.php?token=webapp-dl" class="btn btn-success btn-lg">
+                                <i class="fas fa-download"></i> Baixar Sistema Completo
+                            </a>
+                        </div>
+
+                        <hr>
+
+                        <h6>Links de Download Alternativos:</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <a href="download.php?token=download123" class="btn btn-outline-primary btn-sm w-100">
+                                    <i class="fas fa-file-archive"></i> Link 1
+                                </a>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="download.php?token=ad-manager-dl" class="btn btn-outline-primary btn-sm w-100">
+                                    <i class="fas fa-file-archive"></i> Link 2
+                                </a>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="download.php?token=webapp-dl" class="btn btn-outline-primary btn-sm w-100">
+                                    <i class="fas fa-file-archive"></i> Link 3
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 text-center">
+                            <small class="text-muted">
+                                <i class="fas fa-clock"></i> Última atualização: <?php echo date('d/m/Y H:i'); ?><br>
+                                <i class="fas fa-weight-hanging"></i> Tamanho do arquivo: ~<?php echo file_exists('webapp-ad-manager.tar.gz') ? round(filesize('webapp-ad-manager.tar.gz')/1024) : '?'; ?> KB
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-3">
+                    <a href="/" class="btn btn-link">
+                        <i class="fas fa-arrow-left"></i> Voltar ao Sistema
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

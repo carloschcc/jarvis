@@ -173,3 +173,38 @@
 [2025-09-25 11:57:59] [ERROR] Servidor LDAP não configurado
 [2025-09-25 11:57:59] [ERROR] Servidor LDAP não configurado
 [2025-09-25 11:57:59] [INFO] Carregados 5 usuários do LDAP com filtros aplicados
+[2025-09-25 12:02:49] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 12:02:50] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.206.38"}
+[2025-09-25 12:02:53] [INFO] Login realizado - Admin padrão - {"username":"admin","ip":"10.12.206.38"}
+[2025-09-25 12:02:58] [DEBUG] Filtros recebidos: {"department":"","city":"","title":"","company":"","office":"","manager":"","status":""}
+[2025-09-25 12:02:58] [DEBUG] Filtros após limpeza: []
+[2025-09-25 12:02:58] [ERROR] Servidor LDAP não configurado
+[2025-09-25 12:02:58] [WARNING] Conexão LDAP não disponível, usando dados de fallback
+[2025-09-25 12:02:58] [WARNING] Usando dados de fallback - LDAP não disponível
+[2025-09-25 12:02:58] [ERROR] Servidor LDAP não configurado
+[2025-09-25 12:02:58] [ERROR] Servidor LDAP não configurado
+[2025-09-25 12:02:58] [ERROR] Servidor LDAP não configurado
+[2025-09-25 12:02:58] [ERROR] Servidor LDAP não configurado
+[2025-09-25 12:02:58] [ERROR] Servidor LDAP não configurado
+[2025-09-25 12:02:58] [INFO] Carregados 5 usuários do LDAP com filtros aplicados
+[2025-09-25 13:58:03] [INFO] Logout realizado - {"username":"admin","ip":"10.12.8.8"}
+[2025-09-25 13:58:04] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.8.8"}
+[2025-09-25 14:00:07] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.8.8"}
+[2025-09-25 14:03:08] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.8.8"}
+[2025-09-25 14:03:09] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.8.8"}
+[2025-09-25 14:08:13] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.8.8"}
+[2025-09-25 14:08:14] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.8.8"}
+[2025-09-25 14:09:04] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.8.8"}
+[2025-09-25 14:09:04] [INFO] Logout realizado - {"username":"unknown","ip":"10.12.8.8"}
+[2025-09-25 14:09:08] [INFO] Login realizado - Admin padrão - {"username":"admin","ip":"10.12.8.8"}
+[2025-09-25 14:09:13] [DEBUG] Filtros recebidos: {"department":"","city":"","title":"","company":"","office":"","manager":"","status":""}
+[2025-09-25 14:09:13] [DEBUG] Filtros após limpeza: []
+[2025-09-25 14:09:13] [ERROR] Servidor LDAP não configurado
+[2025-09-25 14:09:13] [WARNING] Conexão LDAP não disponível, usando dados de fallback
+[2025-09-25 14:09:13] [WARNING] Usando dados de fallback - LDAP não disponível
+[2025-09-25 14:09:13] [ERROR] Servidor LDAP não configurado
+[2025-09-25 14:09:13] [ERROR] Servidor LDAP não configurado
+[2025-09-25 14:09:13] [ERROR] Servidor LDAP não configurado
+[2025-09-25 14:09:13] [ERROR] Servidor LDAP não configurado
+[2025-09-25 14:09:13] [ERROR] Servidor LDAP não configurado
+[2025-09-25 14:09:13] [INFO] Carregados 5 usuários do LDAP com filtros aplicados

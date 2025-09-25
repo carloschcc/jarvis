@@ -1,5 +1,109 @@
 [
     {
+        "id": "68d5773455811",
+        "timestamp": "2025-09-25 14:09:08",
+        "action": "LOGIN",
+        "user": "admin",
+        "details": "Login como administrador padr\u00e3o",
+        "ip": "10.12.8.8"
+    },
+    {
+        "id": "68d57730a542f",
+        "timestamp": "2025-09-25 14:09:04",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "10.12.8.8"
+    },
+    {
+        "id": "68d577301c754",
+        "timestamp": "2025-09-25 14:09:04",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "10.12.8.8"
+    },
+    {
+        "id": "68d576fea4ddf",
+        "timestamp": "2025-09-25 14:08:14",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "10.12.8.8"
+    },
+    {
+        "id": "68d576fdf3c09",
+        "timestamp": "2025-09-25 14:08:13",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "10.12.8.8"
+    },
+    {
+        "id": "68d575cd820ca",
+        "timestamp": "2025-09-25 14:03:09",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "10.12.8.8"
+    },
+    {
+        "id": "68d575cceb0c0",
+        "timestamp": "2025-09-25 14:03:08",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "10.12.8.8"
+    },
+    {
+        "id": "68d575174ed11",
+        "timestamp": "2025-09-25 14:00:07",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "10.12.8.8"
+    },
+    {
+        "id": "68d5749c943e7",
+        "timestamp": "2025-09-25 13:58:04",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "10.12.8.8"
+    },
+    {
+        "id": "68d5749bf0724",
+        "timestamp": "2025-09-25 13:58:03",
+        "action": "LOGOUT",
+        "user": "admin",
+        "details": "Logout do sistema",
+        "ip": "10.12.8.8"
+    },
+    {
+        "id": "68d5599dee752",
+        "timestamp": "2025-09-25 12:02:53",
+        "action": "LOGIN",
+        "user": "admin",
+        "details": "Login como administrador padr\u00e3o",
+        "ip": "10.12.206.38"
+    },
+    {
+        "id": "68d5599a33939",
+        "timestamp": "2025-09-25 12:02:50",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "10.12.206.38"
+    },
+    {
+        "id": "68d55999ad4eb",
+        "timestamp": "2025-09-25 12:02:49",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "10.12.206.38"
+    },
+    {
         "id": "68d55474abccd",
         "timestamp": "2025-09-25 11:40:52",
         "action": "LOGIN",
