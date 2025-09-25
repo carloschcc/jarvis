@@ -929,11 +929,11 @@ function showCreateUser() {
                                             <div class="input-group">
                                                 <input type="password" class="form-control" id="createPassword" placeholder="Mínimo 8 caracteres" required>
                                                 <div class="input-group-append">
-                                                    <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('createPassword')" style="padding: 6px 10px;">
-                                                        <i class="fas fa-eye" style="font-size: 14px;"></i>
+                                                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="togglePasswordVisibility('createPassword')" style="padding: 4px 8px;">
+                                                        <i class="fas fa-eye" style="font-size: 11px;"></i>
                                                     </button>
-                                                    <button type="button" class="btn btn-outline-primary" onclick="generateRandomPassword()" style="padding: 6px 10px;">
-                                                        <i class="fas fa-dice" style="font-size: 14px;"></i>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="generateRandomPassword()" style="padding: 4px 8px;">
+                                                        <i class="fas fa-dice" style="font-size: 11px;"></i>
                                                     </button>
                                                 </div>
                                             </div>
