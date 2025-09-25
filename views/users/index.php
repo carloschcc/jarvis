@@ -869,22 +869,22 @@ function showCreateUser() {
                                         
                                         <div class="form-group">
                                             <label for="createFirstName">Nome (Obrigatório):</label>
-                                            <input type="text" class="form-control" id="createFirstName" placeholder="Ex: Carlos" value="João" required>
+                                            <input type="text" class="form-control" id="createFirstName" placeholder="Ex: Carlos" required>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createLastName">Sobrenome (Obrigatório):</label>
-                                            <input type="text" class="form-control" id="createLastName" placeholder="Ex: Silva" value="Silva" required>
+                                            <input type="text" class="form-control" id="createLastName" placeholder="Ex: Silva" required>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createDisplayName">Nome Completo:</label>
-                                            <input type="text" class="form-control" id="createDisplayName" placeholder="Será preenchido automaticamente" value="João Silva" readonly>
+                                            <input type="text" class="form-control" id="createDisplayName" placeholder="Será preenchido automaticamente" readonly>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createEmail">Email:</label>
-                                            <input type="email" class="form-control" id="createEmail" placeholder="joao.silva@empresa.com" value="joao.silva@empresa.local">
+                                            <input type="email" class="form-control" id="createEmail" placeholder="usuario@empresa.com">
                                         </div>
                                     </div>
                                 </div>
@@ -896,14 +896,14 @@ function showCreateUser() {
                                         
                                         <div class="form-group">
                                             <label for="createUsername">Nome de Usuário (Obrigatório):</label>
-                                            <input type="text" class="form-control" id="createUsername" placeholder="Ex: joao.silva" value="joao.silva" required>
+                                            <input type="text" class="form-control" id="createUsername" placeholder="Ex: usuario.sobrenome" required>
                                             <small class="form-text text-muted">Mínimo 3-4 caracteres, apenas letras e números</small>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createPassword">Senha Inicial (Obrigatório):</label>
                                             <div class="input-group">
-                                                <input type="password" class="form-control" id="createPassword" placeholder="Mínimo 8 caracteres" value="TempPass123!" required>
+                                                <input type="password" class="form-control" id="createPassword" placeholder="Mínimo 8 caracteres" required>
                                                 <div class="input-group-append">
                                                     <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('createPassword')">
                                                         <i class="fas fa-eye"></i>
@@ -936,28 +936,17 @@ function showCreateUser() {
                                             </label>
                                             <select class="form-control" id="createOU" style="background: #ffffff; border: 2px solid #2196f3; font-size: 0.95rem; padding: 10px;">
                                                 <option value="">🔍 Detectar automaticamente (Recomendado)</option>
-                                                <optgroup label="📁 Containers Comuns">
-                                                    <option value="CN=Users">CN=Users (Padrão do Windows)</option>
-                                                    <option value="OU=Users">OU=Users</option>
-                                                    <option value="OU=Usuarios">OU=Usuarios (Português)</option>
-                                                    <option value="OU=Funcionarios">OU=Funcionarios</option>
-                                                    <option value="OU=People">OU=People</option>
-                                                    <option value="OU=Employees">OU=Employees</option>
-                                                </optgroup>
-                                                <optgroup label="🏢 Por Departamento">
-                                                    <option value="OU=TI">OU=TI</option>
-                                                    <option value="OU=RH">OU=RH</option>
-                                                    <option value="OU=Financeiro">OU=Financeiro</option>
-                                                    <option value="OU=Comercial">OU=Comercial</option>
-                                                    <option value="OU=Marketing">OU=Marketing</option>
+                                                <optgroup label="📁 Containers Padrão do Windows">
+                                                    <option value="CN=Users">CN=Users (Container padrão)</option>
+                                                    <option value="OU=Users">OU=Users (Organizacional padrão)</option>
                                                 </optgroup>
                                                 <optgroup label="⚙️ Personalizado">
-                                                    <option value="custom">✏️ Digitar OU personalizada</option>
+                                                    <option value="custom">✏️ Digitar OU específica do seu AD</option>
                                                 </optgroup>
                                             </select>
                                             <small class="form-text" style="color: #1976d2; font-weight: 500; margin-top: 8px;">
                                                 <i class="fas fa-info-circle text-info"></i>
-                                                <strong>NOVA FUNCIONALIDADE:</strong> Selecione onde criar o usuário no AD. Use detecção automática se não tiver certeza.
+                                                <strong>NOVA FUNCIONALIDADE:</strong> Especifique onde criar o usuário no seu AD. Use apenas OUs que existem no seu domínio. Se não souber, deixe em "Detectar automaticamente".
                                             </small>
                                         </div>
                                         
@@ -966,7 +955,7 @@ function showCreateUser() {
                                                 <i class="fas fa-edit" style="color: #ffc107;"></i> ✏️ OU Personalizada:
                                             </label>
                                             <input type="text" class="form-control" id="createCustomOU" 
-                                                   placeholder="Ex: OU=TI,OU=Departamentos" style="border: 2px solid #ffc107; font-family: monospace;">
+                                                   placeholder="Ex: OU=Usuarios,OU=Empresa (use OUs do seu AD)" style="border: 2px solid #ffc107; font-family: monospace;">
                                             <small class="form-text" style="color: #856404; font-weight: 500; margin-top: 8px;">
                                                 <strong>📝 Exemplos válidos:</strong><br>
                                                 • <code style="background: #fff; padding: 2px 4px; border-radius: 3px; color: #d63384;">OU=TI</code> (será completado automaticamente)<br>
@@ -985,22 +974,22 @@ function showCreateUser() {
                                         
                                         <div class="form-group">
                                             <label for="createTitle">Função/Cargo:</label>
-                                            <input type="text" class="form-control" id="createTitle" placeholder="Ex: Analista Principal" value="Analista Jr">
+                                            <input type="text" class="form-control" id="createTitle" placeholder="Ex: Analista Principal">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createDepartment">Departamento:</label>
-                                            <input type="text" class="form-control" id="createDepartment" placeholder="Ex: TI, RH, Financeiro..." value="TI">
+                                            <input type="text" class="form-control" id="createDepartment" placeholder="Ex: TI, RH, Financeiro...">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createCompany">Empresa:</label>
-                                            <input type="text" class="form-control" id="createCompany" placeholder="Ex: Empresa Principal, Filial..." value="Empresa Principal">
+                                            <input type="text" class="form-control" id="createCompany" placeholder="Ex: Empresa Principal, Filial...">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createManager">Gestor/Chefe:</label>
-                                            <input type="text" class="form-control" id="createManager" placeholder="Nome do gestor" value="Administrador">
+                                            <input type="text" class="form-control" id="createManager" placeholder="Nome do gestor">
                                         </div>
                                     </div>
                                 </div>
@@ -1014,12 +1003,12 @@ function showCreateUser() {
                                         
                                         <div class="form-group">
                                             <label for="createCity">Cidade:</label>
-                                            <input type="text" class="form-control" id="createCity" placeholder="Ex: São Paulo, Rio de Janeiro..." value="São Paulo">
+                                            <input type="text" class="form-control" id="createCity" placeholder="Ex: São Paulo, Rio de Janeiro...">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createOffice">Escritório:</label>
-                                            <input type="text" class="form-control" id="createOffice" placeholder="Ex: Sede Principal" value="Sede Principal">
+                                            <input type="text" class="form-control" id="createOffice" placeholder="Ex: Sede Principal">
                                         </div>
                                     </div>
                                 </div>
