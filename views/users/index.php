@@ -991,15 +991,6 @@ function showCreateUser() {
                                             <label for="createManager">Gestor/Chefe:</label>
                                             <input type="text" class="form-control" id="createManager" placeholder="Nome do gestor">
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Seção: Localização -->
-                            <div class="row mt-3">
-                                <div class="col-md-4">
-                                    <div class="form-section">
-                                        <h6 class="section-title"><i class="fas fa-map-marker-alt"></i> Localização</h6>
                                         
                                         <div class="form-group">
                                             <label for="createCity">Cidade:</label>
@@ -1010,12 +1001,6 @@ function showCreateUser() {
                                             <label for="createOffice">Escritório:</label>
                                             <input type="text" class="form-control" id="createOffice" placeholder="Ex: Sede Principal">
                                         </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="form-section">
-                                        <h6 class="section-title"><i class="fas fa-phone"></i> Contato</h6>
                                         
                                         <div class="form-group">
                                             <label for="createPhone">Telefone:</label>
@@ -1028,8 +1013,6 @@ function showCreateUser() {
                                         </div>
                                     </div>
                                 </div>
-                                
-
                             </div>
                             
                             <!-- Seção Grupos - Linha Dedicada -->
@@ -1083,8 +1066,8 @@ function showCreateUser() {
                                 <div class="col-12">
                                     <div class="form-section">
                                         <h6 class="section-title"><i class="fas fa-comment"></i> Observações/Descrição</h6>
-                                        <div class="form-group">
-                                            <textarea class="form-control" id="createDescription" rows="3" placeholder="Informações adicionais sobre o usuário..."></textarea>
+                                        <div class="form-group mb-0">
+                                            <textarea class="form-control" id="createDescription" rows="4" placeholder="Informações adicionais sobre o usuário..."></textarea>
                                         </div>
                                     </div>
                                 </div>

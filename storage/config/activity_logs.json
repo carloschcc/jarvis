@@ -1,5 +1,29 @@
 [
     {
+        "id": "68d55474abccd",
+        "timestamp": "2025-09-25 11:40:52",
+        "action": "LOGIN",
+        "user": "admin",
+        "details": "Login como administrador padr\u00e3o",
+        "ip": "10.12.206.38"
+    },
+    {
+        "id": "68d5546d94e6e",
+        "timestamp": "2025-09-25 11:40:45",
+        "action": "LOGOUT",
+        "user": "unknown",
+        "details": "Logout do sistema",
+        "ip": "10.12.206.38"
+    },
+    {
+        "id": "68d5546ce3530",
+        "timestamp": "2025-09-25 11:40:44",
+        "action": "LOGOUT",
+        "user": "admin",
+        "details": "Logout do sistema",
+        "ip": "10.12.206.38"
+    },
+    {
         "id": "68d5464ce742d",
         "timestamp": "2025-09-25 10:40:28",
         "action": "LOGIN",
