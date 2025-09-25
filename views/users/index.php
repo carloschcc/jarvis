@@ -1029,27 +1029,7 @@ function showCreateUser() {
                                     </div>
                                 </div>
                                 
-                                <div class="col-md-4">
-                                    <div class="form-section">
-                                        <h6 class="section-title"><i class="fas fa-cogs"></i> Configurações Adicionais</h6>
-                                        
-                                        <div class="form-group">
-                                            <label for="createProfilePath">Perfil de Usuário:</label>
-                                            <input type="text" class="form-control" id="createProfilePath" placeholder="Ex: \\servidor\perfis\%username%">
-                                            <small class="form-text text-muted">Caminho do perfil móvel (opcional)</small>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label for="createHomeDrive">Unidade Home:</label>
-                                            <select class="form-control" id="createHomeDrive">
-                                                <option value="">Selecione uma unidade</option>
-                                                <option value="H:">H: (Padrão)</option>
-                                                <option value="Z:">Z:</option>
-                                                <option value="Y:">Y:</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
+
                             </div>
                             
                             <!-- Seção Grupos - Linha Dedicada -->
