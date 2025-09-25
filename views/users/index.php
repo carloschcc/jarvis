@@ -517,7 +517,21 @@ function showResetPasswordModal(username) {
     
     // Adicionar e mostrar novo modal
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    $('#resetPasswordModal').modal('show');
+    
+    // Mostrar modal usando vanilla JavaScript
+    const modal = document.getElementById('resetPasswordModal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        if (!document.getElementById('modal-backdrop')) {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'modal-backdrop';
+            document.body.appendChild(backdrop);
+        }
+    }
 }
 
 // Executar reset de senha
@@ -544,7 +558,17 @@ function executePasswordReset(username) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            $('#resetPasswordModal').modal('hide');
+            // Fechar modal
+            const modal = document.getElementById('resetPasswordModal');
+            const backdrop = document.getElementById('modal-backdrop');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('show');
+                modal.remove();
+            }
+            if (backdrop) backdrop.remove();
+            document.body.classList.remove('modal-open');
+            
             showNotification(data.message, 'success');
         } else {
             showNotification('Erro: ' + data.message, 'error');
@@ -641,7 +665,21 @@ function showUserModal(user) {
     
     // Adicionar e mostrar novo modal
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    $('#userModal').modal('show');
+    
+    // Mostrar modal usando vanilla JavaScript
+    const modal = document.getElementById('userModal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        if (!document.getElementById('modal-backdrop')) {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'modal-backdrop';
+            document.body.appendChild(backdrop);
+        }
+    }
 }
 
 // Função para mostrar notificações
@@ -812,7 +850,7 @@ function showCreateUser() {
                         <h5 class="modal-title">
                             <i class="fas fa-user-plus"></i> Criar Novo Usuário no Active Directory
                         </h5>
-                        <button type="button" class="close" data-dismiss="modal" style="color: white; opacity: 0.8;">
+                        <button type="button" class="close" onclick="closeCreateUserModal()" style="color: white; opacity: 0.8;">
                             <span>&times;</span>
                         </button>
                     </div>
@@ -831,22 +869,29 @@ function showCreateUser() {
                                         
                                         <div class="form-group">
                                             <label for="createFirstName">Nome (Obrigatório):</label>
-                                            <input type="text" class="form-control" id="createFirstName" placeholder="Ex: Carlos" value="João" required>
+                                            <input type="text" class="form-control" id="createFirstName" placeholder="Ex: Carlos" required>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createLastName">Sobrenome (Obrigatório):</label>
-                                            <input type="text" class="form-control" id="createLastName" placeholder="Ex: Silva" value="Silva" required>
+                                            <input type="text" class="form-control" id="createLastName" placeholder="Ex: Silva" required>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createDisplayName">Nome Completo:</label>
-                                            <input type="text" class="form-control" id="createDisplayName" placeholder="Será preenchido automaticamente" value="João Silva" readonly>
+                                            <input type="text" class="form-control" id="createDisplayName" placeholder="Será preenchido automaticamente" readonly>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createEmail">Email:</label>
-                                            <input type="email" class="form-control" id="createEmail" placeholder="joao.silva@empresa.com" value="joao.silva@empresa.local">
+                                            <input type="email" class="form-control" id="createEmail" placeholder="usuario@empresa.com">
+                                        </div>
+                                        
+                                        <div class="form-group mt-3">
+                                            <label for="createDescription" style="font-weight: 600; color: #495057;">
+                                                <i class="fas fa-comment" style="color: #6c757d;"></i> Observações:
+                                            </label>
+                                            <textarea class="form-control" id="createDescription" rows="3" placeholder="Informações adicionais sobre o usuário..." style="font-size: 0.85rem; resize: vertical; min-height: 60px;"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -858,14 +903,14 @@ function showCreateUser() {
                                         
                                         <div class="form-group">
                                             <label for="createUsername">Nome de Usuário (Obrigatório):</label>
-                                            <input type="text" class="form-control" id="createUsername" placeholder="Ex: joao.silva" value="joao.silva" required>
+                                            <input type="text" class="form-control" id="createUsername" placeholder="Ex: usuario.sobrenome" required>
                                             <small class="form-text text-muted">Mínimo 3-4 caracteres, apenas letras e números</small>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createPassword">Senha Inicial (Obrigatório):</label>
                                             <div class="input-group">
-                                                <input type="password" class="form-control" id="createPassword" placeholder="Mínimo 8 caracteres" value="TempPass123!" required>
+                                                <input type="password" class="form-control" id="createPassword" placeholder="Mínimo 8 caracteres" required>
                                                 <div class="input-group-append">
                                                     <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('createPassword')">
                                                         <i class="fas fa-eye"></i>
@@ -890,6 +935,38 @@ function showCreateUser() {
                                                 Conta ativa inicialmente
                                             </label>
                                         </div>
+                                        
+                                        <!-- OU Selection Section - RESPONSIVA -->
+                                        <div class="form-group ou-selector-section" style="background: linear-gradient(135deg, #e3f2fd, #f8f9fa); border: 2px solid #2196f3; border-radius: 6px; padding: 12px; margin: 10px 0; box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);">
+                                            <label for="createOU" style="font-weight: 600; font-size: 0.9rem; color: #1976d2; margin-bottom: 8px; display: block;">
+                                                <i class="fas fa-sitemap" style="color: #2196f3;"></i> 📂 OU/Container:
+                                            </label>
+                                            <select class="form-control" id="createOU" style="background: #ffffff; border: 2px solid #2196f3; font-size: 0.85rem; padding: 6px 8px; height: auto; min-height: 32px;">
+                                                <option value="">🔍 Detectar automaticamente</option>
+                                                <optgroup label="📁 Containers Padrão">
+                                                    <option value="CN=Users">CN=Users (Padrão)</option>
+                                                    <option value="OU=Users">OU=Users</option>
+                                                </optgroup>
+                                                <optgroup label="⚙️ Personalizado">
+                                                    <option value="custom">✏️ Digitar OU específica</option>
+                                                </optgroup>
+                                            </select>
+                                            <small class="form-text" style="color: #1976d2; font-size: 0.75rem; margin-top: 4px; line-height: 1.2;">
+                                                <i class="fas fa-info-circle"></i>
+                                                <strong>NOVA:</strong> Especifique onde criar no AD ou deixe automático.
+                                            </small>
+                                        </div>
+                                        
+                                        <div class="form-group" id="customOUGroup" style="display: none; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; padding: 8px; margin-top: 6px;">
+                                            <label for="createCustomOU" style="font-weight: 600; color: #856404; font-size: 0.85rem; margin-bottom: 4px;">
+                                                <i class="fas fa-edit" style="color: #ffc107;"></i> OU Personalizada:
+                                            </label>
+                                            <input type="text" class="form-control" id="createCustomOU" 
+                                                   placeholder="Ex: OU=TI,OU=Departamentos" style="border: 1px solid #ffc107; font-family: monospace; font-size: 0.8rem; padding: 4px 6px;">
+                                            <small class="form-text" style="color: #856404; font-size: 0.7rem; margin-top: 2px; line-height: 1.1;">
+                                                <strong>Ex:</strong> OU=TI, OU=TI,OU=Departamentos, CN=Users
+                                            </small>
+                                        </div>
                                     </div>
                                 </div>
                                 
@@ -900,99 +977,134 @@ function showCreateUser() {
                                         
                                         <div class="form-group">
                                             <label for="createTitle">Função/Cargo:</label>
-                                            <input type="text" class="form-control" id="createTitle" placeholder="Ex: Analista Principal" value="Analista Jr">
+                                            <input type="text" class="form-control" id="createTitle" placeholder="Ex: Analista Principal">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createDepartment">Departamento:</label>
-                                            <input type="text" class="form-control" id="createDepartment" placeholder="Ex: TI, RH, Financeiro..." value="TI">
+                                            <input type="text" class="form-control" id="createDepartment" placeholder="Ex: TI, RH, Financeiro...">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createCompany">Empresa:</label>
-                                            <input type="text" class="form-control" id="createCompany" placeholder="Ex: Empresa Principal, Filial..." value="Empresa Principal">
+                                            <input type="text" class="form-control" id="createCompany" placeholder="Ex: Empresa Principal, Filial...">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createManager">Gestor/Chefe:</label>
-                                            <input type="text" class="form-control" id="createManager" placeholder="Nome do gestor" value="Administrador">
+                                            <input type="text" class="form-control" id="createManager" placeholder="Nome do gestor">
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Seção: Localização -->
-                            <div class="row mt-3">
-                                <div class="col-md-4">
-                                    <div class="form-section">
-                                        <h6 class="section-title"><i class="fas fa-map-marker-alt"></i> Localização</h6>
                                         
                                         <div class="form-group">
                                             <label for="createCity">Cidade:</label>
-                                            <input type="text" class="form-control" id="createCity" placeholder="Ex: São Paulo, Rio de Janeiro..." value="São Paulo">
+                                            <input type="text" class="form-control" id="createCity" placeholder="Ex: São Paulo, Rio de Janeiro...">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createOffice">Escritório:</label>
-                                            <input type="text" class="form-control" id="createOffice" placeholder="Ex: Sede Principal" value="Sede Principal">
+                                            <input type="text" class="form-control" id="createOffice" placeholder="Ex: Sede Principal">
                                         </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="form-section">
-                                        <h6 class="section-title"><i class="fas fa-phone"></i> Contato</h6>
                                         
                                         <div class="form-group">
                                             <label for="createPhone">Telefone:</label>
-                                            <input type="tel" class="form-control" id="createPhone" placeholder="(11) 99999-9999" value="(11) 3456-7890">
+                                            <input type="tel" class="form-control" id="createPhone" placeholder="(11) 99999-9999">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label for="createMobile">Celular:</label>
-                                            <input type="tel" class="form-control" id="createMobile" placeholder="(11) 99999-9999" value="(11) 98765-4321">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="form-section">
-                                        <h6 class="section-title"><i class="fas fa-users"></i> Grupos</h6>
-                                        
-                                        <div class="form-group">
-                                            <label for="createGroups">Adicionar aos Grupos:</label>
-                                            <div class="checkbox-group" style="max-height: 150px; overflow-y: auto; border: 1px solid #ced4da; padding: 10px; border-radius: 4px;">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" value="Domain Users" id="group_domain_users" checked disabled>
-                                                    <label class="form-check-label" for="group_domain_users">
-                                                        Domain Users (Padrão)
-                                                    </label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" value="Funcionarios" id="group_funcionarios">
-                                                    <label class="form-check-label" for="group_funcionarios">
-                                                        Funcionarios
-                                                    </label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" value="VPN Users" id="group_vpn">
-                                                    <label class="form-check-label" for="group_vpn">
-                                                        VPN Users
-                                                    </label>
-                                                </div>
-                                            </div>
+                                            <input type="tel" class="form-control" id="createMobile" placeholder="(11) 99999-9999">
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <!-- Observações -->
+                            <!-- Seção Grupos - Linha Dedicada -->
                             <div class="row mt-3">
                                 <div class="col-12">
-                                    <div class="form-section">
-                                        <h6 class="section-title"><i class="fas fa-comment"></i> Observações/Descrição</h6>
+                                    <div class="form-section" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); border: 2px solid #007bff; border-radius: 8px;">
+                                        <h6 class="section-title" style="color: #007bff;"><i class="fas fa-users"></i> 👥 Grupos do Active Directory</h6>
+                                        
                                         <div class="form-group">
-                                            <textarea class="form-control" id="createDescription" rows="3" placeholder="Informações adicionais sobre o usuário...">Novo funcionário contratado. Acesso inicial aos sistemas básicos da empresa.</textarea>
+                                            <label for="createGroups" style="font-weight: 600; color: #495057;">Adicionar aos Grupos:</label>
+                                            <!-- Lista de Grupos Dinâmica -->
+                                            <div id="groupsList" class="groups-container" style="max-height: 200px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 6px; padding: 10px; background: #ffffff;">
+                                                
+                                                <!-- Grupo Obrigatório Domain Users -->
+                                                <div class="form-check group-item" style="margin-bottom: 8px; padding: 8px; background: #e8f5e8; border-radius: 4px; border: 1px solid #c3e6c3;">
+                                                    <input class="form-check-input" type="checkbox" value="Domain Users" id="group_domain_users" checked disabled>
+                                                    <label class="form-check-label" for="group_domain_users" style="font-weight: 600; color: #28a745; display: flex; align-items: center;">
+                                                        <i class="fas fa-users" style="margin-right: 6px; color: #28a745;"></i>
+                                                        ✓ Domain Users (Padrão)
+                                                    </label>
+                                                    <small class="d-block text-muted" style="margin-left: 20px; font-size: 0.75rem;">Grupo padrão obrigatório</small>
+                                                </div>
+
+                                                <!-- Grupos Comuns do AD -->
+                                                <div class="form-check group-item" style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef;">
+                                                    <input class="form-check-input" type="checkbox" value="Funcionarios" id="group_funcionarios">
+                                                    <label class="form-check-label" for="group_funcionarios" style="color: #495057; display: flex; align-items: center;">
+                                                        <i class="fas fa-building" style="margin-right: 6px; color: #6c757d;"></i>
+                                                        👥 Funcionários
+                                                    </label>
+                                                    <small class="d-block text-muted" style="margin-left: 20px; font-size: 0.75rem;">Acesso geral da empresa</small>
+                                                </div>
+
+                                                <div class="form-check group-item" style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef;">
+                                                    <input class="form-check-input" type="checkbox" value="VPN Users" id="group_vpn_users">
+                                                    <label class="form-check-label" for="group_vpn_users" style="color: #495057; display: flex; align-items: center;">
+                                                        <i class="fas fa-shield-alt" style="margin-right: 6px; color: #6c757d;"></i>
+                                                        🔐 VPN Users
+                                                    </label>
+                                                    <small class="d-block text-muted" style="margin-left: 20px; font-size: 0.75rem;">Acesso remoto via VPN</small>
+                                                </div>
+
+                                                <div class="form-check group-item" style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef;">
+                                                    <input class="form-check-input" type="checkbox" value="Administrators" id="group_administrators">
+                                                    <label class="form-check-label" for="group_administrators" style="color: #495057; display: flex; align-items: center;">
+                                                        <i class="fas fa-crown" style="margin-right: 6px; color: #dc3545;"></i>
+                                                        👑 Administrators
+                                                    </label>
+                                                    <small class="d-block text-muted" style="margin-left: 20px; font-size: 0.75rem;">Acesso administrativo total</small>
+                                                </div>
+
+                                                <div class="form-check group-item" style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef;">
+                                                    <input class="form-check-input" type="checkbox" value="Remote Desktop Users" id="group_rdp_users">
+                                                    <label class="form-check-label" for="group_rdp_users" style="color: #495057; display: flex; align-items: center;">
+                                                        <i class="fas fa-desktop" style="margin-right: 6px; color: #6c757d;"></i>
+                                                        💻 Remote Desktop Users
+                                                    </label>
+                                                    <small class="d-block text-muted" style="margin-left: 20px; font-size: 0.75rem;">Acesso via RDP</small>
+                                                </div>
+
+                                                <div class="form-check group-item" style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef;">
+                                                    <input class="form-check-input" type="checkbox" value="Power Users" id="group_power_users">
+                                                    <label class="form-check-label" for="group_power_users" style="color: #495057; display: flex; align-items: center;">
+                                                        <i class="fas fa-bolt" style="margin-right: 6px; color: #ffc107;"></i>
+                                                        ⚡ Power Users
+                                                    </label>
+                                                    <small class="d-block text-muted" style="margin-left: 20px; font-size: 0.75rem;">Usuários avançados</small>
+                                                </div>
+
+                                                <div class="form-check group-item" style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef;">
+                                                    <input class="form-check-input" type="checkbox" value="Backup Operators" id="group_backup_ops">
+                                                    <label class="form-check-label" for="group_backup_ops" style="color: #495057; display: flex; align-items: center;">
+                                                        <i class="fas fa-hdd" style="margin-right: 6px; color: #6c757d;"></i>
+                                                        💾 Backup Operators
+                                                    </label>
+                                                    <small class="d-block text-muted" style="margin-left: 20px; font-size: 0.75rem;">Operadores de backup</small>
+                                                </div>
+
+                                                <!-- Botão para carregar mais grupos -->
+                                                <div class="text-center mt-2">
+                                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="loadMoreGroups()" style="font-size: 0.8rem; padding: 4px 12px;">
+                                                        <i class="fas fa-sync-alt"></i> Carregar grupos do AD
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="alert alert-info mt-2" style="margin-bottom: 0; padding: 8px 12px;">
+                                                <i class="fas fa-info-circle"></i>
+                                                <strong>Importante:</strong> Domain Users é adicionado automaticamente. Selecione grupos adicionais conforme necessário.
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1000,7 +1112,7 @@ function showCreateUser() {
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <button type="button" class="btn btn-secondary" onclick="closeCreateUserModal()">
                             <i class="fas fa-times"></i> Cancelar
                         </button>
                         <button type="button" class="btn btn-success" onclick="createNewUser()">
@@ -1025,8 +1137,55 @@ function showCreateUser() {
     // Configurar auto-preenchimento do email
     setupAutoFillEmail();
     
-    // Mostrar modal
-    $('#createUserModal').modal('show');
+    // Configurar controle da OU personalizada
+    setupOUSelector();
+    
+    // Mostrar modal usando vanilla JavaScript
+    const modal = document.getElementById('createUserModal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        // Adicionar backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade show';
+        backdrop.id = 'modal-backdrop';
+        backdrop.onclick = () => closeModal('createUserModal');
+        document.body.appendChild(backdrop);
+        
+        // Fechar modal com ESC
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                closeModal('createUserModal');
+                document.removeEventListener('keydown', handleEscape);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
+    }
+}
+
+// Função genérica para fechar modais
+function closeModal(modalId) {
+    const modal = modalId ? document.getElementById(modalId) : document.querySelector('.modal.show');
+    const backdrop = document.getElementById('modal-backdrop');
+    
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('show');
+        modal.remove(); // Remove completamente do DOM
+    }
+    
+    if (backdrop) {
+        backdrop.remove();
+    }
+    
+    document.body.classList.remove('modal-open');
+}
+
+// Função específica para fechar o modal de criação
+function closeCreateUserModal() {
+    closeModal('createUserModal');
 }
 
 // Função para editar usuário
@@ -1120,7 +1279,22 @@ function showEditUserModal(user) {
     
     // Adicionar e mostrar novo modal
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    $('#editUserModal').modal('show');
+    
+    // Mostrar modal usando vanilla JavaScript
+    const modal = document.getElementById('editUserModal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        // Adicionar backdrop se não existir
+        if (!document.getElementById('modal-backdrop')) {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'modal-backdrop';
+            document.body.appendChild(backdrop);
+        }
+    }
 }
 
 // Salvar edição do usuário
@@ -1145,7 +1319,17 @@ function saveUserEdit(username) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            $('#editUserModal').modal('hide');
+            // Fechar modal
+            const modal = document.getElementById('editUserModal');
+            const backdrop = document.getElementById('modal-backdrop');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('show');
+                modal.remove();
+            }
+            if (backdrop) backdrop.remove();
+            document.body.classList.remove('modal-open');
+            
             showNotification(data.message, 'success');
             setTimeout(() => window.location.reload(), 1500);
         } else {
@@ -1225,7 +1409,21 @@ function showUserGroupsModal(username, groups) {
     
     // Adicionar e mostrar novo modal
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    $('#userGroupsModal').modal('show');
+    
+    // Mostrar modal usando vanilla JavaScript
+    const modal = document.getElementById('userGroupsModal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        if (!document.getElementById('modal-backdrop')) {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'modal-backdrop';
+            document.body.appendChild(backdrop);
+        }
+    }
 }
 
 // Função para excluir usuário
@@ -1302,6 +1500,23 @@ function setupAutoFillEmail() {
     
     firstNameInput.addEventListener('blur', updateEmail);
     lastNameInput.addEventListener('blur', updateEmail);
+}
+
+// Função para configurar seletor de OU
+function setupOUSelector() {
+    const ouSelect = document.getElementById('createOU');
+    const customOUGroup = document.getElementById('customOUGroup');
+    const customOUInput = document.getElementById('createCustomOU');
+    
+    ouSelect.addEventListener('change', function() {
+        if (this.value === 'custom') {
+            customOUGroup.style.display = 'block';
+            customOUInput.focus();
+        } else {
+            customOUGroup.style.display = 'none';
+            customOUInput.value = '';
+        }
+    });
 }
 
 // Função para alternar visibilidade da senha
@@ -1389,6 +1604,17 @@ function createNewUser() {
         return;
     }
     
+    // Obter OU selecionada
+    const ouSelect = document.getElementById('createOU');
+    const customOU = document.getElementById('createCustomOU').value.trim();
+    let targetOU = '';
+    
+    if (ouSelect.value === 'custom' && customOU) {
+        targetOU = customOU;
+    } else if (ouSelect.value) {
+        targetOU = ouSelect.value;
+    }
+    
     // Coletar dados do formulário
     const userData = {
         firstName: firstName,
@@ -1408,6 +1634,7 @@ function createNewUser() {
         description: document.getElementById('createDescription').value.trim(),
         forcePasswordChange: document.getElementById('createForcePasswordChange').checked,
         accountEnabled: document.getElementById('createAccountEnabled').checked,
+        targetOU: targetOU,
         groups: getSelectedGroups()
     };
     
@@ -1438,7 +1665,16 @@ function createNewUser() {
         createBtn.disabled = false;
         
         if (data.success) {
-            $('#createUserModal').modal('hide');
+            // Fechar modal
+            const modal = document.getElementById('createUserModal');
+            const backdrop = document.getElementById('modal-backdrop');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('show');
+                modal.remove();
+            }
+            if (backdrop) backdrop.remove();
+            document.body.classList.remove('modal-open');
             
             // Verificar se é modo simulação
             if (data.mode === 'simulation') {
@@ -1545,7 +1781,21 @@ function showSimulationSuccess(data) {
     
     // Adicionar e mostrar novo modal
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    $('#simulationResultModal').modal('show');
+    
+    // Mostrar modal usando vanilla JavaScript
+    const modal = document.getElementById('simulationResultModal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        if (!document.getElementById('modal-backdrop')) {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'modal-backdrop';
+            document.body.appendChild(backdrop);
+        }
+    }
     
     // Também mostrar notificação
     showNotification('🎭 Simulação realizada com sucesso! Usuário seria criado no AD.', 'success');
@@ -1561,6 +1811,71 @@ function createAnotherUser() {
     setTimeout(() => {
         showCreateUser();
     }, 500);
+}
+
+// Função para carregar mais grupos do AD
+function loadMoreGroups() {
+    const button = event.target;
+    const originalText = button.innerHTML;
+    
+    // Mostrar loading
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Carregando...';
+    button.disabled = true;
+    
+    // Simular busca no AD (em produção, faria uma requisição AJAX real)
+    setTimeout(() => {
+        // Grupos adicionais que podem existir no AD
+        const additionalGroups = [
+            {id: 'print_operators', name: 'Print Operators', icon: 'fas fa-print', color: '#6c757d', description: 'Operadores de impressão'},
+            {id: 'account_operators', name: 'Account Operators', icon: 'fas fa-user-cog', color: '#6c757d', description: 'Operadores de contas'},
+            {id: 'server_operators', name: 'Server Operators', icon: 'fas fa-server', color: '#6c757d', description: 'Operadores de servidor'},
+            {id: 'network_operators', name: 'Network Configuration Operators', icon: 'fas fa-network-wired', color: '#6c757d', description: 'Operadores de rede'},
+            {id: 'guests', name: 'Guests', icon: 'fas fa-user-friends', color: '#6c757d', description: 'Usuários convidados'},
+            {id: 'users', name: 'Users', icon: 'fas fa-users', color: '#6c757d', description: 'Usuários locais'},
+            {id: 'replicator', name: 'Replicator', icon: 'fas fa-copy', color: '#6c757d', description: 'Replicação de diretório'},
+            {id: 'crypto_operators', name: 'Cryptographic Operators', icon: 'fas fa-key', color: '#6c757d', description: 'Operadores criptográficos'}
+        ];
+        
+        const groupsContainer = document.getElementById('groupsList');
+        const loadButton = button.parentElement;
+        
+        // Adicionar novos grupos
+        additionalGroups.forEach(group => {
+            const groupHtml = `
+                <div class="form-check group-item" style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef;">
+                    <input class="form-check-input" type="checkbox" value="${group.name}" id="group_${group.id}">
+                    <label class="form-check-label" for="group_${group.id}" style="color: #495057; display: flex; align-items: center;">
+                        <i class="${group.icon}" style="margin-right: 6px; color: ${group.color};"></i>
+                        ${group.name}
+                    </label>
+                    <small class="d-block text-muted" style="margin-left: 20px; font-size: 0.75rem;">${group.description}</small>
+                </div>
+            `;
+            
+            // Inserir antes do botão
+            loadButton.insertAdjacentHTML('beforebegin', groupHtml);
+        });
+        
+        // Remover botão após carregar
+        loadButton.remove();
+        
+        showNotification('✅ Grupos do AD carregados com sucesso!', 'success');
+        
+    }, 1500); // Simula tempo de carregamento
+}
+
+// Função para coletar grupos selecionados (atualizada)
+function getSelectedGroups() {
+    const checkboxes = document.querySelectorAll('#groupsList .form-check-input:checked:not(:disabled)');
+    const groups = [];
+    
+    checkboxes.forEach(checkbox => {
+        if (checkbox.value && checkbox.value !== '') {
+            groups.push(checkbox.value);
+        }
+    });
+    
+    return groups;
 }
 </script>
 
@@ -1973,10 +2288,47 @@ function createAnotherUser() {
     100% { transform: rotate(360deg); }
 }
 
+/* Estilos gerais para modais */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1050;
+    display: none;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal.show {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1040;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-backdrop.show {
+    opacity: 0.5;
+}
+
+.modal-open {
+    overflow: hidden;
+}
+
 /* Estilos para o Modal de Criação de Usuário */
 #createUserModal .modal-dialog {
-    max-width: 1200px;
-    margin: 1.75rem auto;
+    max-width: 1400px;
+    margin: 0.5rem auto;
 }
 
 #createUserModal .modal-content {
@@ -1996,9 +2348,137 @@ function createAnotherUser() {
 }
 
 #createUserModal .modal-body {
-    padding: 25px;
-    max-height: 70vh;
+    padding: 15px;
+    max-height: 85vh;
     overflow-y: auto;
+}
+
+/* Garantir que campos da OU sejam visíveis, destacados e responsivos */
+#createOU, #customOUGroup {
+    margin-bottom: 8px !important;
+    z-index: 9999 !important;
+}
+
+#createOU {
+    border: 2px solid #2196f3 !important;
+    background-color: #ffffff !important;
+    font-size: 0.85rem !important;
+    padding: 6px 8px !important;
+    height: auto !important;
+    min-height: 32px !important;
+    word-wrap: break-word !important;
+}
+
+/* Responsividade para opções do select */
+#createOU option,
+#createOU optgroup {
+    font-size: 0.8rem !important;
+    padding: 4px 6px !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+}
+
+.ou-selector-section {
+    background: linear-gradient(135deg, #e3f2fd, #f8f9fa) !important;
+    border: 2px solid #2196f3 !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    margin: 15px 0 !important;
+    box-shadow: 0 2px 10px rgba(33, 150, 243, 0.1) !important;
+    position: relative !important;
+}
+
+/* Destacar ainda mais a seção OU */
+.ou-selector-section::before {
+    content: "🆕 NOVO!";
+    position: absolute;
+    top: -8px;
+    right: 10px;
+    background: #ff5722;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Garantir visibilidade da seção de Grupos */
+.groups-section {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef) !important;
+    border: 2px solid #007bff !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+}
+
+.groups-section .form-check {
+    transition: all 0.2s ease;
+}
+
+.groups-section .form-check:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0,123,255,0.2);
+}
+
+/* Estilos para a lista de grupos dinâmica */
+.groups-container {
+    scrollbar-width: thin;
+    scrollbar-color: #007bff #f8f9fa;
+}
+
+.groups-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.groups-container::-webkit-scrollbar-track {
+    background: #f8f9fa;
+    border-radius: 3px;
+}
+
+.groups-container::-webkit-scrollbar-thumb {
+    background: #007bff;
+    border-radius: 3px;
+}
+
+.groups-container::-webkit-scrollbar-thumb:hover {
+    background: #0056b3;
+}
+
+.group-item {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.group-item:hover {
+    background: #e3f2fd !important;
+    border-color: #2196f3 !important;
+    transform: translateX(3px);
+}
+
+.group-item input[type="checkbox"]:checked + label {
+    font-weight: 600;
+    color: #007bff !important;
+}
+
+.group-item input[type="checkbox"]:disabled + label {
+    opacity: 1;
+}
+
+/* Animação para novos grupos adicionados */
+@keyframes slideInGroup {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.group-item.new-group {
+    animation: slideInGroup 0.3s ease-out;
 }
 
 #createUserModal .form-section {
@@ -2105,10 +2585,32 @@ function createAnotherUser() {
     border-color: #1e7e34;
 }
 
+/* Garantir que o modal use o máximo da viewport */
+#createUserModal {
+    padding: 0 !important;
+}
+
+#createUserModal .modal-dialog {
+    height: 98vh;
+    margin: 1vh auto;
+}
+
+#createUserModal .modal-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#createUserModal .modal-body {
+    flex: 1;
+    overflow-y: auto;
+}
+
 /* Responsividade do modal */
 @media (max-width: 1200px) {
     #createUserModal .modal-dialog {
         max-width: 95%;
+        height: 98vh;
     }
 }
 

@@ -348,7 +348,8 @@ class UsersController {
                 'manager' => $userData['manager'],
                 'groups' => $userData['groups'] ?? ['Domain Users'],
                 'accountEnabled' => $userData['accountEnabled'] ?? true,
-                'forcePasswordChange' => $userData['forcePasswordChange'] ?? true
+                'forcePasswordChange' => $userData['forcePasswordChange'] ?? true,
+                'targetOU' => trim($userData['targetOU'] ?? '') // OU/Container selecionado pelo usuário
             ];
             
             logMessage('INFO', 'Tentativa de criação de usuário: ' . $processedData['username'], [

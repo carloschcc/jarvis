@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Modal - AD Manager</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Estilos gerais para modais */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1050;
+            display: none;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal.show {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1040;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-backdrop.show {
+            opacity: 0.5;
+        }
+
+        .modal-open {
+            overflow: hidden;
+        }
+
+        /* Estilos para o Modal de Criação de Usuário */
+        #createUserModal .modal-dialog {
+            max-width: 1200px;
+            margin: 1.75rem auto;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            height: 100%;
+        }
+
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #495057;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Teste do Modal de Criação de Usuário</h1>
+        <p>Clique no botão abaixo para testar se o modal está funcionando corretamente:</p>
+        <button onclick="showCreateUser()" class="btn btn-info">
+            <i class="fas fa-user-plus"></i>
+            Novo Usuário (Testar Modal)
+        </button>
+    </div>
+
+    <script>
+        // Função para mostrar modal de criação de usuário
+        function showCreateUser() {
+            console.log('showCreateUser() chamada - modal deve abrir agora');
+            
+            const modalHtml = `
+                <div class="modal fade" id="createUserModal" tabindex="-1" style="z-index: 9999;">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background: #0078d4; color: white;">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-user-plus"></i> Criar Novo Usuário no Active Directory
+                                </h5>
+                                <button type="button" class="close" onclick="closeCreateUserModal()" style="color: white; opacity: 0.8;">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="alert alert-info" style="border-left: 4px solid #0078d4;">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Teste de Modal:</strong> Este é um teste para verificar se o modal está funcionando corretamente com a seleção de OU.
+                                </div>
+                                
+                                <form id="createUserForm">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-section">
+                                                <h6 class="section-title"><i class="fas fa-user"></i> Dados Pessoais</h6>
+                                                
+                                                <div class="form-group">
+                                                    <label for="createFirstName">Nome (Obrigatório):</label>
+                                                    <input type="text" class="form-control" id="createFirstName" placeholder="Ex: Carlos" value="João" required>
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <label for="createLastName">Sobrenome (Obrigatório):</label>
+                                                    <input type="text" class="form-control" id="createLastName" placeholder="Ex: Silva" value="Silva" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="form-section">
+                                                <h6 class="section-title"><i class="fas fa-sitemap"></i> Configuração OU</h6>
+                                                
+                                                <div class="form-group">
+                                                    <label for="createOU">
+                                                        <i class="fas fa-sitemap"></i> OU/Container de Destino:
+                                                    </label>
+                                                    <select class="form-control" id="createOU" style="background: #f8f9fa;">
+                                                        <option value="">🔍 Detectar automaticamente (Recomendado)</option>
+                                                        <optgroup label="📁 Containers Comuns">
+                                                            <option value="CN=Users">CN=Users (Padrão do Windows)</option>
+                                                            <option value="OU=Users">OU=Users</option>
+                                                            <option value="OU=Usuarios">OU=Usuarios (Português)</option>
+                                                            <option value="OU=Funcionarios">OU=Funcionarios</option>
+                                                            <option value="OU=People">OU=People</option>
+                                                            <option value="OU=Employees">OU=Employees</option>
+                                                        </optgroup>
+                                                        <optgroup label="🏢 Por Departamento">
+                                                            <option value="OU=TI">OU=TI</option>
+                                                            <option value="OU=RH">OU=RH</option>
+                                                            <option value="OU=Financeiro">OU=Financeiro</option>
+                                                            <option value="OU=Comercial">OU=Comercial</option>
+                                                            <option value="OU=Marketing">OU=Marketing</option>
+                                                        </optgroup>
+                                                        <optgroup label="⚙️ Personalizado">
+                                                            <option value="custom">✏️ Digitar OU personalizada</option>
+                                                        </optgroup>
+                                                    </select>
+                                                    <small class="form-text text-muted">
+                                                        <i class="fas fa-info-circle text-info"></i>
+                                                        <strong>Recomendação:</strong> Use detecção automática se não tiver certeza. O sistema tentará os containers mais comuns.
+                                                    </small>
+                                                </div>
+                                                
+                                                <div class="form-group" id="customOUGroup" style="display: none;">
+                                                    <label for="createCustomOU">
+                                                        <i class="fas fa-edit"></i> OU Personalizada:
+                                                    </label>
+                                                    <input type="text" class="form-control" id="createCustomOU" 
+                                                           placeholder="Ex: OU=TI,OU=Departamentos">
+                                                    <small class="form-text text-muted">
+                                                        <strong>Exemplos válidos:</strong><br>
+                                                        • <code>OU=TI</code> (será completado automaticamente)<br>
+                                                        • <code>OU=TI,OU=Departamentos</code> (estrutura hierárquica)<br>
+                                                        • <code>CN=Users</code> (container padrão)<br>
+                                                        • <code>OU=Funcionarios,OU=Empresa,DC=domain,DC=com</code> (caminho completo)
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" onclick="closeCreateUserModal()">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                                <button type="button" class="btn btn-success" onclick="alert('Teste: Botão criar funcionando!')">
+                                    <i class="fas fa-user-plus"></i> Criar Usuário (Teste)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remover modal existente
+            const existingModal = document.getElementById('createUserModal');
+            if (existingModal) existingModal.remove();
+            
+            // Adicionar e mostrar novo modal
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Configurar controle da OU personalizada
+            setupOUSelector();
+            
+            // Mostrar modal usando vanilla JavaScript
+            const modal = document.getElementById('createUserModal');
+            if (modal) {
+                modal.style.display = 'block';
+                modal.classList.add('show');
+                document.body.classList.add('modal-open');
+                
+                // Adicionar backdrop
+                const backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade show';
+                backdrop.id = 'modal-backdrop';
+                backdrop.onclick = () => closeModal('createUserModal');
+                document.body.appendChild(backdrop);
+                
+                // Fechar modal com ESC
+                const handleEscape = (e) => {
+                    if (e.key === 'Escape') {
+                        closeModal('createUserModal');
+                        document.removeEventListener('keydown', handleEscape);
+                    }
+                };
+                document.addEventListener('keydown', handleEscape);
+                
+                console.log('Modal deveria estar visível agora!');
+            }
+        }
+
+        // Função genérica para fechar modais
+        function closeModal(modalId) {
+            const modal = modalId ? document.getElementById(modalId) : document.querySelector('.modal.show');
+            const backdrop = document.getElementById('modal-backdrop');
+            
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('show');
+                modal.remove(); // Remove completamente do DOM
+            }
+            
+            if (backdrop) {
+                backdrop.remove();
+            }
+            
+            document.body.classList.remove('modal-open');
+            console.log('Modal fechado');
+        }
+
+        // Função específica para fechar o modal de criação
+        function closeCreateUserModal() {
+            closeModal('createUserModal');
+        }
+
+        // Função para configurar seletor de OU
+        function setupOUSelector() {
+            const ouSelect = document.getElementById('createOU');
+            const customOUGroup = document.getElementById('customOUGroup');
+            const customOUInput = document.getElementById('createCustomOU');
+            
+            if (ouSelect && customOUGroup && customOUInput) {
+                ouSelect.addEventListener('change', function() {
+                    if (this.value === 'custom') {
+                        customOUGroup.style.display = 'block';
+                        customOUInput.focus();
+                        console.log('Campo OU personalizada ativado');
+                    } else {
+                        customOUGroup.style.display = 'none';
+                        customOUInput.value = '';
+                        console.log('OU selecionada:', this.value);
+                    }
+                });
+            }
+        }
+
+        console.log('Teste do modal carregado. Use o botão para testar.');
+    </script>
+</body>
+</html>
