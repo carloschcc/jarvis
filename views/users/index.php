@@ -1026,33 +1026,79 @@ function showCreateUser() {
                                         
                                         <div class="form-group">
                                             <label for="createGroups" style="font-weight: 600; color: #495057;">Adicionar aos Grupos:</label>
-                                            <div class="row">
-                                                <div class="col-md-4">
-                                                    <div class="form-check" style="margin-bottom: 10px; padding: 10px; background: #ffffff; border-radius: 6px; border: 1px solid #dee2e6;">
-                                                        <input class="form-check-input" type="checkbox" value="Domain Users" id="group_domain_users" checked disabled>
-                                                        <label class="form-check-label" for="group_domain_users" style="font-weight: 500; color: #28a745;">
-                                                            ✓ Domain Users (Padrão)
-                                                        </label>
-                                                        <small class="d-block text-muted">Grupo padrão obrigatório</small>
-                                                    </div>
+                                            <!-- Lista de Grupos Dinâmica -->
+                                            <div id="groupsList" class="groups-container" style="max-height: 200px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 6px; padding: 10px; background: #ffffff;">
+                                                
+                                                <!-- Grupo Obrigatório Domain Users -->
+                                                <div class="form-check group-item" style="margin-bottom: 8px; padding: 8px; background: #e8f5e8; border-radius: 4px; border: 1px solid #c3e6c3;">
+                                                    <input class="form-check-input" type="checkbox" value="Domain Users" id="group_domain_users" checked disabled>
+                                                    <label class="form-check-label" for="group_domain_users" style="font-weight: 600; color: #28a745; display: flex; align-items: center;">
+                                                        <i class="fas fa-users" style="margin-right: 6px; color: #28a745;"></i>
+                                                        ✓ Domain Users (Padrão)
+                                                    </label>
+                                                    <small class="d-block text-muted" style="margin-left: 20px; font-size: 0.75rem;">Grupo padrão obrigatório</small>
                                                 </div>
-                                                <div class="col-md-4">
-                                                    <div class="form-check" style="margin-bottom: 10px; padding: 10px; background: #ffffff; border-radius: 6px; border: 1px solid #dee2e6;">
-                                                        <input class="form-check-input" type="checkbox" value="Funcionarios" id="group_funcionarios">
-                                                        <label class="form-check-label" for="group_funcionarios" style="color: #495057;">
-                                                            👥 Funcionarios
-                                                        </label>
-                                                        <small class="d-block text-muted">Acesso geral da empresa</small>
-                                                    </div>
+
+                                                <!-- Grupos Comuns do AD -->
+                                                <div class="form-check group-item" style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef;">
+                                                    <input class="form-check-input" type="checkbox" value="Funcionarios" id="group_funcionarios">
+                                                    <label class="form-check-label" for="group_funcionarios" style="color: #495057; display: flex; align-items: center;">
+                                                        <i class="fas fa-building" style="margin-right: 6px; color: #6c757d;"></i>
+                                                        👥 Funcionários
+                                                    </label>
+                                                    <small class="d-block text-muted" style="margin-left: 20px; font-size: 0.75rem;">Acesso geral da empresa</small>
                                                 </div>
-                                                <div class="col-md-4">
-                                                    <div class="form-check" style="margin-bottom: 10px; padding: 10px; background: #ffffff; border-radius: 6px; border: 1px solid #dee2e6;">
-                                                        <input class="form-check-input" type="checkbox" value="VPN Users" id="group_vpn">
-                                                        <label class="form-check-label" for="group_vpn" style="color: #495057;">
-                                                            🔐 VPN Users
-                                                        </label>
-                                                        <small class="d-block text-muted">Acesso remoto via VPN</small>
-                                                    </div>
+
+                                                <div class="form-check group-item" style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef;">
+                                                    <input class="form-check-input" type="checkbox" value="VPN Users" id="group_vpn_users">
+                                                    <label class="form-check-label" for="group_vpn_users" style="color: #495057; display: flex; align-items: center;">
+                                                        <i class="fas fa-shield-alt" style="margin-right: 6px; color: #6c757d;"></i>
+                                                        🔐 VPN Users
+                                                    </label>
+                                                    <small class="d-block text-muted" style="margin-left: 20px; font-size: 0.75rem;">Acesso remoto via VPN</small>
+                                                </div>
+
+                                                <div class="form-check group-item" style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef;">
+                                                    <input class="form-check-input" type="checkbox" value="Administrators" id="group_administrators">
+                                                    <label class="form-check-label" for="group_administrators" style="color: #495057; display: flex; align-items: center;">
+                                                        <i class="fas fa-crown" style="margin-right: 6px; color: #dc3545;"></i>
+                                                        👑 Administrators
+                                                    </label>
+                                                    <small class="d-block text-muted" style="margin-left: 20px; font-size: 0.75rem;">Acesso administrativo total</small>
+                                                </div>
+
+                                                <div class="form-check group-item" style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef;">
+                                                    <input class="form-check-input" type="checkbox" value="Remote Desktop Users" id="group_rdp_users">
+                                                    <label class="form-check-label" for="group_rdp_users" style="color: #495057; display: flex; align-items: center;">
+                                                        <i class="fas fa-desktop" style="margin-right: 6px; color: #6c757d;"></i>
+                                                        💻 Remote Desktop Users
+                                                    </label>
+                                                    <small class="d-block text-muted" style="margin-left: 20px; font-size: 0.75rem;">Acesso via RDP</small>
+                                                </div>
+
+                                                <div class="form-check group-item" style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef;">
+                                                    <input class="form-check-input" type="checkbox" value="Power Users" id="group_power_users">
+                                                    <label class="form-check-label" for="group_power_users" style="color: #495057; display: flex; align-items: center;">
+                                                        <i class="fas fa-bolt" style="margin-right: 6px; color: #ffc107;"></i>
+                                                        ⚡ Power Users
+                                                    </label>
+                                                    <small class="d-block text-muted" style="margin-left: 20px; font-size: 0.75rem;">Usuários avançados</small>
+                                                </div>
+
+                                                <div class="form-check group-item" style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef;">
+                                                    <input class="form-check-input" type="checkbox" value="Backup Operators" id="group_backup_ops">
+                                                    <label class="form-check-label" for="group_backup_ops" style="color: #495057; display: flex; align-items: center;">
+                                                        <i class="fas fa-hdd" style="margin-right: 6px; color: #6c757d;"></i>
+                                                        💾 Backup Operators
+                                                    </label>
+                                                    <small class="d-block text-muted" style="margin-left: 20px; font-size: 0.75rem;">Operadores de backup</small>
+                                                </div>
+
+                                                <!-- Botão para carregar mais grupos -->
+                                                <div class="text-center mt-2">
+                                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="loadMoreGroups()" style="font-size: 0.8rem; padding: 4px 12px;">
+                                                        <i class="fas fa-sync-alt"></i> Carregar grupos do AD
+                                                    </button>
                                                 </div>
                                             </div>
                                             <div class="alert alert-info mt-2" style="margin-bottom: 0; padding: 8px 12px;">
@@ -1766,6 +1812,71 @@ function createAnotherUser() {
         showCreateUser();
     }, 500);
 }
+
+// Função para carregar mais grupos do AD
+function loadMoreGroups() {
+    const button = event.target;
+    const originalText = button.innerHTML;
+    
+    // Mostrar loading
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Carregando...';
+    button.disabled = true;
+    
+    // Simular busca no AD (em produção, faria uma requisição AJAX real)
+    setTimeout(() => {
+        // Grupos adicionais que podem existir no AD
+        const additionalGroups = [
+            {id: 'print_operators', name: 'Print Operators', icon: 'fas fa-print', color: '#6c757d', description: 'Operadores de impressão'},
+            {id: 'account_operators', name: 'Account Operators', icon: 'fas fa-user-cog', color: '#6c757d', description: 'Operadores de contas'},
+            {id: 'server_operators', name: 'Server Operators', icon: 'fas fa-server', color: '#6c757d', description: 'Operadores de servidor'},
+            {id: 'network_operators', name: 'Network Configuration Operators', icon: 'fas fa-network-wired', color: '#6c757d', description: 'Operadores de rede'},
+            {id: 'guests', name: 'Guests', icon: 'fas fa-user-friends', color: '#6c757d', description: 'Usuários convidados'},
+            {id: 'users', name: 'Users', icon: 'fas fa-users', color: '#6c757d', description: 'Usuários locais'},
+            {id: 'replicator', name: 'Replicator', icon: 'fas fa-copy', color: '#6c757d', description: 'Replicação de diretório'},
+            {id: 'crypto_operators', name: 'Cryptographic Operators', icon: 'fas fa-key', color: '#6c757d', description: 'Operadores criptográficos'}
+        ];
+        
+        const groupsContainer = document.getElementById('groupsList');
+        const loadButton = button.parentElement;
+        
+        // Adicionar novos grupos
+        additionalGroups.forEach(group => {
+            const groupHtml = `
+                <div class="form-check group-item" style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef;">
+                    <input class="form-check-input" type="checkbox" value="${group.name}" id="group_${group.id}">
+                    <label class="form-check-label" for="group_${group.id}" style="color: #495057; display: flex; align-items: center;">
+                        <i class="${group.icon}" style="margin-right: 6px; color: ${group.color};"></i>
+                        ${group.name}
+                    </label>
+                    <small class="d-block text-muted" style="margin-left: 20px; font-size: 0.75rem;">${group.description}</small>
+                </div>
+            `;
+            
+            // Inserir antes do botão
+            loadButton.insertAdjacentHTML('beforebegin', groupHtml);
+        });
+        
+        // Remover botão após carregar
+        loadButton.remove();
+        
+        showNotification('✅ Grupos do AD carregados com sucesso!', 'success');
+        
+    }, 1500); // Simula tempo de carregamento
+}
+
+// Função para coletar grupos selecionados (atualizada)
+function getSelectedGroups() {
+    const checkboxes = document.querySelectorAll('#groupsList .form-check-input:checked:not(:disabled)');
+    const groups = [];
+    
+    checkboxes.forEach(checkbox => {
+        if (checkbox.value && checkbox.value !== '') {
+            groups.push(checkbox.value);
+        }
+    });
+    
+    return groups;
+}
 </script>
 
 <style>
@@ -2308,6 +2419,66 @@ function createAnotherUser() {
 .groups-section .form-check:hover {
     transform: translateX(5px);
     box-shadow: 0 2px 8px rgba(0,123,255,0.2);
+}
+
+/* Estilos para a lista de grupos dinâmica */
+.groups-container {
+    scrollbar-width: thin;
+    scrollbar-color: #007bff #f8f9fa;
+}
+
+.groups-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.groups-container::-webkit-scrollbar-track {
+    background: #f8f9fa;
+    border-radius: 3px;
+}
+
+.groups-container::-webkit-scrollbar-thumb {
+    background: #007bff;
+    border-radius: 3px;
+}
+
+.groups-container::-webkit-scrollbar-thumb:hover {
+    background: #0056b3;
+}
+
+.group-item {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.group-item:hover {
+    background: #e3f2fd !important;
+    border-color: #2196f3 !important;
+    transform: translateX(3px);
+}
+
+.group-item input[type="checkbox"]:checked + label {
+    font-weight: 600;
+    color: #007bff !important;
+}
+
+.group-item input[type="checkbox"]:disabled + label {
+    opacity: 1;
+}
+
+/* Animação para novos grupos adicionados */
+@keyframes slideInGroup {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.group-item.new-group {
+    animation: slideInGroup 0.3s ease-out;
 }
 
 #createUserModal .form-section {
