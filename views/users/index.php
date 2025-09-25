@@ -1031,29 +1031,67 @@ function showCreateUser() {
                                 
                                 <div class="col-md-4">
                                     <div class="form-section">
-                                        <h6 class="section-title"><i class="fas fa-users"></i> Grupos</h6>
+                                        <h6 class="section-title"><i class="fas fa-cogs"></i> Configurações Adicionais</h6>
                                         
                                         <div class="form-group">
-                                            <label for="createGroups">Adicionar aos Grupos:</label>
-                                            <div class="checkbox-group" style="max-height: 150px; overflow-y: auto; border: 1px solid #ced4da; padding: 10px; border-radius: 4px;">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" value="Domain Users" id="group_domain_users" checked disabled>
-                                                    <label class="form-check-label" for="group_domain_users">
-                                                        Domain Users (Padrão)
-                                                    </label>
+                                            <label for="createProfilePath">Perfil de Usuário:</label>
+                                            <input type="text" class="form-control" id="createProfilePath" placeholder="Ex: \\servidor\perfis\%username%">
+                                            <small class="form-text text-muted">Caminho do perfil móvel (opcional)</small>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="createHomeDrive">Unidade Home:</label>
+                                            <select class="form-control" id="createHomeDrive">
+                                                <option value="">Selecione uma unidade</option>
+                                                <option value="H:">H: (Padrão)</option>
+                                                <option value="Z:">Z:</option>
+                                                <option value="Y:">Y:</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Seção Grupos - Linha Dedicada -->
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="form-section" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); border: 2px solid #007bff; border-radius: 8px;">
+                                        <h6 class="section-title" style="color: #007bff;"><i class="fas fa-users"></i> 👥 Grupos do Active Directory</h6>
+                                        
+                                        <div class="form-group">
+                                            <label for="createGroups" style="font-weight: 600; color: #495057;">Adicionar aos Grupos:</label>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-check" style="margin-bottom: 10px; padding: 10px; background: #ffffff; border-radius: 6px; border: 1px solid #dee2e6;">
+                                                        <input class="form-check-input" type="checkbox" value="Domain Users" id="group_domain_users" checked disabled>
+                                                        <label class="form-check-label" for="group_domain_users" style="font-weight: 500; color: #28a745;">
+                                                            ✓ Domain Users (Padrão)
+                                                        </label>
+                                                        <small class="d-block text-muted">Grupo padrão obrigatório</small>
+                                                    </div>
                                                 </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" value="Funcionarios" id="group_funcionarios">
-                                                    <label class="form-check-label" for="group_funcionarios">
-                                                        Funcionarios
-                                                    </label>
+                                                <div class="col-md-4">
+                                                    <div class="form-check" style="margin-bottom: 10px; padding: 10px; background: #ffffff; border-radius: 6px; border: 1px solid #dee2e6;">
+                                                        <input class="form-check-input" type="checkbox" value="Funcionarios" id="group_funcionarios">
+                                                        <label class="form-check-label" for="group_funcionarios" style="color: #495057;">
+                                                            👥 Funcionarios
+                                                        </label>
+                                                        <small class="d-block text-muted">Acesso geral da empresa</small>
+                                                    </div>
                                                 </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" value="VPN Users" id="group_vpn">
-                                                    <label class="form-check-label" for="group_vpn">
-                                                        VPN Users
-                                                    </label>
+                                                <div class="col-md-4">
+                                                    <div class="form-check" style="margin-bottom: 10px; padding: 10px; background: #ffffff; border-radius: 6px; border: 1px solid #dee2e6;">
+                                                        <input class="form-check-input" type="checkbox" value="VPN Users" id="group_vpn">
+                                                        <label class="form-check-label" for="group_vpn" style="color: #495057;">
+                                                            🔐 VPN Users
+                                                        </label>
+                                                        <small class="d-block text-muted">Acesso remoto via VPN</small>
+                                                    </div>
                                                 </div>
+                                            </div>
+                                            <div class="alert alert-info mt-2" style="margin-bottom: 0; padding: 8px 12px;">
+                                                <i class="fas fa-info-circle"></i>
+                                                <strong>Importante:</strong> Domain Users é adicionado automaticamente. Selecione grupos adicionais conforme necessário.
                                             </div>
                                         </div>
                                     </div>
@@ -2245,8 +2283,8 @@ function createAnotherUser() {
 }
 
 #createUserModal .modal-body {
-    padding: 25px;
-    max-height: 95vh;
+    padding: 20px;
+    max-height: 100vh;
     overflow-y: auto;
 }
 
@@ -2286,6 +2324,24 @@ function createAnotherUser() {
     font-size: 0.7rem;
     font-weight: bold;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Garantir visibilidade da seção de Grupos */
+.groups-section {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef) !important;
+    border: 2px solid #007bff !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+}
+
+.groups-section .form-check {
+    transition: all 0.2s ease;
+}
+
+.groups-section .form-check:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0,123,255,0.2);
 }
 
 #createUserModal .form-section {
