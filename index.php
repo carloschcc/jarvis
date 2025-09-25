@@ -7,6 +7,17 @@
  * @description Sistema completo para gestão de usuários do Active Directory
  */
 
+// Servir arquivos estáticos quando usando servidor built-in do PHP
+if (php_sapi_name() === 'cli-server') {
+    $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $file_path = __DIR__ . $request_uri;
+    
+    // Se for um arquivo estático e existe, servir diretamente
+    if (is_file($file_path) && preg_match('/\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/i', $file_path)) {
+        return false; // Deixa o servidor built-in servir o arquivo
+    }
+}
+
 // Configurar sessões para funcionar em diferentes IPs
 ini_set('session.cookie_domain', '');
 ini_set('session.cookie_path', '/');

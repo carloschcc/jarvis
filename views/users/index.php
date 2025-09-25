@@ -517,7 +517,21 @@ function showResetPasswordModal(username) {
     
     // Adicionar e mostrar novo modal
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    $('#resetPasswordModal').modal('show');
+    
+    // Mostrar modal usando vanilla JavaScript
+    const modal = document.getElementById('resetPasswordModal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        if (!document.getElementById('modal-backdrop')) {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'modal-backdrop';
+            document.body.appendChild(backdrop);
+        }
+    }
 }
 
 // Executar reset de senha
@@ -544,7 +558,17 @@ function executePasswordReset(username) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            $('#resetPasswordModal').modal('hide');
+            // Fechar modal
+            const modal = document.getElementById('resetPasswordModal');
+            const backdrop = document.getElementById('modal-backdrop');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('show');
+                modal.remove();
+            }
+            if (backdrop) backdrop.remove();
+            document.body.classList.remove('modal-open');
+            
             showNotification(data.message, 'success');
         } else {
             showNotification('Erro: ' + data.message, 'error');
@@ -641,7 +665,21 @@ function showUserModal(user) {
     
     // Adicionar e mostrar novo modal
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    $('#userModal').modal('show');
+    
+    // Mostrar modal usando vanilla JavaScript
+    const modal = document.getElementById('userModal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        if (!document.getElementById('modal-backdrop')) {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'modal-backdrop';
+            document.body.appendChild(backdrop);
+        }
+    }
 }
 
 // Função para mostrar notificações
@@ -812,7 +850,7 @@ function showCreateUser() {
                         <h5 class="modal-title">
                             <i class="fas fa-user-plus"></i> Criar Novo Usuário no Active Directory
                         </h5>
-                        <button type="button" class="close" data-dismiss="modal" style="color: white; opacity: 0.8;">
+                        <button type="button" class="close" onclick="closeCreateUserModal()" style="color: white; opacity: 0.8;">
                             <span>&times;</span>
                         </button>
                     </div>
@@ -1046,7 +1084,7 @@ function showCreateUser() {
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <button type="button" class="btn btn-secondary" onclick="closeCreateUserModal()">
                             <i class="fas fa-times"></i> Cancelar
                         </button>
                         <button type="button" class="btn btn-success" onclick="createNewUser()">
@@ -1074,8 +1112,52 @@ function showCreateUser() {
     // Configurar controle da OU personalizada
     setupOUSelector();
     
-    // Mostrar modal
-    $('#createUserModal').modal('show');
+    // Mostrar modal usando vanilla JavaScript
+    const modal = document.getElementById('createUserModal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        // Adicionar backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade show';
+        backdrop.id = 'modal-backdrop';
+        backdrop.onclick = () => closeModal('createUserModal');
+        document.body.appendChild(backdrop);
+        
+        // Fechar modal com ESC
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                closeModal('createUserModal');
+                document.removeEventListener('keydown', handleEscape);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
+    }
+}
+
+// Função genérica para fechar modais
+function closeModal(modalId) {
+    const modal = modalId ? document.getElementById(modalId) : document.querySelector('.modal.show');
+    const backdrop = document.getElementById('modal-backdrop');
+    
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('show');
+        modal.remove(); // Remove completamente do DOM
+    }
+    
+    if (backdrop) {
+        backdrop.remove();
+    }
+    
+    document.body.classList.remove('modal-open');
+}
+
+// Função específica para fechar o modal de criação
+function closeCreateUserModal() {
+    closeModal('createUserModal');
 }
 
 // Função para editar usuário
@@ -1169,7 +1251,22 @@ function showEditUserModal(user) {
     
     // Adicionar e mostrar novo modal
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    $('#editUserModal').modal('show');
+    
+    // Mostrar modal usando vanilla JavaScript
+    const modal = document.getElementById('editUserModal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        // Adicionar backdrop se não existir
+        if (!document.getElementById('modal-backdrop')) {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'modal-backdrop';
+            document.body.appendChild(backdrop);
+        }
+    }
 }
 
 // Salvar edição do usuário
@@ -1194,7 +1291,17 @@ function saveUserEdit(username) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            $('#editUserModal').modal('hide');
+            // Fechar modal
+            const modal = document.getElementById('editUserModal');
+            const backdrop = document.getElementById('modal-backdrop');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('show');
+                modal.remove();
+            }
+            if (backdrop) backdrop.remove();
+            document.body.classList.remove('modal-open');
+            
             showNotification(data.message, 'success');
             setTimeout(() => window.location.reload(), 1500);
         } else {
@@ -1274,7 +1381,21 @@ function showUserGroupsModal(username, groups) {
     
     // Adicionar e mostrar novo modal
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    $('#userGroupsModal').modal('show');
+    
+    // Mostrar modal usando vanilla JavaScript
+    const modal = document.getElementById('userGroupsModal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        if (!document.getElementById('modal-backdrop')) {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'modal-backdrop';
+            document.body.appendChild(backdrop);
+        }
+    }
 }
 
 // Função para excluir usuário
@@ -1516,7 +1637,16 @@ function createNewUser() {
         createBtn.disabled = false;
         
         if (data.success) {
-            $('#createUserModal').modal('hide');
+            // Fechar modal
+            const modal = document.getElementById('createUserModal');
+            const backdrop = document.getElementById('modal-backdrop');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('show');
+                modal.remove();
+            }
+            if (backdrop) backdrop.remove();
+            document.body.classList.remove('modal-open');
             
             // Verificar se é modo simulação
             if (data.mode === 'simulation') {
@@ -1623,7 +1753,21 @@ function showSimulationSuccess(data) {
     
     // Adicionar e mostrar novo modal
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    $('#simulationResultModal').modal('show');
+    
+    // Mostrar modal usando vanilla JavaScript
+    const modal = document.getElementById('simulationResultModal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        if (!document.getElementById('modal-backdrop')) {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'modal-backdrop';
+            document.body.appendChild(backdrop);
+        }
+    }
     
     // Também mostrar notificação
     showNotification('🎭 Simulação realizada com sucesso! Usuário seria criado no AD.', 'success');
@@ -2049,6 +2193,43 @@ function createAnotherUser() {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Estilos gerais para modais */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1050;
+    display: none;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal.show {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1040;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-backdrop.show {
+    opacity: 0.5;
+}
+
+.modal-open {
+    overflow: hidden;
 }
 
 /* Estilos para o Modal de Criação de Usuário */
